@@ -569,9 +569,11 @@
     function gpxDocument(points, segments, source) {
       const stamp = new Date().toISOString(), image = source === 'Image trace — unverified';
       const warning = `UNVERIFIED SOURCE DATA — NOT FOR NAVIGATION. ${image ? 'Digitized from user-calibrated image pixels; position and line selection may be wrong.' : 'User-provided source geometry; not routed, repaired or verified.'} Trail status, access, closures, terrain and public transport are unverified. Segment gaps are preserved. Recorded times and unsupported extensions are omitted. No elevation is invented.`;
-      const ele = p => Number.isFinite(p.ele) ? `<ele>${p.ele}</ele>` : '';
-      const waypoints = points.map(p => `  <wpt lat="${p.lat}" lon="${p.lon}">${ele(p)}<name>${xmlText(p.name || 'Unverified waypoint')}</name><desc>Unverified reference point. Its original name does not determine the current travel direction.</desc></wpt>`).join('\n');
-      const track = segments.length ? `  <trk><name>${image ? 'Image reference trace' : 'Imported source track'} — UNVERIFIED</name><desc>${xmlText(warning)}</desc>\n${segments.map(seg => `    <trkseg>\n${seg.map(p => `      <trkpt lat="${p.lat}" lon="${p.lon}">${ele(p)}</trkpt>`).join('\n')}\n    </trkseg>`).join('\n')}\n  </trk>` : '';
+      // GPX uses XML decimal values, which must not contain exponent notation near 0°.
+      const decimal = value => value.toLocaleString('en-US', { useGrouping: false, maximumFractionDigits: 12 });
+      const ele = p => Number.isFinite(p.ele) ? `<ele>${decimal(p.ele)}</ele>` : '';
+      const waypoints = points.map(p => `  <wpt lat="${decimal(p.lat)}" lon="${decimal(p.lon)}">${ele(p)}<name>${xmlText(p.name || 'Unverified waypoint')}</name><desc>Unverified reference point. Its original name does not determine the current travel direction.</desc></wpt>`).join('\n');
+      const track = segments.length ? `  <trk><name>${image ? 'Image reference trace' : 'Imported source track'} — UNVERIFIED</name><desc>${xmlText(warning)}</desc>\n${segments.map(seg => `    <trkseg>\n${seg.map(p => `      <trkpt lat="${decimal(p.lat)}" lon="${decimal(p.lon)}">${ele(p)}</trkpt>`).join('\n')}\n    </trkseg>`).join('\n')}\n  </trk>` : '';
       return `<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="Trailcraft planning preview" xmlns="http://www.topografix.com/GPX/1/1">\n  <metadata><name>Trailcraft — unverified GPX draft</name><desc>${xmlText(warning)}</desc><time>${stamp}</time></metadata>\n${waypoints}\n${track}\n</gpx>\n`;
     }
     $('save-gpx').addEventListener('click', () => {

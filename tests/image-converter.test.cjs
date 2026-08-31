@@ -68,4 +68,6 @@ test('reversing swaps segment order and points, never joins gaps, and is involut
 test('waypoint-only GPX invents no track, and XML labels are escaped', () => {
   const gpx = gpxDocument([{ lat: 1, lon: 2, name: '<x & "y">' }], [], 'Coordinates');
   assert.doesNotMatch(gpx, /<trk/); assert.match(gpx, /&lt;x &amp; &quot;y&quot;&gt;/);
+  const nearZero = gpxDocument([{ lat: 0.0000001, lon: -0.0000002, ele: 0.0000003 }], [], 'Coordinates');
+  assert.match(nearZero, /lat="0.0000001" lon="-0.0000002"/); assert.match(nearZero, /<ele>0.0000003<\/ele>/);
 });
