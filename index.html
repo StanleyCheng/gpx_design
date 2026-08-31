@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#263e35">
+  <meta name="description" content="A careful start to your next hike. Import waypoints, review a map, and prepare a GPX planning draft. Verified trail routing is in development.">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Trailcraft — GPX route planner</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%23263e35'/%3E%3Cpath d='M12 46 29 17 39 34 45 25 55 46Z' fill='none' stroke='%23f5f3eb' stroke-width='4' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous">
+  <style>
+    :root{--paper:#f7f6f0;--white:#fffefa;--ink:#263e35;--muted:#667267;--line:#dce1d6;--soft:#edefe5;--accent:#bc4827;--accent-soft:#f9eee5;--danger:#a52a25;--map:#e3e9df;--shadow:0 8px 24px #263e350b;--font:'DM Sans',sans-serif;--display:'DM Serif Display',Georgia,serif}
+    *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:24px}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.6 var(--font)}button,input,textarea,select{font:inherit}button,a,input,select,textarea,summary{touch-action:manipulation}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.5}button,a{transition:background .16s,color .16s,border-color .16s}a{color:inherit;text-underline-offset:4px}button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:4px}svg{display:block}button svg{width:18px;height:18px}button{display:inline-flex;align-items:center;justify-content:center;gap:9px}h1,h2,h3,p{margin:0}h1,h2{font-family:var(--display);font-weight:400}h3{font-weight:600}button,.button{border:1px solid var(--line);border-radius:7px;padding:10px 16px;background:var(--white);color:var(--ink);font-weight:600;font-size:13px;min-height:44px;text-decoration:none}button:hover:not(:disabled),.button:hover{background:var(--soft)}.primary{background:var(--ink);border-color:var(--ink);color:var(--white)}.primary:hover:not(:disabled){background:var(--accent);border-color:var(--accent)}.text-button{padding:4px 0;background:transparent;border:0;border-radius:0;min-height:36px;color:var(--accent)}.text-button:hover:not(:disabled){background:transparent;text-decoration:underline}.small{font-size:12px;color:var(--muted)}.eyebrow{font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:700}.pill{display:inline-flex;align-items:center;gap:7px;background:var(--soft);border:1px solid var(--line);padding:5px 10px;border-radius:30px;font-size:11px;font-weight:600;white-space:nowrap}.pill::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--accent)}.mono{font-variant-numeric:tabular-nums;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}.skip{position:absolute;top:-100px;left:20px;z-index:9999;background:var(--white);padding:10px}.skip:focus{top:10px}[hidden]{display:none!important}
+    .shell{width:calc(100% - 96px);max-width:1440px;margin-inline:auto}.topbar{border-bottom:1px solid var(--line)}.topbar-inner{height:88px;display:flex;align-items:center;justify-content:space-between;gap:25px}.brand{display:flex;align-items:center;gap:12px;text-decoration:none}.brand-mark{width:39px;height:39px;padding:8px;background:var(--ink);color:var(--paper);border-radius:10px}.brand-name{font-family:var(--display);font-size:27px;letter-spacing:-.5px}.brand-subtitle{border-left:1px solid var(--line);padding-left:16px;margin-left:5px;font-size:12px;color:var(--muted)}nav{display:flex;align-items:center;gap:26px;font-size:13px}nav a{text-decoration:none}nav a:hover{color:var(--accent)}.hero{position:relative;padding:53px 0 39px;display:grid;grid-template-columns:1.4fr 1fr;gap:60px;align-items:center;overflow:hidden}.hero .eyebrow{display:flex;align-items:center;gap:9px;color:var(--accent);margin-bottom:16px}.hero .eyebrow::before{content:'';width:22px;height:1px;background:var(--accent)}h1{font-size:clamp(45px,5.1vw,73px);line-height:1.05;letter-spacing:-2px;max-width:780px}h1 em{font-weight:400;color:var(--accent)}.hero-copy{max-width:505px;color:var(--muted);margin-top:23px;font-size:15px}.hero-aside{position:relative;min-height:238px;display:flex;align-items:center;justify-content:center}.contours{position:absolute;width:100%;height:100%;opacity:.28}.field-note{position:relative;border:1px solid var(--line);background:var(--paper);padding:20px 25px;transform:rotate(-3deg);width:255px;box-shadow:var(--shadow)}.field-note .eyebrow{font-size:10px;letter-spacing:.11em;margin-bottom:12px}.field-note strong{display:block;font-family:var(--display);font-weight:400;font-size:24px;line-height:1.3;margin-bottom:12px}.field-note p{font-size:12px;color:var(--muted)}.field-note .note-number{display:block;margin-top:17px;padding-top:10px;border-top:1px solid var(--line);font-size:10px;color:var(--muted);letter-spacing:.1em}.safety-strip{display:flex;align-items:flex-start;gap:12px;border:1px solid var(--line);background:var(--soft);border-radius:7px;padding:13px 18px;font-size:12px;margin-bottom:32px}.safety-strip svg{width:20px;height:20px;flex-shrink:0;margin-top:1px}.safety-strip strong{font-weight:700}.safety-strip a{margin-left:auto;white-space:nowrap;font-weight:600}
+    .workspace{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(290px,1fr);gap:25px}.panel{border:1px solid var(--line);border-radius:10px;background:var(--white);overflow:hidden}.panel-heading{display:flex;align-items:center;gap:12px;padding:22px 25px 18px}.step{font-size:11px;color:var(--accent);border:1px solid var(--line);border-radius:50%;width:29px;height:29px;display:grid;place-items:center}.panel-heading h2{font-size:27px;line-height:1.2;letter-spacing:-.3px}.panel-body{padding:0 25px 25px}.field{display:block;font-size:12px;font-weight:600;margin-bottom:7px}.field-top{display:flex;align-items:center;justify-content:space-between;margin:19px 0 7px}.field-top .field{margin:0}.field-top span{font-size:10px;color:var(--muted)}select,input[type=text],input[type=date],textarea{border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);width:100%;padding:11px 13px}select{height:47px;cursor:pointer}textarea{resize:vertical;min-height:139px;font-size:13px;line-height:1.8}textarea::placeholder,input::placeholder{color:var(--muted);opacity:.8}.help{font-size:11px;color:var(--muted);margin-top:7px}.input-actions{display:flex;gap:15px;align-items:center;justify-content:space-between;margin-top:18px}.upload-area{position:relative;display:flex;align-items:center;justify-content:center;text-align:center;flex-direction:column;min-height:170px;padding:20px;border:1px dashed var(--muted);border-radius:7px;margin-top:18px;background:var(--paper)}.upload-area svg{width:27px;height:27px;color:var(--accent);margin-bottom:9px}.upload-area strong{font-weight:600;font-size:13px}.upload-area .small{margin:5px 0 12px}input[type=file]{max-width:100%;font-size:12px;color:var(--muted)}input[type=file]::file-selector-button{border:1px solid var(--line);border-radius:4px;background:var(--white);padding:7px 12px;color:var(--ink);margin-right:8px;cursor:pointer}.file-name{overflow-wrap:anywhere}.image-preview{margin-top:15px;border:1px solid var(--line);padding:10px;border-radius:6px}.image-preview img{max-width:100%;height:200px;object-fit:contain;display:block;margin:auto}.image-preview p{font-size:12px;margin:10px 0;color:var(--muted)}.image-confirm{display:flex;align-items:start;gap:8px;font-size:12px;margin-top:10px}.image-confirm input{margin-top:5px;accent-color:var(--ink)}.message{padding:12px 14px;margin-top:16px;border-radius:6px;background:var(--soft);border:1px solid var(--line);font-size:12px;overflow-wrap:anywhere}.message.error{color:var(--danger);border-color:var(--danger);background:var(--accent-soft)}.principles{padding:0 25px 20px}.principle{display:grid;grid-template-columns:25px 1fr;gap:12px;padding:17px 0;border-bottom:1px solid var(--line)}.principle:first-child{padding-top:5px}.principle:last-child{border-bottom:none;padding-bottom:0}.principle svg{width:21px;height:21px;color:var(--accent);margin-top:3px}.principle h3{font-size:13px}.principle p{font-size:12px;color:var(--muted);margin-top:4px}.principles-foot{border-top:1px solid var(--line);background:var(--paper);padding:14px 25px;display:flex;align-items:center;gap:8px;font-size:10px;color:var(--muted)}.principles-foot svg{height:14px;width:14px;flex-shrink:0}
+    .route-section{margin-top:35px}.section-title{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:15px}.section-title h2{font-size:29px;letter-spacing:-.3px}.section-title h2 span{font:11px var(--font);color:var(--accent);margin-right:10px}.section-title p{font-size:12px;color:var(--muted)}.route-options{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.route-option{position:relative;border:1px solid var(--line);border-radius:8px;padding:18px 21px;background:var(--white)}.route-option:first-child{border-top:3px solid var(--ink);padding-top:16px}.route-topline{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;color:var(--muted);font-size:10px;letter-spacing:.06em}.route-option h3{font-size:16px}.route-option p{font-size:12px;color:var(--muted);margin-top:5px;max-width:340px}.route-status{border-top:1px solid var(--line);padding-top:12px;margin-top:17px;font-size:11px;color:var(--muted);display:flex;gap:8px;align-items:center}.route-status svg{width:13px;height:13px}.coming-note{font-size:11px;color:var(--muted);margin:11px 0 24px}.map-section{margin-top:32px}.map-actions{display:flex;align-items:center;gap:8px}.map-container{position:relative;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--map)}#map{height:clamp(400px,58vh,720px);width:100%;isolation:isolate;background:var(--map)}.map-label{position:absolute;top:18px;left:65px;z-index:500;max-width:calc(100% - 130px);pointer-events:none;border:1px solid var(--line);background:var(--white);padding:8px 12px;border-radius:5px;font-size:11px;box-shadow:var(--shadow)}.map-label strong{font-weight:600}.map-label span{color:var(--muted);margin-left:7px}.map-empty{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);z-index:450;text-align:center;pointer-events:none;width:300px;max-width:calc(100% - 40px);background:var(--white);border:1px solid var(--line);padding:25px;border-radius:8px;box-shadow:var(--shadow)}.map-empty svg{width:32px;height:32px;margin:0 auto 12px;color:var(--accent)}.map-empty h3{font-family:var(--display);font-size:25px;font-weight:400}.map-empty p{font-size:12px;margin-top:8px;color:var(--muted)}.map-bottom{display:flex;justify-content:space-between;align-items:center;gap:15px;background:var(--white);padding:12px 17px;border-top:1px solid var(--line)}.map-bottom p{font-size:11px;color:var(--muted)}.map-bottom button{font-size:11px;padding:7px 10px;min-height:37px}.legend{display:flex;gap:15px;align-items:center}.legend-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:5px}.legend-dash{display:inline-block;width:16px;border-top:2px dashed var(--accent);margin:0 5px 3px 0}.number-pin{background:none;border:none}.number-pin span{display:grid;place-items:center;background:var(--ink);color:var(--white);border:3px solid var(--white);height:33px;width:33px;border-radius:50%;font:600 11px var(--font);box-shadow:0 2px 8px #263e3540}.leaflet-container{font-family:var(--font)}.leaflet-control-attribution{font-size:10px!important}.leaflet-popup-content{font-family:var(--font);line-height:1.6}.leaflet-popup-content span{display:block;color:var(--muted);font-size:11px}.map-unavailable{position:absolute;inset:0;display:grid;place-items:center;padding:30px;text-align:center}.map-footer{display:flex;justify-content:space-between;gap:20px;align-items:start;padding-top:16px}.export-actions{display:flex;flex-wrap:wrap;gap:8px}.export-note{font-size:11px;color:var(--muted);max-width:460px}.pin-list{margin-top:20px;border:1px solid var(--line);border-radius:8px;background:var(--white);overflow:hidden}.pin-list summary{padding:14px 18px;font-size:13px;font-weight:600;cursor:pointer}.pin-list ol{padding:0 18px 10px;margin:0;list-style:none;max-height:340px;overflow:auto}.pin-row{display:flex;align-items:center;gap:12px;border-top:1px solid var(--line);padding:11px 0;font-size:12px}.pin-index{color:var(--accent);font-size:11px;min-width:23px}.pin-info{flex:1;min-width:0}.pin-info strong{display:block;font-weight:600;overflow-wrap:anywhere}.pin-info span{font-size:11px;color:var(--muted)}.pin-row button{min-height:36px;padding:5px 10px;font-size:11px}
+    .method{border-top:1px solid var(--line);margin-top:42px;padding:30px 0;display:grid;grid-template-columns:1fr 1.8fr;gap:50px}.method h2{font-size:28px}.method-intro p{font-size:12px;color:var(--muted);margin-top:8px;max-width:280px}.method details{border-bottom:1px solid var(--line);padding:13px 0}.method details:first-child{padding-top:3px}.method summary{cursor:pointer;font-size:13px;font-weight:600}.method details p{font-size:12px;color:var(--muted);margin:12px 0;max-width:700px}.footer{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding:24px 0 32px;gap:20px;font-size:11px;color:var(--muted)}.footer-links{display:flex;gap:18px}.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--white);border:1px solid var(--muted);box-shadow:var(--shadow);z-index:2000;border-radius:7px;padding:12px 20px;max-width:calc(100% - 32px);font-size:12px}.noscript{padding:20px;background:var(--accent-soft);border:1px solid var(--accent);margin:20px}dialog{border:1px solid var(--line);border-radius:10px;background:var(--white);color:var(--ink);max-width:420px;width:calc(100% - 40px);padding:26px;box-shadow:var(--shadow)}dialog::backdrop{background:#263e3566}dialog h2{font-size:28px}dialog p{color:var(--muted);font-size:13px;margin:13px 0 20px}.dialog-actions{display:flex;justify-content:flex-end;gap:9px}
+    @media(min-width:1600px){.shell{max-width:1560px}.hero{padding-top:65px;padding-bottom:50px}.workspace{grid-template-columns:1.8fr 1fr}}
+    @media(max-width:1000px){.shell{width:calc(100% - 48px)}.brand-subtitle{display:none}.hero{gap:20px}.hero-aside{min-height:220px}.workspace{grid-template-columns:minmax(0,1.4fr) minmax(260px,1fr)}.panel-heading,.panel-body{padding-left:20px;padding-right:20px}.principles{padding-left:20px;padding-right:20px}.map-footer{flex-direction:column}.route-option{padding:16px}.route-option:first-child{padding-top:14px}.safety-strip a{display:none}}
+    @media(max-width:720px){.shell{width:calc(100% - 32px)}.topbar-inner{height:72px}.brand-name{font-size:25px}nav{gap:15px}nav .nav-method{display:none}.hero{grid-template-columns:1fr;padding:35px 0 28px}.hero-aside{display:none}h1{font-size:51px;letter-spacing:-1.8px}.hero-copy{margin-top:17px;font-size:14px}.safety-strip{padding:12px 14px;margin-bottom:22px}.workspace{grid-template-columns:1fr;gap:18px}.panel-heading{padding-top:20px}.principles{display:grid;grid-template-columns:1fr;gap:0}.route-section{margin-top:26px}.section-title{align-items:start}.section-title h2{font-size:25px}.section-title p{max-width:130px;font-size:10px;text-align:right}.route-options{grid-template-columns:1fr;gap:10px}.route-option{display:grid;grid-template-columns:1fr auto;gap:0 20px}.route-topline{grid-column:1/-1;margin-bottom:4px}.route-option h3{font-size:15px}.route-option p{grid-column:1;margin-top:2px}.route-status{grid-column:2;grid-row:2/4;border:0;padding:0;margin:0;max-width:95px;font-size:10px}.coming-note{font-size:10px}.map-section{margin-top:25px}.map-section .section-title{align-items:center}.map-actions button{padding:8px 10px;font-size:11px}#map{height:470px}.map-label{top:13px;left:57px;padding:7px 9px;max-width:calc(100% - 75px);font-size:10px}.map-label span{display:none}.map-bottom{align-items:flex-start;padding:12px}.legend{flex-direction:column;align-items:flex-start;gap:3px}.map-footer{gap:12px}.export-actions{width:100%}.export-actions button{flex:1;font-size:11px;padding:9px 10px}.method{grid-template-columns:1fr;gap:22px;margin-top:30px;padding-top:25px}.method-intro p{max-width:none}.footer{align-items:flex-start;flex-direction:column;gap:9px}.pill{font-size:10px;padding:4px 8px}.input-actions{gap:10px}.input-actions button{font-size:12px;padding-inline:12px}}
+    .privacy-button{font-size:11px;padding:0;min-height:auto;border:0;background:transparent;font-weight:400;text-decoration:underline;text-underline-offset:4px;color:var(--muted)}.consent{position:fixed;left:24px;bottom:24px;z-index:1900;background:var(--white);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 40px #263e3526;padding:19px 21px;width:410px;max-width:calc(100% - 32px)}.consent h2{font:600 14px var(--font)}.consent p{font-size:12px;color:var(--muted);margin:8px 0 14px}.consent-actions{display:flex;gap:8px}.consent-actions button{flex:1;font-size:12px}.consent-dismiss{margin-top:9px;font-size:11px}.consent .small{display:block;margin-top:10px}@media(max-width:720px){.consent{left:16px;bottom:16px}.footer-links{flex-wrap:wrap;gap:14px}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+  </style>
+</head>
+<body>
+  <a class="skip" href="#planner">Skip to route planner</a>
+  <header class="topbar"><div class="shell topbar-inner">
+    <a href="#" class="brand" aria-label="Trailcraft home"><svg class="brand-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="m2 26 12-21 7 12 4-7 7 16Z" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round"/><path d="m9 14 5 2 4-3" stroke="currentColor" stroke-width="1.7"/></svg><span class="brand-name">trailcraft</span><span class="brand-subtitle">GPX ROUTE PLANNER</span></a>
+    <nav aria-label="Main navigation"><a href="#planner">Planner</a><a href="#approach" class="nav-method">Our approach</a><span class="pill">Early preview</span></nav>
+  </div></header>
+  <noscript><p class="noscript">JavaScript is required to import files and use the map. This early preview does not generate verified hiking routes.</p></noscript>
+  <main class="shell">
+    <section class="hero" aria-labelledby="hero-title">
+      <div><p class="eyebrow">Thoughtful routes. Better days outside.</p><h1 id="hero-title">Find your way.<br><em>Keep to the trail.</em></h1><p class="hero-copy">Turn your waypoints into the start of a considered hike. Official trails first. Practical arrivals and departures. Every connection accounted for.</p></div>
+      <div class="hero-aside" aria-hidden="true"><svg class="contours" viewBox="0 0 450 260" fill="none" stroke="currentColor" stroke-width="1"><path d="M-20 170C40 270 163 12 240 52S374 328 480 155M-20 149C41 247 158-7 249 32S380 303 480 135M-20 127C56 229 164-28 260 12S397 273 480 112M-20 106C69 218 167-47 270-9S420 250 480 90M-20 84C80 198 170-68 279-30S442 234 480 70M-20 194C25 291 155 35 229 73S353 345 480 182M-20 215C21 309 144 64 219 94S337 368 480 203M-20 237C17 329 125 87 209 116S322 381 480 223M-20 257C16 350 115 108 197 137S299 400 480 245"/></svg><div class="field-note"><p class="eyebrow">A note from the trail</p><strong>The best route<br>is one you can verify.</strong><p>A map is a starting point.<br>Evidence makes the difference.</p><span class="note-number">FIELD NOTES &nbsp; / &nbsp; Nº 001</span></div></div>
+    </section>
+    <div class="safety-strip"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6Z" stroke="currentColor" stroke-width="1.5"/><path d="m8 12 3 3 5-6" stroke="currentColor" stroke-width="1.5"/></svg><p><strong>Planning preview, not a navigation tool.</strong> Official trail verification, closures, and transit checks are not connected yet. No route is certified safe.</p><a href="#approach">Read the safeguards ↗</a></div>
+    <section id="planner" class="workspace" aria-label="Plan your hike">
+      <div class="panel"><div class="panel-heading"><span class="step">01</span><h2>Start with your waypoints</h2></div><div class="panel-body">
+        <label class="field" for="input-method">How would you like to add them?</label>
+        <select id="input-method"><option value="coordinates">Paste coordinates</option><option value="text">Upload a text or CSV file</option><option value="gpx">Upload a GPX file</option><option value="image">Review a map image or photo</option></select>
+        <div id="coordinates-panel"><div class="field-top"><label class="field" for="coordinates">Coordinates</label><span>WGS84 · LATITUDE, LONGITUDE</span></div><textarea id="coordinates" spellcheck="false" aria-describedby="coordinate-help" placeholder="22.361976, 114.371535&#10;22.371935, 114.373133&#10;22.394868, 114.360075"></textarea><p class="help" id="coordinate-help">Decimal degrees. One latitude/longitude pair per line, or comma-separated pairs. No trail connections are assumed.</p><div class="input-actions"><button id="preview-points" class="primary">Preview waypoints <span aria-hidden="true">↗</span></button><button id="load-example" class="text-button">Try example pins</button></div></div>
+        <div id="file-panel" hidden><div class="upload-area"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 16V3m-4 4 4-4 4 4M4 14v6h16v-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><strong id="upload-title">Choose your coordinate file</strong><p id="upload-help" class="small">TXT or CSV · maximum 10 MB</p><label class="field" for="file-input">Select a file</label><input id="file-input" type="file" accept=".txt,.csv,text/plain,text/csv" aria-describedby="upload-help"></div><p class="help">Import replaces the current draft. Review your file before using any points.</p><div id="image-review" class="image-preview" hidden><img id="photo" alt="Your uploaded map image for manual location review"><p id="photo-status" role="status"></p><label id="photo-confirm-label" class="image-confirm" hidden><input type="checkbox" id="photo-confirm"><span>I checked this GPS position on an independent map and want to add it as a waypoint. It may be the camera location, not the map location.</span></label><button id="add-photo-gps" hidden disabled>Add confirmed photo position</button><p class="help">Automatic map and waypoint recognition is not available in this release. Use the coordinate input or “Add pins on map” after identifying the area yourself.</p></div></div>
+        <p id="input-message" class="message" role="status" aria-live="polite" hidden></p>
+      </div></div>
+      <aside class="panel" aria-labelledby="principles-title"><div class="panel-heading"><span class="step">↗</span><h2 id="principles-title">A little more considered</h2></div><div class="principles">
+        <div class="principle"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m3 20 8-16 5 9 3-5 4 12ZM8 10l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg><div><h3>Official trails come first</h3><p>Government-managed routes are the priority. A mapped path alone is not proof of official status or safe access.</p></div></div>
+        <div class="principle"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="3" width="14" height="16" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M5 11h14M8 19l-2 3m10-3 2 3M9 15h.01M15 15h.01" stroke="currentColor" stroke-width="2"/></svg><div><h3>Get there. Get home.</h3><p>Both ends need usable public transport, with service dates and last departures checked—not just a nearby stop.</p></div></div>
+        <div class="principle"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="6" cy="5" r="2" stroke="currentColor" stroke-width="1.5"/><circle cx="18" cy="19" r="2" stroke="currentColor" stroke-width="1.5"/><path d="M6 7v6c0 5 12-7 12-1v5" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 2"/></svg><div><h3>No made-up connections</h3><p>Waypoints stay separate until a real trail connection can be verified. Fewer qualifying routes is always acceptable.</p></div></div>
+      </div><div class="principles-foot"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.5"/></svg>Files are processed in your browser. No file uploads.</div></aside>
+    </section>
+    <section class="route-section" aria-labelledby="routes-title"><div class="section-title"><h2 id="routes-title"><span>02</span>Room for three good options</h2><p>Verified routing in development</p></div><div class="route-options">
+      <article class="route-option"><div class="route-topline"><span>OPTION 01</span><span>OUR FIRST PRIORITY</span></div><h3>Official trails first</h3><p>Prefer verified government-managed trails with practical transit connections.</p><div class="route-status"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6" stroke="currentColor"/><path d="M8 4v4l3 2" stroke="currentColor"/></svg>Awaiting verified data</div></article>
+      <article class="route-option"><div class="route-topline"><span>OPTION 02</span><span>TAKE IT EASIER</span></div><h3>A gentler day out</h3><p>Compare distance and ascent within the same trail and access safeguards.</p><div class="route-status"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6" stroke="currentColor"/><path d="M8 4v4l3 2" stroke="currentColor"/></svg>Awaiting verified data</div></article>
+      <article class="route-option"><div class="route-topline"><span>OPTION 03</span><span>MAKE A DAY OF IT</span></div><h3>The scenic alternative</h3><p>Explore worthwhile viewpoints without relaxing the route requirements.</p><div class="route-status"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6" stroke="currentColor"/><path d="M8 4v4l3 2" stroke="currentColor"/></svg>Awaiting verified data</div></article>
+    </div><p class="coming-note">These are planned comparison categories, not generated routes. Route generation and navigation-track export remain unavailable until the safety checks are connected.</p></section>
+    <section class="map-section" aria-labelledby="map-title"><div class="section-title"><h2 id="map-title"><span>03</span>See the bigger picture</h2><div class="map-actions"><button id="fit-points" disabled>Fit all points <span aria-hidden="true">⤢</span></button></div></div>
+      <div id="map-capture" class="map-container"><div id="map" aria-label="Interactive map for reviewing waypoint locations"></div><div class="map-label"><strong id="map-caption">Your planning canvas</strong><span id="map-count">No waypoints added</span></div><div id="map-empty" class="map-empty"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M25 13c0 7-9 16-9 16S7 20 7 13a9 9 0 1 1 18 0Z" stroke="currentColor" stroke-width="1.5"/><circle cx="16" cy="13" r="3" stroke="currentColor" stroke-width="1.5"/></svg><h3>Every hike starts somewhere.</h3><p>Add coordinates above, or place your own pins on the map. Your whole draft will fit here.</p></div><div class="map-bottom"><p class="legend"><span><span class="legend-dot"></span>Waypoints, not a routed trail</span><span id="track-legend" hidden><span class="legend-dash"></span>Unverified imported track</span></p><button id="toggle-pins" aria-pressed="false">+ Add pins on map</button></div></div>
+      <div class="map-footer"><p class="export-note" id="export-note">Exports are planning drafts only. GPX contains waypoints, never an invented trail. PNG includes a visible “not for navigation” warning.</p><div class="export-actions"><button id="save-png" disabled>Save preview as PNG <span aria-hidden="true">↓</span></button><button id="save-gpx" class="primary" disabled>Save waypoints as GPX <span aria-hidden="true">↓</span></button><button id="discard" disabled>Discard</button></div></div>
+      <details id="waypoint-list" class="pin-list" hidden><summary id="waypoint-summary">Review your waypoints</summary><ol id="waypoints"></ol></details>
+    </section>
+    <section id="approach" class="method" aria-labelledby="method-title"><div class="method-intro"><p class="eyebrow">Built with care</p><h2 id="method-title">Know what’s behind<br>your route.</h2><p>Clear limits are part of the product.<br>Here’s what this first release can—and cannot—do.</p></div><div>
+      <details open><summary>What works in this preview?</summary><p>Paste decimal coordinates, import TXT/CSV or GPX files, review map images, read supported photo GPS metadata, place map pins, and save a planning PNG or waypoint-only GPX. Imported track segments remain separate and are shown as unverified. Nothing is snapped or repaired automatically.</p></details>
+      <details><summary>What must happen before route generation?</summary><p>We need regional government trail sources, access and closure information, real path-network routing, and dated public-transport checks. The gpx-trail-fix workflow requires real OpenStreetMap geometry, trail-relation checks, honest elevation statistics, and transit caveats. Its Python route repair is not running inside this page. Hiking relations alone do not establish government management.</p><p>Distance, ascent, travel time, and safety scores are intentionally absent until they can be supported. Unknown conditions must not silently pass a safety check.</p></details>
+      <details><summary>How are map photos handled?</summary><p>Images are viewed locally. When readable GPS metadata exists, we show the camera position for your confirmation. This does not identify where a photographed map is located or recognize its waypoints. Automatic image recognition is still to be built; place pins or enter coordinates after independently identifying the map area.</p></details>
+      <details id="privacy-details"><summary>Where does my data go?</summary><p>This app does not upload your files or store your draft between visits. Google Analytics loads only if you allow optional analytics. It measures page views and fixed app-action names, plus standard browser/device and approximate location data. We do not send coordinates, filenames, photos, GPX contents, typed text, query strings, or referrer URLs to Analytics. Automatic enhanced measurement and advertising features are disabled. You can withdraw consent using “Privacy settings” below. Browser privacy signals and blockers may prevent tracking.</p><p>Your analytics choice is stored locally; analytics cookies, if accepted, are limited to this project. GitHub hosts the page; Google Fonts and the pinned Leaflet and Exifr libraries load from external providers. OpenStreetMap receives requests for the map tiles you view, which reveal the approximate area and your IP address. PNG export uses tiles already displayed; it does not download an offline map. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google privacy policy</a>.</p></details>
+    </div></section>
+    <footer class="footer"><p>trailcraft &nbsp; / &nbsp; A more considered way outside.</p><div class="footer-links"><button id="privacy-settings" class="privacy-button">Privacy settings</button><a href="https://github.com/StanleyCheng/gpx_design" target="_blank" rel="noopener noreferrer">View source ↗</a><a href="https://github.com/StanleyCheng/gpx_design/issues" target="_blank" rel="noopener noreferrer">Feedback ↗</a><a href="https://www.openstreetmap.org/fixthemap" target="_blank" rel="noopener noreferrer">Map issues ↗</a></div></footer>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <aside id="analytics-consent" class="consent" aria-labelledby="consent-title" hidden><h2 id="consent-title">Help improve the next hike?</h2><p>Optional Google Analytics measures visits and basic app actions. Your coordinates, files, and photos are excluded. The planner works the same either way.</p><div class="consent-actions"><button id="analytics-decline">No thanks</button><button id="analytics-accept">Allow analytics</button></div><button id="consent-close" class="text-button consent-dismiss" hidden>Keep current choice</button><span class="small" id="consent-status"></span></aside>
+  <dialog id="discard-dialog" aria-labelledby="discard-title"><h2 id="discard-title">Discard this draft?</h2><p>This removes the current waypoints, imported tracks, and image from this page. Your original files are never changed.</p><div class="dialog-actions"><button id="keep-draft">Keep draft</button><button id="confirm-discard" class="primary">Discard draft</button></div></dialog>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/lite.umd.js" crossorigin="anonymous"></script>
+  <script>
+  'use strict';
+  (() => {
+    const $ = id => document.getElementById(id);
+    const state = { points: [], segments: [], source: '', imageUrl: null, photoGPS: null, adding: false, fileVersion: 0 };
+    const MAX_WAYPOINTS = 500, MAX_TRACKPOINTS = 100000;
+    let map = null, markers = null, tracks = null, tileLayer = null, toastTimer;
+    const GA_MEASUREMENT_ID = 'G-YF4QD5R18X';
+    const GA_PAGE = 'https://stanleycheng.github.io/gpx_design/';
+    const CONSENT_KEY = 'trailcraft.analytics-consent.v1';
+    const analyticsProduction = location.hostname === 'stanleycheng.github.io' && location.pathname.startsWith('/gpx_design/');
+    const privacySignal = navigator.globalPrivacyControl === true || navigator.doNotTrack === '1';
+    const analyticsEvents = new Set(['waypoints_previewed','file_imported','photo_reviewed','photo_gps_confirmed','map_pin_added','gpx_exported','png_exported','draft_discarded']);
+    let analyticsChoice = null, analyticsStarted = false;
+    try { const stored = JSON.parse(localStorage.getItem(CONSENT_KEY)); if (stored && ['granted','denied'].includes(stored.value) && Date.now() - stored.at < 180 * 86400000) analyticsChoice = stored.value; } catch {}
+    function gtag() { window.dataLayer = window.dataLayer || []; window.dataLayer.push(arguments); }
+    function track(name) { if (analyticsStarted && analyticsChoice === 'granted' && !privacySignal && analyticsEvents.has(name)) gtag('event', name, { send_to: GA_MEASUREMENT_ID, page_location: GA_PAGE, page_title: 'Trailcraft — GPX route planner', page_referrer: '' }); }
+    function startAnalytics() {
+      if (!analyticsProduction || privacySignal || analyticsChoice !== 'granted') return;
+      window['ga-disable-' + GA_MEASUREMENT_ID] = false;
+      if (analyticsStarted) { gtag('consent', 'update', { analytics_storage: 'granted' }); return; }
+      analyticsStarted = true;
+      gtag('consent', 'default', { analytics_storage: 'granted', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' });
+      gtag('js', new Date());
+      gtag('config', GA_MEASUREMENT_ID, { send_page_view: false, page_location: GA_PAGE, page_title: 'Trailcraft — GPX route planner', page_referrer: '', allow_google_signals: false, allow_ad_personalization_signals: false, cookie_prefix: 'trailcraft', cookie_domain: 'none', cookie_path: '/gpx_design/', cookie_expires: 90 * 86400, cookie_flags: 'SameSite=Lax;Secure' });
+      gtag('event', 'page_view', { send_to: GA_MEASUREMENT_ID, page_location: GA_PAGE, page_title: 'Trailcraft — GPX route planner', page_referrer: '' });
+      const script = document.createElement('script'); script.async = true; script.id = 'trailcraft-google-tag'; script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`; script.referrerPolicy = 'origin'; script.onerror = () => { toast('Analytics could not load. All planning tools still work.'); }; document.head.append(script);
+    }
+    function analyticsStatus() { $('consent-status').textContent = privacySignal ? 'Your browser privacy signal is respected. Analytics stays off.' : !analyticsProduction ? 'Tracking is off on local and preview copies.' : `Current choice: ${analyticsChoice === 'granted' ? 'analytics allowed' : 'analytics off'}. No ad personalisation.`; $('analytics-accept').disabled = privacySignal; }
+    function chooseAnalytics(value) {
+      analyticsChoice = value;
+      try { localStorage.setItem(CONSENT_KEY, JSON.stringify({ value, at: Date.now() })); } catch {}
+      if (value === 'granted') startAnalytics();
+      else {
+        window['ga-disable-' + GA_MEASUREMENT_ID] = true;
+        if (analyticsStarted) gtag('consent', 'update', { analytics_storage: 'denied', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' });
+        for (const cookie of document.cookie.split(';')) { const name = cookie.split('=')[0].trim(); if (name.startsWith('trailcraft_')) document.cookie = `${name}=; Max-Age=0; Path=/gpx_design/; SameSite=Lax; Secure`; }
+      }
+      $('analytics-consent').hidden = true; analyticsStatus();
+    }
+    $('analytics-accept').addEventListener('click', () => chooseAnalytics('granted'));
+    $('analytics-decline').addEventListener('click', () => chooseAnalytics('denied'));
+    $('privacy-settings').addEventListener('click', () => { analyticsStatus(); $('consent-close').hidden = !analyticsChoice; $('analytics-consent').hidden = false; $('analytics-decline').focus(); });
+    $('consent-close').addEventListener('click', () => { $('analytics-consent').hidden = true; });
+    analyticsStatus();
+    if (!analyticsChoice && !privacySignal && analyticsProduction) $('analytics-consent').hidden = false;
+    if (analyticsChoice === 'granted') startAnalytics();
+    const element = (tag, text, className) => { const el = document.createElement(tag); if (text !== undefined) el.textContent = text; if (className) el.className = className; return el; };
+    const point = (lat, lon, name) => {
+      if (lat == null || lon == null || String(lat).trim() === '' || String(lon).trim() === '') throw new Error('A point is missing a latitude or longitude.');
+      lat = Number(lat); lon = Number(lon);
+      if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) throw new Error('Coordinates must be valid WGS84 decimal degrees: latitude −90 to 90, longitude −180 to 180.');
+      return { lat, lon, name: String(name || 'Waypoint').slice(0, 180) };
+    };
+    function message(text, error = false) { $('input-message').textContent = text; $('input-message').classList.toggle('error', error); $('input-message').hidden = false; }
+    function toast(text) { clearTimeout(toastTimer); $('toast').textContent = text; $('toast').hidden = false; toastTimer = setTimeout(() => { $('toast').hidden = true; }, 5500); }
+    function parseCoordinates(text) {
+      text = text.trim().replace(/^\uFEFF/, '').replace(/^lat(?:itude)?\s*[,;\t]\s*(?:lon(?:gitude)?|lng)\s*(?:\r?\n|\r)/i, '');
+      if (!text) throw new Error('Add at least one latitude/longitude pair first.');
+      const lines = text.split(/\r\n|\r|\n/).filter(line => line.trim());
+      const pairs = [];
+      for (let i = 0; i < lines.length; i++) {
+        if (/[,;]\s*[,;]/.test(lines[i]) || /^[,;]/.test(lines[i].trim()) || /[,;]$/.test(lines[i].trim())) throw new Error(`Line ${i + 1}: a coordinate value is empty. Check for extra commas or semicolons.`);
+        const tokens = lines[i].trim().split(/[,;\t ]+/);
+        if (tokens.some(token => !/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(token))) throw new Error(`Line ${i + 1}: use decimal numbers separated by commas or spaces. Text labels and empty values are not supported.`);
+        if (tokens.length % 2) throw new Error(`Line ${i + 1}: every latitude needs a longitude. Use one pair per line or comma-separated pairs.`);
+        for (let j = 0; j < tokens.length; j += 2) pairs.push(point(tokens[j], tokens[j + 1], `Waypoint ${pairs.length + 1}`));
+      }
+      if (pairs.length > MAX_WAYPOINTS) throw new Error(`Keep planning inputs to ${MAX_WAYPOINTS} waypoints or fewer.`);
+      return pairs;
+    }
+    function parseGPX(text) {
+      if (/<!DOCTYPE|<!ENTITY/i.test(text)) throw new Error('GPX files containing document types or entities are not supported.');
+      const xml = new DOMParser().parseFromString(text, 'application/xml');
+      if (xml.getElementsByTagName('parsererror').length || xml.documentElement.localName !== 'gpx') throw new Error('This file is not valid GPX XML.');
+      const child = (el, name) => Array.from(el.children).find(node => node.localName === name);
+      const read = (el, index) => point(el.getAttribute('lat'), el.getAttribute('lon'), child(el, 'name')?.textContent || `Waypoint ${index + 1}`);
+      const all = Array.from(xml.getElementsByTagName('*'));
+      const pts = all.filter(el => el.localName === 'wpt').map(read);
+      const groups = all.filter(el => el.localName === 'trkseg' || el.localName === 'rte');
+      const segments = groups.map(group => Array.from(group.children).filter(el => el.localName === 'trkpt' || el.localName === 'rtept').map(read)).filter(seg => seg.length);
+      if (segments.reduce((sum, seg) => sum + seg.length, 0) > MAX_TRACKPOINTS) throw new Error(`This GPX exceeds ${MAX_TRACKPOINTS.toLocaleString()} trackpoints. Please use a smaller file.`);
+      if (!pts.length && segments.length) {
+        segments.forEach((segment, i) => { pts.push({ ...segment[0], name: `Segment ${i + 1} start (unverified)` }); if (segment.length > 1) pts.push({ ...segment.at(-1), name: `Segment ${i + 1} end (unverified)` }); });
+      }
+      if (!pts.length) throw new Error('No waypoints or track coordinates were found in this GPX.');
+      if (pts.length > MAX_WAYPOINTS) throw new Error(`This GPX has too many waypoints or segments. Maximum ${MAX_WAYPOINTS} planning waypoints.`);
+      return { points: pts, segments };
+    }
+    function fitPoints() {
+      if (!map) return;
+      const coords = [...state.points.map(p => [p.lat, p.lon]), ...state.segments.flatMap(seg => seg.map(p => [p.lat, p.lon]))];
+      if (!coords.length) return;
+      map.fitBounds(L.latLngBounds(coords), { padding: [55, 70], maxZoom: 15, animate: false });
+    }
+    function render(fit = true) {
+      if (map) {
+        markers.clearLayers(); tracks.clearLayers();
+        state.segments.forEach(seg => L.polyline(seg.map(p => [p.lat, p.lon]), { color: '#bc4827', weight: 3, dashArray: '7 7', opacity: .8 }).addTo(tracks));
+        state.points.forEach((p, i) => {
+          const popup = element('div'); popup.append(element('strong', p.name), element('span', `${p.lat.toFixed(6)}, ${p.lon.toFixed(6)}`), element('span', 'Unverified waypoint · not a routed trail'));
+          L.marker([p.lat, p.lon], { icon: L.divIcon({ className: 'number-pin', html: `<span>${i + 1}</span>`, iconSize: [33, 33], iconAnchor: [16, 16] }), title: `${i + 1}. ${p.name}`, alt: p.name }).bindPopup(popup).addTo(markers);
+        });
+        if (fit) fitPoints();
+      }
+      const hasPoints = state.points.length > 0;
+      const hasGeometry = hasPoints || state.segments.length > 0;
+      $('map-empty').hidden = hasGeometry || !map;
+      $('map-caption').textContent = hasGeometry ? 'Unverified planning draft' : 'Your planning canvas';
+      $('map-count').textContent = hasGeometry ? `${state.points.length} waypoint${state.points.length === 1 ? '' : 's'} · no verified route` : 'No waypoints added';
+      $('track-legend').hidden = !state.segments.length;
+      $('save-gpx').disabled = !hasPoints;
+      $('save-png').disabled = !hasGeometry || !map;
+      $('fit-points').disabled = !hasGeometry || !map;
+      $('discard').disabled = !hasGeometry && !state.imageUrl;
+      $('waypoint-list').hidden = !hasPoints;
+      $('waypoint-summary').textContent = `Review ${state.points.length} waypoint${state.points.length === 1 ? '' : 's'}${state.segments.length ? ' · imported track is unverified' : ''}`;
+      const list = document.createDocumentFragment();
+      state.points.forEach((p, i) => { const row = element('li', undefined, 'pin-row'), info = element('div', undefined, 'pin-info'); info.append(element('strong', p.name), element('span', `${p.lat.toFixed(6)}, ${p.lon.toFixed(6)}`, 'mono')); const remove = element('button', 'Remove'); remove.type = 'button'; remove.setAttribute('aria-label', `Remove waypoint ${i + 1}: ${p.name}`); remove.addEventListener('click', () => { state.points.splice(i, 1); render(false); toast('Waypoint removed. Any imported track remains unchanged.'); }); row.append(element('span', String(i + 1).padStart(2, '0'), 'pin-index mono'), info, remove); list.append(row); });
+      $('waypoints').replaceChildren(list);
+    }
+    function replaceDraft(points, segments, source) { state.points = points; state.segments = segments; state.source = source; render(); }
+    function clearPhoto() {
+      if (state.imageUrl) URL.revokeObjectURL(state.imageUrl);
+      state.imageUrl = null; state.photoGPS = null; $('photo').removeAttribute('src'); $('image-review').hidden = true; $('photo-confirm').checked = false; $('photo-confirm-label').hidden = true; $('add-photo-gps').hidden = true; $('add-photo-gps').disabled = true;
+    }
+    $('input-method').addEventListener('change', () => {
+      const method = $('input-method').value; state.fileVersion++;
+      $('coordinates-panel').hidden = method !== 'coordinates'; $('file-panel').hidden = method === 'coordinates'; $('input-message').hidden = true; $('file-input').value = '';
+      const config = { text: ['Choose your coordinate file', 'TXT or CSV · maximum 10 MB', '.txt,.csv,text/plain,text/csv'], gpx: ['Choose your GPX file', 'GPX · maximum 10 MB · preview only', '.gpx,application/gpx+xml,application/xml,text/xml'], image: ['Choose your map image or photo', 'JPEG, PNG or WebP · maximum 10 MB · local processing', 'image/jpeg,image/png,image/webp'] }[method];
+      if (config) { $('upload-title').textContent = config[0]; $('upload-help').textContent = config[1]; $('file-input').accept = config[2]; }
+      $('image-review').hidden = method !== 'image' || !state.imageUrl;
+    });
+    $('preview-points').addEventListener('click', () => {
+      try { const points = parseCoordinates($('coordinates').value); state.fileVersion++; clearPhoto(); replaceDraft(points, [], 'Entered coordinates'); message(`${points.length} waypoints added. Check every pin. Government trail status and transport are not verified.`); track('waypoints_previewed'); }
+      catch (error) { message(error.message, true); }
+    });
+    $('load-example').addEventListener('click', () => { $('coordinates').value = '22.361976, 114.371535\n22.371935, 114.373133\n22.394868, 114.360075'; $('preview-points').click(); message('Example pins near Sai Kung, Hong Kong—not a recommended hike. No trail or transit connection is implied.'); });
+    $('file-input').addEventListener('change', async event => {
+      const file = event.target.files[0]; if (!file) return;
+      const version = ++state.fileVersion, method = $('input-method').value;
+      if (file.size > 10 * 1024 * 1024) { message('Please choose a file smaller than 10 MB.', true); return; }
+      try {
+        if (method === 'image') {
+          if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) throw new Error('Use a JPEG, PNG, or WebP image. Convert HEIC files to JPEG first.');
+          const imageUrl = URL.createObjectURL(file), probe = new Image(); probe.src = imageUrl;
+          try { await probe.decode(); if (probe.naturalWidth * probe.naturalHeight > 40000000) throw new Error('Please resize the image below 40 megapixels.'); } catch (error) { URL.revokeObjectURL(imageUrl); throw new Error(error.message.includes('megapixels') ? error.message : 'This image could not be decoded. Try another JPEG or PNG.'); }
+          if (version !== state.fileVersion) { URL.revokeObjectURL(imageUrl); return; }
+          clearPhoto(); state.imageUrl = imageUrl; $('photo').src = imageUrl; $('image-review').hidden = false; $('photo-status').textContent = 'Checking for photo GPS metadata…'; render(false);
+          message(`Opened ${file.name} locally. Your existing waypoint draft is unchanged. No map recognition has been performed.`);
+          track('photo_reviewed');
+          if (!window.exifr) { $('photo-status').textContent = 'The metadata reader is unavailable. You can still inspect the image and place waypoints manually.'; return; }
+          let gps;
+          try { gps = await exifr.gps(file); } catch { if (version === state.fileVersion) $('photo-status').textContent = 'GPS metadata could not be read. Inspect the map and place waypoints manually.'; return; }
+          if (version !== state.fileVersion) return;
+          if (gps && Number.isFinite(gps.latitude) && Number.isFinite(gps.longitude)) {
+            state.photoGPS = point(gps.latitude, gps.longitude, 'Confirmed photo GPS position (unverified)');
+            $('photo-status').textContent = `Photo GPS: ${gps.latitude.toFixed(6)}, ${gps.longitude.toFixed(6)}. This may be the camera position, not the area depicted on the map. It has NOT been added.`;
+            $('photo-confirm-label').hidden = false; $('add-photo-gps').hidden = false;
+          } else $('photo-status').textContent = 'No readable GPS metadata found. Identify the map area independently, then enter coordinates or place pins on the map.';
+        } else {
+          const text = await file.text(); if (version !== state.fileVersion) return;
+          const result = method === 'gpx' ? parseGPX(text) : { points: parseCoordinates(text), segments: [] };
+          clearPhoto(); replaceDraft(result.points, result.segments, file.name);
+          track('file_imported');
+          message(`Imported ${result.points.length} waypoints${result.segments.length ? ` and ${result.segments.length} unverified track segments` : ''} from ${file.name}. No routing or repair performed. GPX export contains waypoints only.`);
+        }
+      } catch (error) { if (version === state.fileVersion) message(error.message || 'The file could not be read.', true); }
+    });
+    $('photo-confirm').addEventListener('change', () => { $('add-photo-gps').disabled = !$('photo-confirm').checked || !state.photoGPS; });
+    $('add-photo-gps').addEventListener('click', () => {
+      if (!$('photo-confirm').checked || !state.photoGPS) return;
+      if (state.points.length >= MAX_WAYPOINTS) { message(`Maximum ${MAX_WAYPOINTS} waypoints.`, true); return; }
+      state.points.push({ ...state.photoGPS }); state.source = 'User-confirmed photo GPS'; $('photo-confirm').checked = false; $('add-photo-gps').disabled = true; render(); toast('Confirmed photo position added. Trail access is still unverified.');
+      track('photo_gps_confirmed');
+    });
+    function setAdding(value) { state.adding = value; $('toggle-pins').setAttribute('aria-pressed', String(value)); $('toggle-pins').textContent = value ? '✓ Finish adding pins' : '+ Add pins on map'; if (map) map.getContainer().style.cursor = value ? 'crosshair' : ''; }
+    $('toggle-pins').addEventListener('click', () => { if (!map) return; setAdding(!state.adding); if (state.adding) toast('Click the map to add waypoints. Finish adding pins when done.'); });
+    $('fit-points').addEventListener('click', fitPoints);
+    function download(blob, filename) { const url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url; a.download = filename; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 30000); }
+    function xmlText(text) { return String(text).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '').replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&apos;'}[c])); }
+    $('save-gpx').addEventListener('click', () => {
+      if (!state.points.length) return;
+      const stamp = new Date().toISOString(), warning = 'UNVERIFIED PLANNING WAYPOINTS — NOT FOR NAVIGATION. No connecting trail, official status, access, closures, terrain, or public transport has been verified. No track is included.';
+      const gpx = `<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="Trailcraft planning preview" xmlns="http://www.topografix.com/GPX/1/1">\n  <metadata><name>Trailcraft — unverified planning waypoints</name><desc>${xmlText(warning)}</desc><time>${stamp}</time></metadata>\n${state.points.map(p => `  <wpt lat="${p.lat}" lon="${p.lon}"><name>${xmlText(p.name)}</name><desc>Unverified planning waypoint. No trail connection or public transport confirmed.</desc></wpt>`).join('\n')}\n</gpx>\n`;
+      download(new Blob([gpx], { type: 'application/gpx+xml;charset=utf-8' }), `trailcraft-waypoints-UNVERIFIED-${stamp.slice(0, 10)}.gpx`); toast('Saved waypoint-only GPX. It contains no navigation track.');
+      track('gpx_exported');
+    });
+    function roundedRect(ctx, x, y, w, h, r, color) { ctx.fillStyle = color; ctx.beginPath(); ctx.roundRect(x, y, w, h, r); ctx.fill(); }
+    $('save-png').addEventListener('click', async () => {
+      if (!map || (!state.points.length && !state.segments.length)) return;
+      const button = $('save-png'); button.disabled = true;
+      try {
+        map.stop();
+        const bounds = map.getBounds(), allPoints = [...state.points, ...state.segments.flat()];
+        if (allPoints.some(p => !bounds.contains([p.lat, p.lon]))) throw new Error('Use “Fit all points” before saving so your whole draft is visible.');
+        if (tileLayer.isLoading()) throw new Error('Map tiles are still loading. Wait a moment, then save again.');
+        const rect = map.getContainer().getBoundingClientRect(), width = Math.round(rect.width), height = Math.round(rect.height), header = 80, footer = 82;
+        const canvas = document.createElement('canvas'), scale = Math.min(2, 4096 / (height + header + footer), 4096 / width); canvas.width = width * scale; canvas.height = (height + header + footer) * scale;
+        const ctx = canvas.getContext('2d'); ctx.scale(scale, scale); ctx.fillStyle = '#f7f6f0'; ctx.fillRect(0, 0, width, height + header + footer);
+        ctx.fillStyle = '#263e35'; ctx.font = '28px Georgia'; ctx.fillText('trailcraft / planning draft', 22, 35, width - 44); ctx.font = '12px sans-serif'; ctx.fillText(`${state.points.length} waypoints · ${new Date().toISOString().slice(0, 10)} · NOT FOR NAVIGATION`, 22, 59, width - 44);
+        ctx.save(); ctx.beginPath(); ctx.rect(0, header, width, height); ctx.clip(); ctx.fillStyle = '#e3e9df'; ctx.fillRect(0, header, width, height);
+        const tiles = Array.from(map.getContainer().querySelectorAll('.leaflet-tile'));
+        const visible = tiles.filter(img => { const r = img.getBoundingClientRect(); return r.right > rect.left && r.left < rect.right && r.bottom > rect.top && r.top < rect.bottom; });
+        if (!visible.length || visible.some(img => !img.complete || !img.naturalWidth)) throw new Error('Some map tiles are unavailable. Wait for the basemap to load before exporting.');
+        visible.forEach(img => { const r = img.getBoundingClientRect(); ctx.drawImage(img, r.left - rect.left, r.top - rect.top + header, r.width, r.height); });
+        ctx.strokeStyle = '#bc4827'; ctx.lineWidth = 3; ctx.setLineDash([7, 7]);
+        state.segments.forEach(seg => { ctx.beginPath(); seg.forEach((p, i) => { const pos = map.latLngToContainerPoint([p.lat, p.lon]); if (i) ctx.lineTo(pos.x, pos.y + header); else ctx.moveTo(pos.x, pos.y + header); }); ctx.stroke(); }); ctx.setLineDash([]);
+        state.points.forEach((p, i) => { const pos = map.latLngToContainerPoint([p.lat, p.lon]); ctx.beginPath(); ctx.arc(pos.x, pos.y + header, 16, 0, Math.PI * 2); ctx.fillStyle = '#263e35'; ctx.fill(); ctx.strokeStyle = '#fffefa'; ctx.lineWidth = 3; ctx.stroke(); ctx.fillStyle = '#fffefa'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(String(i + 1), pos.x, pos.y + header); });
+        ctx.restore(); ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+        roundedRect(ctx, 12, header + height - 29, Math.min(280, width - 24), 23, 3, '#fffefa'); ctx.fillStyle = '#263e35'; ctx.font = '10px sans-serif'; ctx.fillText('© OpenStreetMap contributors · openstreetmap.org/copyright', 20, header + height - 14, width - 40);
+        ctx.fillStyle = '#bc4827'; ctx.font = 'bold 12px sans-serif'; ctx.fillText('UNVERIFIED · NOT FOR NAVIGATION', 22, header + height + 26, width - 44); ctx.fillStyle = '#667267'; ctx.font = '11px sans-serif'; ctx.fillText('Waypoints are not a connected route. Imported tracks are unverified.', 22, header + height + 46, width - 44); ctx.fillText('Trail access, closures, terrain and public transport have not been checked.', 22, header + height + 63, width - 44);
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png')); if (!blob) throw new Error('PNG export failed in this browser.');
+        download(blob, 'trailcraft-planning-draft-UNVERIFIED.png'); toast('Saved the current map preview with its planning warning.');
+        track('png_exported');
+      } catch (error) { toast(error.name === 'SecurityError' ? 'The map provider blocked image export. No incomplete PNG was saved.' : error.message); }
+      finally { button.disabled = (!state.points.length && !state.segments.length) || !map; }
+    });
+    $('discard').addEventListener('click', () => $('discard-dialog').showModal());
+    $('keep-draft').addEventListener('click', () => $('discard-dialog').close());
+    $('confirm-discard').addEventListener('click', () => { state.fileVersion++; clearPhoto(); state.points = []; state.segments = []; state.source = ''; $('coordinates').value = ''; $('file-input').value = ''; $('input-message').hidden = true; setAdding(false); render(false); $('discard-dialog').close(); toast('Draft discarded. Your original files are unchanged.'); track('draft_discarded'); });
+    if (window.L) {
+      map = L.map('map', { scrollWheelZoom: false, worldCopyJump: true, minZoom: 2 }).setView([22.36, 114.24], 10);
+      tileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, crossOrigin: 'anonymous', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }).addTo(map);
+      markers = L.layerGroup().addTo(map); tracks = L.layerGroup().addTo(map);
+      map.on('click', event => { if (!state.adding) return; if (state.points.length >= MAX_WAYPOINTS) { toast(`Maximum ${MAX_WAYPOINTS} waypoints.`); return; } const p = event.latlng.wrap(); state.points.push(point(p.lat, p.lng, `Map waypoint ${state.points.length + 1}`)); state.source = 'Manual map pins'; render(false); track('map_pin_added'); });
+      tileLayer.on('tileerror', () => { toast('Some basemap tiles could not load. Check your connection; do not infer paths from missing tiles.'); });
+      new ResizeObserver(() => map.invalidateSize({ animate: false })).observe($('map'));
+    } else { $('map').append(element('p', 'The map library could not load. Check your internet connection and reload. Coordinate import and waypoint GPX export still work.', 'map-unavailable')); $('toggle-pins').disabled = true; }
+    render(false);
+  })();
+  </script>
+</body>
+</html>
