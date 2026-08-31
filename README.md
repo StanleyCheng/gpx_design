@@ -1,59 +1,59 @@
-# Trailcraft — GPX planning preview
+# Trailcraft — GPX route planner
 
-Live site: https://stanleycheng.github.io/gpx_design/
+[Live app](https://stanleycheng.github.io/gpx_design/). A responsive single HTML frontend with embedded CSS and JavaScript, published on GitHub Pages. **Routes are provisional planning candidates, not certified safe navigation tracks.**
 
-A responsive single HTML page with embedded application CSS and JavaScript. Hosted on GitHub Pages. **This is an initial planning interface, not a completed routing or navigation app.**
+## Workflow
 
-## Implemented
+1. Add mandatory places using decimal coordinates, TXT/CSV, GPX, image recognition, or map pins.
+2. Review each place and its order. Select regional guidance, hike date, distance, transport approach, waypoint tolerance and road-connector limits. Confirm the places.
+3. Find up to three distinct routes. Every route must include every place within the accepted tolerance, follow real connected OSM walking ways, and start/end near passenger stops linked to mapped transit services.
+4. Choose a route, inspect the full map and evidence, independently check access and transport, then save GPX. Reversing a route resets export checks; reversal is disabled when mapped foot direction or boarding rules prohibit it. PNG remains a clearly labelled planning preview.
 
-- Decimal WGS84 coordinates: newline/CR, commas, spaces, or semicolons; explicit range and input validation.
-- Local TXT/CSV and GPX import. GPX track segments remain separate and unverified; numeric source elevations are preserved. No invented connections, snapping, repair, or elevation statistics.
-- Local JPEG/PNG/WebP review and EXIF GPS reading. GPS is never automatically added; user confirmation is required. It may describe the camera position rather than the area depicted.
-- Full-width responsive OpenStreetMap preview, numbered pins, map-click pin placement, fit-to-draft, and waypoint removal.
-- PNG of already displayed map tiles, with attribution and a prominent planning warning. No tile bulk download or offline map packaging.
-- Reverse route: reverse waypoint order, segment order, and every segment’s point order. Start/end labels reflect the current geometry. GPX export preserves source segments and their gaps; coordinate-only drafts remain waypoint-only. Timestamps and unsupported GPX extensions are not re-exported.
-- Paste route map → GPX: clipboard image button, keyboard paste, and file-upload fallback. On-device colour tracing after three-point geographic calibration, followed by mandatory image and basemap review. See [IMAGE_CONVERSION.md](IMAGE_CONVERSION.md).
-- Larger phone controls, safe-area spacing, responsive image zoom, scroll-friendly map exploration, persistent download links, and native file sharing where supported.
-- Matching browser favicon and iPhone Home Screen icon, plus a web app manifest. No offline mode is claimed.
-- Three explicitly pending route-comparison categories; no fabricated route candidates or safety scores.
+The engine returns fewer options or an actionable failure instead of inventing routes or silently relaxing limits. Candidate ranking prefers hiking relations and nearby official trail corridors, penalises roads and retracing, and considers endpoint access distance and mapped services. It is a bounded heuristic, not a globally optimal itinerary or timetable planner. A 30 m default waypoint tolerance is explicit, reviewable and adjustable. No synthetic connectors fill waypoint or transport-stop gaps.
 
-## Still required for the full product
+## Regional coverage and evidence
 
-1. Decide regional coverage and authoritative government trail sources.
-2. Connect a real path graph and the `gpx-trail-fix` workflow: use OSM way geometry, verify hiking relations, and separately substantiate government management.
-3. Check legal access, closures, trail conditions and terrain suitability. Missing critical evidence must not silently pass.
-4. Verify start/end transit for the hike date and time, including last departures and service caveats.
-5. Confirm user constraints, mandatory waypoint order, permitted connectors, difficulty limits, and fallback policy.
-6. Generate up to three distinct qualifying routes, with distance/ascent provenance. Return fewer when fewer qualify.
-7. Add automatic map geolocation and waypoint recognition. Current image conversion is assisted, limited to flat maps and continuous coloured lines, and requires independently known reference coordinates.
-8. Enable verified navigation-route generation only after the routing and evidence workflow exists. Raw source exports are explicitly unverified references. The Python helper from `gpx-trail-fix` does not execute in this static page.
+- **Hong Kong:** worldwide OSM graph plus a live AFCD hiking-trail geometry query. Approximate corridor matches use 12 m tolerance, not proof of ownership, management or current access. If AFCD is unavailable, the app says so.
+- **Taiwan, Japan, South Korea:** the same OSM walking and transport-service graph, plus relevant official authority links. Government trail geometry, current closures and timetables are **not integrated** for these regions yet.
+- **Elsewhere:** experimental, subject to OSM coverage. Limited to local searches between 75°S and 75°N, at most 250 km², not crossing the date line.
 
-## Run and deploy
+Up to 16 mandatory places in entered order, or 8 with order optimisation. All limits are enforced. A bus-stop symbol without a mapped service does not qualify. Stops must be within 80 m of a route-network node, with that unrouted gap explicitly shown. The hike date is for manual timetable checks, not an automatic schedule filter. No ascent, duration, safety score or elevation is invented. Known restrictions, conditional access, fords, demanding `sac_scale` tags and unsuitable roads are excluded; untagged conditions remain unknown.
 
-Serve only the public files with a static HTTP server and open localhost. Do not expose `.env`, even on a development server. No build step. Publish the `main` branch root in repository Settings → Pages. `.nojekyll` disables Jekyll processing.
+## Image input
 
-Application code is in `index.html`. Leaflet 1.9.4, Exifr 7.1.3, Google Fonts, and the basemap load online; this is not a fully offline file. Library versions are pinned. Leaflet assets use integrity hashes.
+[Kimi recognition](AI_SETUP.md) identifies a suggested area and visible marked places only through a private server, explicit image-upload consent, and individual coordinate confirmation. It never supplies the routing graph. Unsupported coordinates remain blank. Kimi recognition on the public site needs a separately deployed HTTPS backend; no endpoint or secret is shipped.
 
-## Privacy and safety
+[Manual image conversion](IMAGE_CONVERSION.md) still works locally: calibrate three known locations, select a continuous route colour, trace and review. Image traces and imported tracks are unverified source references, not traversability evidence. GPX import preserves segments and numeric elevations; if no waypoints exist, only segment endpoints become mandatory places. Add any other must-visit locations explicitly.
 
-Files are processed in the browser, never uploaded by this application. Drafts are held only in memory. Optional Google Analytics loads only after visitor consent and only on the production site. Coordinates, filenames, files, typed text, query strings and referrer URLs are excluded. Enhanced measurement and advertising features are disabled. Privacy settings allow withdrawal, and browser privacy signals disable analytics. See [ANALYTICS.md](ANALYTICS.md). Hosting, fonts, CDNs and map providers receive normal browser requests; map tile requests reveal the viewed area and IP address. Do not mistake local file processing for total network privacy.
+## Run, test and publish
 
-No API keys or account sign-in are included in the public app. Kimi is selected as the future AI provider, model `kimi-k3`; the private `.env` is ignored by Git. AI is not active. See [AI_SETUP.md](AI_SETUP.md) for the backend requirement.
+Node 24, no package installation required:
 
-Imported GPX tracks and digitized image traces are input evidence only, not proof of a traversable path. GPX export is a source transcription in the current direction, not a repaired or certified route. The `gpx-trail-fix` rule requiring OSM graph geometry still applies to future generated/repaired hiking routes; raw image references do not satisfy that rule. No route is certified safe.
+```sh
+node scripts/build-inline.mjs
+node --test tests/*.test.cjs tests/*.test.mjs
+node --env-file=.env server/recognition.mjs
+```
 
-Run the geometry/export safety checks with `node --test tests/image-converter.test.cjs`. See [RESPONSIVE_QA.md](RESPONSIVE_QA.md) for screen and browser checks.
+Open `http://127.0.0.1:8787/`. Copy `.env.example` to a private `.env` if one does not already exist; never overwrite a populated key file. The server serves an explicit public-file allowlist and will not serve `.env`, source files, tests or its usage ledger. No Kimi calls are possible without a configured key and image consent.
 
-## Design
+The authored routing engine and UI fragments in `lib/` are embedded into `index.html` by the build script. The deployed frontend stays one HTML file plus icons. Leaflet 1.9.4, Exifr 7.1.3, fonts and map tiles load online. No offline navigation is claimed. Publish the repository's `main` branch root via GitHub Pages; no private server can run on Pages.
 
-Field-notebook editorial style, with DM Serif Display / DM Sans, paper `#f7f6f0`, forest `#263e35`, and clay `#bc4827`. Contour lines and a numbered field note form the visual anchor; interaction and warnings take priority over decoration. Responsive layout and reduced-motion support. Design feasibility score: 14 (impact 4, fit 5, feasibility 5, performance 4, consistency risk 4).
+## Privacy and operations
 
-## Documentation
+Drafts and files stay in browser memory except explicitly consented recognition images/clues. Recognition serializes a resized canvas, stripping camera metadata; the server forwards to Kimi and does not write images to disk. The server stores only a date and request count for its budget. Remote hosting requires a separate app access token, one process and persistent storage; see setup notes.
 
-- [GitHub Pages publishing sources](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)
-- [GitHub Pages REST API](https://docs.github.com/en/rest/pages/pages)
-- [Leaflet 1.9.4](https://leafletjs.com/reference.html)
-- [Exifr](https://github.com/MikeKovarik/exifr)
-- [OpenStreetMap tile usage policy](https://operations.osmfoundation.org/policies/tiles/)
+Routing sends a bounding box to the selected Overpass provider and (Hong Kong only) the AFCD service. Providers see the area and IP address. OSM tiles reveal the viewed area; PNG reuses displayed tiles. A ten-minute, one-area memory cache, bounded downloads, one request at a time and a pause after rate-limit responses reduce public-service load. High-traffic deployment needs a dedicated routing data service.
 
-Documentation checked through Context7 MCP and the official sources during initial development.
+Optional Google Analytics is consent-based and production-only; coordinates, files, photos, typed clues and access codes are never analytics parameters. See [ANALYTICS.md](ANALYTICS.md). `.env`, private inputs, exports, runtime ledgers and common generated files are ignored by Git. The header's noninteractive “Early preview” badge has been removed.
+
+## Sources
+
+- [OpenStreetMap / Overpass](https://wiki.openstreetmap.org/wiki/Overpass_API) and [public-service usage guidance](https://dev.overpass-api.de/overpass-doc/en/preface/commons.html)
+- [AFCD hiking trails dataset](https://data.gov.hk/en-data/dataset/hk-afcd-afcdlist-hikingtrailscp/resource/4186314e-8a12-452c-b8c8-9d60eadce640)
+- [Taiwan Forestry and Nature Conservation Agency](https://recreation.forest.gov.tw/EN/)
+- [Japan Ministry of the Environment national parks](https://www.env.go.jp/en/nature/nps/park/parks/)
+- [Korea National Park Service](https://english.knps.or.kr/)
+- [Kimi thinking and vision models](https://platform.kimi.ai/docs/guide/use-thinking-models)
+
+The `gpx-trail-fix` workflow informed the graph-geometry and evidence rules; its Python script is not executed in the browser. Current API documentation was checked through Context7 and primary sources. See [ROUTING_QA.md](ROUTING_QA.md) for validation and limits.

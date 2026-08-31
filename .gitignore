@@ -76,3 +76,6 @@ Thumbs.db
 Thumbs.db:encryptable
 Desktop.ini
 $RECYCLE.BIN/
+
+# Local recognition usage ledger
+.runtime/
