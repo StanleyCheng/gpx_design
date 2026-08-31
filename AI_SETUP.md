@@ -4,7 +4,7 @@ The selected AI provider is **Kimi**, with model **`kimi-k3`**. The model name a
 
 Place your API key in the local `.env` file as `MOONSHOT_API_KEY=...`. The file is excluded from Git and must never be deployed to GitHub Pages. `.env.example` contains names and non-secret defaults only.
 
-This initial release has **no AI backend and makes no Kimi calls**. Adding a key does not enable recognition yet. GitHub Pages serves static public files and cannot keep an API key secret or execute a private backend. Do not add a client-side key input, expose the key through build-time substitution, or commit `.env` to make this work.
+This release has **no AI backend and makes no Kimi calls**. Pasted-map conversion runs locally using user-provided calibration and colour-based pixel tracing; it does not require AI. Adding a key does not enable recognition yet. GitHub Pages serves static public files and cannot keep an API key secret or execute a private backend. Do not add a client-side key input, expose the key through build-time substitution, or commit `.env` to make this work.
 
 The next implementation should deploy a separate server endpoint which:
 

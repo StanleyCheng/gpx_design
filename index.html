@@ -2,28 +2,51 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#263e35">
   <meta name="description" content="A careful start to your next hike. Import waypoints, review a map, and prepare a GPX planning draft. Verified trail routing is in development.">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>Trailcraft — GPX route planner</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%23263e35'/%3E%3Cpath d='M12 46 29 17 39 34 45 25 55 46Z' fill='none' stroke='%23f5f3eb' stroke-width='4' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/svg+xml" href="icon.svg?v=2">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=2">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=2">
+  <link rel="manifest" href="site.webmanifest">
+  <meta name="apple-mobile-web-app-title" content="Trailcraft">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous">
   <style>
     :root{--paper:#f7f6f0;--white:#fffefa;--ink:#263e35;--muted:#667267;--line:#dce1d6;--soft:#edefe5;--accent:#bc4827;--accent-soft:#f9eee5;--danger:#a52a25;--map:#e3e9df;--shadow:0 8px 24px #263e350b;--font:'DM Sans',sans-serif;--display:'DM Serif Display',Georgia,serif}
-    *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:24px}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.6 var(--font)}button,input,textarea,select{font:inherit}button,a,input,select,textarea,summary{touch-action:manipulation}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.5}button,a{transition:background .16s,color .16s,border-color .16s}a{color:inherit;text-underline-offset:4px}button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:4px}svg{display:block}button svg{width:18px;height:18px}button{display:inline-flex;align-items:center;justify-content:center;gap:9px}h1,h2,h3,p{margin:0}h1,h2{font-family:var(--display);font-weight:400}h3{font-weight:600}button,.button{border:1px solid var(--line);border-radius:7px;padding:10px 16px;background:var(--white);color:var(--ink);font-weight:600;font-size:13px;min-height:44px;text-decoration:none}button:hover:not(:disabled),.button:hover{background:var(--soft)}.primary{background:var(--ink);border-color:var(--ink);color:var(--white)}.primary:hover:not(:disabled){background:var(--accent);border-color:var(--accent)}.text-button{padding:4px 0;background:transparent;border:0;border-radius:0;min-height:36px;color:var(--accent)}.text-button:hover:not(:disabled){background:transparent;text-decoration:underline}.small{font-size:12px;color:var(--muted)}.eyebrow{font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:700}.pill{display:inline-flex;align-items:center;gap:7px;background:var(--soft);border:1px solid var(--line);padding:5px 10px;border-radius:30px;font-size:11px;font-weight:600;white-space:nowrap}.pill::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--accent)}.mono{font-variant-numeric:tabular-nums;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}.skip{position:absolute;top:-100px;left:20px;z-index:9999;background:var(--white);padding:10px}.skip:focus{top:10px}[hidden]{display:none!important}
-    .shell{width:calc(100% - 96px);max-width:1440px;margin-inline:auto}.topbar{border-bottom:1px solid var(--line)}.topbar-inner{height:88px;display:flex;align-items:center;justify-content:space-between;gap:25px}.brand{display:flex;align-items:center;gap:12px;text-decoration:none}.brand-mark{width:39px;height:39px;padding:8px;background:var(--ink);color:var(--paper);border-radius:10px}.brand-name{font-family:var(--display);font-size:27px;letter-spacing:-.5px}.brand-subtitle{border-left:1px solid var(--line);padding-left:16px;margin-left:5px;font-size:12px;color:var(--muted)}nav{display:flex;align-items:center;gap:26px;font-size:13px}nav a{text-decoration:none}nav a:hover{color:var(--accent)}.hero{position:relative;padding:53px 0 39px;display:grid;grid-template-columns:1.4fr 1fr;gap:60px;align-items:center;overflow:hidden}.hero .eyebrow{display:flex;align-items:center;gap:9px;color:var(--accent);margin-bottom:16px}.hero .eyebrow::before{content:'';width:22px;height:1px;background:var(--accent)}h1{font-size:clamp(45px,5.1vw,73px);line-height:1.05;letter-spacing:-2px;max-width:780px}h1 em{font-weight:400;color:var(--accent)}.hero-copy{max-width:505px;color:var(--muted);margin-top:23px;font-size:15px}.hero-aside{position:relative;min-height:238px;display:flex;align-items:center;justify-content:center}.contours{position:absolute;width:100%;height:100%;opacity:.28}.field-note{position:relative;border:1px solid var(--line);background:var(--paper);padding:20px 25px;transform:rotate(-3deg);width:255px;box-shadow:var(--shadow)}.field-note .eyebrow{font-size:10px;letter-spacing:.11em;margin-bottom:12px}.field-note strong{display:block;font-family:var(--display);font-weight:400;font-size:24px;line-height:1.3;margin-bottom:12px}.field-note p{font-size:12px;color:var(--muted)}.field-note .note-number{display:block;margin-top:17px;padding-top:10px;border-top:1px solid var(--line);font-size:10px;color:var(--muted);letter-spacing:.1em}.safety-strip{display:flex;align-items:flex-start;gap:12px;border:1px solid var(--line);background:var(--soft);border-radius:7px;padding:13px 18px;font-size:12px;margin-bottom:32px}.safety-strip svg{width:20px;height:20px;flex-shrink:0;margin-top:1px}.safety-strip strong{font-weight:700}.safety-strip a{margin-left:auto;white-space:nowrap;font-weight:600}
-    .workspace{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(290px,1fr);gap:25px}.panel{border:1px solid var(--line);border-radius:10px;background:var(--white);overflow:hidden}.panel-heading{display:flex;align-items:center;gap:12px;padding:22px 25px 18px}.step{font-size:11px;color:var(--accent);border:1px solid var(--line);border-radius:50%;width:29px;height:29px;display:grid;place-items:center}.panel-heading h2{font-size:27px;line-height:1.2;letter-spacing:-.3px}.panel-body{padding:0 25px 25px}.field{display:block;font-size:12px;font-weight:600;margin-bottom:7px}.field-top{display:flex;align-items:center;justify-content:space-between;margin:19px 0 7px}.field-top .field{margin:0}.field-top span{font-size:10px;color:var(--muted)}select,input[type=text],input[type=date],textarea{border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);width:100%;padding:11px 13px}select{height:47px;cursor:pointer}textarea{resize:vertical;min-height:139px;font-size:13px;line-height:1.8}textarea::placeholder,input::placeholder{color:var(--muted);opacity:.8}.help{font-size:11px;color:var(--muted);margin-top:7px}.input-actions{display:flex;gap:15px;align-items:center;justify-content:space-between;margin-top:18px}.upload-area{position:relative;display:flex;align-items:center;justify-content:center;text-align:center;flex-direction:column;min-height:170px;padding:20px;border:1px dashed var(--muted);border-radius:7px;margin-top:18px;background:var(--paper)}.upload-area svg{width:27px;height:27px;color:var(--accent);margin-bottom:9px}.upload-area strong{font-weight:600;font-size:13px}.upload-area .small{margin:5px 0 12px}input[type=file]{max-width:100%;font-size:12px;color:var(--muted)}input[type=file]::file-selector-button{border:1px solid var(--line);border-radius:4px;background:var(--white);padding:7px 12px;color:var(--ink);margin-right:8px;cursor:pointer}.file-name{overflow-wrap:anywhere}.image-preview{margin-top:15px;border:1px solid var(--line);padding:10px;border-radius:6px}.image-preview img{max-width:100%;height:200px;object-fit:contain;display:block;margin:auto}.image-preview p{font-size:12px;margin:10px 0;color:var(--muted)}.image-confirm{display:flex;align-items:start;gap:8px;font-size:12px;margin-top:10px}.image-confirm input{margin-top:5px;accent-color:var(--ink)}.message{padding:12px 14px;margin-top:16px;border-radius:6px;background:var(--soft);border:1px solid var(--line);font-size:12px;overflow-wrap:anywhere}.message.error{color:var(--danger);border-color:var(--danger);background:var(--accent-soft)}.principles{padding:0 25px 20px}.principle{display:grid;grid-template-columns:25px 1fr;gap:12px;padding:17px 0;border-bottom:1px solid var(--line)}.principle:first-child{padding-top:5px}.principle:last-child{border-bottom:none;padding-bottom:0}.principle svg{width:21px;height:21px;color:var(--accent);margin-top:3px}.principle h3{font-size:13px}.principle p{font-size:12px;color:var(--muted);margin-top:4px}.principles-foot{border-top:1px solid var(--line);background:var(--paper);padding:14px 25px;display:flex;align-items:center;gap:8px;font-size:10px;color:var(--muted)}.principles-foot svg{height:14px;width:14px;flex-shrink:0}
-    .route-section{margin-top:35px}.section-title{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:15px}.section-title h2{font-size:29px;letter-spacing:-.3px}.section-title h2 span{font:11px var(--font);color:var(--accent);margin-right:10px}.section-title p{font-size:12px;color:var(--muted)}.route-options{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.route-option{position:relative;border:1px solid var(--line);border-radius:8px;padding:18px 21px;background:var(--white)}.route-option:first-child{border-top:3px solid var(--ink);padding-top:16px}.route-topline{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;color:var(--muted);font-size:10px;letter-spacing:.06em}.route-option h3{font-size:16px}.route-option p{font-size:12px;color:var(--muted);margin-top:5px;max-width:340px}.route-status{border-top:1px solid var(--line);padding-top:12px;margin-top:17px;font-size:11px;color:var(--muted);display:flex;gap:8px;align-items:center}.route-status svg{width:13px;height:13px}.coming-note{font-size:11px;color:var(--muted);margin:11px 0 24px}.map-section{margin-top:32px}.map-actions{display:flex;align-items:center;gap:8px}.map-container{position:relative;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--map)}#map{height:clamp(400px,58vh,720px);width:100%;isolation:isolate;background:var(--map)}.map-label{position:absolute;top:18px;left:65px;z-index:500;max-width:calc(100% - 130px);pointer-events:none;border:1px solid var(--line);background:var(--white);padding:8px 12px;border-radius:5px;font-size:11px;box-shadow:var(--shadow)}.map-label strong{font-weight:600}.map-label span{color:var(--muted);margin-left:7px}.map-empty{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);z-index:450;text-align:center;pointer-events:none;width:300px;max-width:calc(100% - 40px);background:var(--white);border:1px solid var(--line);padding:25px;border-radius:8px;box-shadow:var(--shadow)}.map-empty svg{width:32px;height:32px;margin:0 auto 12px;color:var(--accent)}.map-empty h3{font-family:var(--display);font-size:25px;font-weight:400}.map-empty p{font-size:12px;margin-top:8px;color:var(--muted)}.map-bottom{display:flex;justify-content:space-between;align-items:center;gap:15px;background:var(--white);padding:12px 17px;border-top:1px solid var(--line)}.map-bottom p{font-size:11px;color:var(--muted)}.map-bottom button{font-size:11px;padding:7px 10px;min-height:37px}.legend{display:flex;gap:15px;align-items:center}.legend-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:5px}.legend-dash{display:inline-block;width:16px;border-top:2px dashed var(--accent);margin:0 5px 3px 0}.number-pin{background:none;border:none}.number-pin span{display:grid;place-items:center;background:var(--ink);color:var(--white);border:3px solid var(--white);height:33px;width:33px;border-radius:50%;font:600 11px var(--font);box-shadow:0 2px 8px #263e3540}.leaflet-container{font-family:var(--font)}.leaflet-control-attribution{font-size:10px!important}.leaflet-popup-content{font-family:var(--font);line-height:1.6}.leaflet-popup-content span{display:block;color:var(--muted);font-size:11px}.map-unavailable{position:absolute;inset:0;display:grid;place-items:center;padding:30px;text-align:center}.map-footer{display:flex;justify-content:space-between;gap:20px;align-items:start;padding-top:16px}.export-actions{display:flex;flex-wrap:wrap;gap:8px}.export-note{font-size:11px;color:var(--muted);max-width:460px}.pin-list{margin-top:20px;border:1px solid var(--line);border-radius:8px;background:var(--white);overflow:hidden}.pin-list summary{padding:14px 18px;font-size:13px;font-weight:600;cursor:pointer}.pin-list ol{padding:0 18px 10px;margin:0;list-style:none;max-height:340px;overflow:auto}.pin-row{display:flex;align-items:center;gap:12px;border-top:1px solid var(--line);padding:11px 0;font-size:12px}.pin-index{color:var(--accent);font-size:11px;min-width:23px}.pin-info{flex:1;min-width:0}.pin-info strong{display:block;font-weight:600;overflow-wrap:anywhere}.pin-info span{font-size:11px;color:var(--muted)}.pin-row button{min-height:36px;padding:5px 10px;font-size:11px}
-    .method{border-top:1px solid var(--line);margin-top:42px;padding:30px 0;display:grid;grid-template-columns:1fr 1.8fr;gap:50px}.method h2{font-size:28px}.method-intro p{font-size:12px;color:var(--muted);margin-top:8px;max-width:280px}.method details{border-bottom:1px solid var(--line);padding:13px 0}.method details:first-child{padding-top:3px}.method summary{cursor:pointer;font-size:13px;font-weight:600}.method details p{font-size:12px;color:var(--muted);margin:12px 0;max-width:700px}.footer{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding:24px 0 32px;gap:20px;font-size:11px;color:var(--muted)}.footer-links{display:flex;gap:18px}.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--white);border:1px solid var(--muted);box-shadow:var(--shadow);z-index:2000;border-radius:7px;padding:12px 20px;max-width:calc(100% - 32px);font-size:12px}.noscript{padding:20px;background:var(--accent-soft);border:1px solid var(--accent);margin:20px}dialog{border:1px solid var(--line);border-radius:10px;background:var(--white);color:var(--ink);max-width:420px;width:calc(100% - 40px);padding:26px;box-shadow:var(--shadow)}dialog::backdrop{background:#263e3566}dialog h2{font-size:28px}dialog p{color:var(--muted);font-size:13px;margin:13px 0 20px}.dialog-actions{display:flex;justify-content:flex-end;gap:9px}
+    *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:24px}body{margin:0;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);-webkit-text-size-adjust:100%;text-size-adjust:100%;background:var(--paper);color:var(--ink);font:15px/1.6 var(--font)}button,input,textarea,select{font:inherit}button,a,input,select,textarea,summary{touch-action:manipulation}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.5}button,a{transition:background .16s,color .16s,border-color .16s}a{color:inherit;text-underline-offset:4px}button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:4px}svg{display:block}button svg{width:18px;height:18px}button{display:inline-flex;align-items:center;justify-content:center;gap:9px}h1,h2,h3,p{margin:0}h1,h2{font-family:var(--display);font-weight:400}h3{font-weight:600}button,.button{border:1px solid var(--line);border-radius:7px;padding:10px 16px;background:var(--white);color:var(--ink);font-weight:600;font-size:13px;min-height:44px;text-decoration:none}button:hover:not(:disabled),.button:hover{background:var(--soft)}.primary{background:var(--ink);border-color:var(--ink);color:var(--white)}.primary:hover:not(:disabled){background:var(--accent);border-color:var(--accent)}.text-button{padding:4px 0;background:transparent;border:0;border-radius:0;min-height:36px;color:var(--accent)}.text-button:hover:not(:disabled){background:transparent;text-decoration:underline}.small{font-size:12px;color:var(--muted)}.eyebrow{font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:700}.pill{display:inline-flex;align-items:center;gap:7px;background:var(--soft);border:1px solid var(--line);padding:5px 10px;border-radius:30px;font-size:11px;font-weight:600;white-space:nowrap}.pill::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--accent)}.mono{font-variant-numeric:tabular-nums;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}.skip{position:absolute;top:-100px;left:20px;z-index:9999;background:var(--white);padding:10px}.skip:focus{top:10px}[hidden]{display:none!important}
+    .shell{width:calc(100% - 96px);max-width:1440px;margin-inline:auto}.topbar{border-bottom:1px solid var(--line)}.topbar-inner{height:88px;display:flex;align-items:center;justify-content:space-between;gap:25px}.brand{display:flex;align-items:center;gap:12px;text-decoration:none}.brand-mark{flex-shrink:0;width:39px;height:39px;padding:8px;background:var(--ink);color:var(--paper);border-radius:10px}.brand-name{font-family:var(--display);font-size:27px;letter-spacing:-.5px}.brand-subtitle{border-left:1px solid var(--line);padding-left:16px;margin-left:5px;font-size:12px;color:var(--muted)}nav{display:flex;align-items:center;gap:26px;font-size:13px}nav a{text-decoration:none}nav a:hover{color:var(--accent)}.hero{position:relative;padding:53px 0 39px;display:grid;grid-template-columns:1.4fr 1fr;gap:60px;align-items:center;overflow:hidden}.hero .eyebrow{display:flex;align-items:center;gap:9px;color:var(--accent);margin-bottom:16px}.hero .eyebrow::before{content:'';width:22px;height:1px;background:var(--accent)}h1{font-size:clamp(45px,5.1vw,73px);line-height:1.05;letter-spacing:-2px;max-width:780px}h1 em{font-weight:400;color:var(--accent)}.hero-copy{max-width:505px;color:var(--muted);margin-top:23px;font-size:15px}.hero-aside{position:relative;min-height:238px;display:flex;align-items:center;justify-content:center}.contours{position:absolute;width:100%;height:100%;opacity:.28}.field-note{position:relative;border:1px solid var(--line);background:var(--paper);padding:20px 25px;transform:rotate(-3deg);width:255px;box-shadow:var(--shadow)}.field-note .eyebrow{font-size:10px;letter-spacing:.11em;margin-bottom:12px}.field-note strong{display:block;font-family:var(--display);font-weight:400;font-size:24px;line-height:1.3;margin-bottom:12px}.field-note p{font-size:12px;color:var(--muted)}.field-note .note-number{display:block;margin-top:17px;padding-top:10px;border-top:1px solid var(--line);font-size:10px;color:var(--muted);letter-spacing:.1em}.safety-strip{display:flex;align-items:flex-start;gap:12px;border:1px solid var(--line);background:var(--soft);border-radius:7px;padding:13px 18px;font-size:12px;margin-bottom:32px}.safety-strip svg{width:20px;height:20px;flex-shrink:0;margin-top:1px}.safety-strip strong{font-weight:700}.safety-strip a{margin-left:auto;white-space:nowrap;font-weight:600}
+    .workspace{min-width:0;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(290px,1fr);gap:25px}.panel{min-width:0;border:1px solid var(--line);border-radius:10px;background:var(--white);overflow:hidden}.panel-heading{display:flex;align-items:center;gap:12px;padding:22px 25px 18px}.step{flex-shrink:0;font-size:11px;color:var(--accent);border:1px solid var(--line);border-radius:50%;width:29px;height:29px;display:grid;place-items:center}.panel-heading h2{font-size:27px;line-height:1.2;letter-spacing:-.3px}.panel-body{padding:0 25px 25px}.field{display:block;font-size:12px;font-weight:600;margin-bottom:7px}.field-top{display:flex;align-items:center;justify-content:space-between;margin:19px 0 7px}.field-top .field{margin:0}.field-top span{font-size:10px;color:var(--muted)}select,input[type=text],input[type=date],textarea{border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);width:100%;padding:11px 13px}select{height:47px;cursor:pointer}textarea{resize:vertical;min-height:139px;font-size:13px;line-height:1.8}textarea::placeholder,input::placeholder{color:var(--muted);opacity:.8}.help{font-size:11px;color:var(--muted);margin-top:7px}.input-actions{display:flex;gap:15px;align-items:center;justify-content:space-between;margin-top:18px}.upload-area{position:relative;display:flex;align-items:center;justify-content:center;text-align:center;flex-direction:column;min-height:170px;padding:20px;border:1px dashed var(--muted);border-radius:7px;margin-top:18px;background:var(--paper)}.upload-area svg{width:27px;height:27px;color:var(--accent);margin-bottom:9px}.upload-area strong{font-weight:600;font-size:13px}.upload-area .small{margin:5px 0 12px}input[type=file]{width:100%;min-width:0;max-width:100%;font-size:12px;color:var(--muted)}input[type=file]::file-selector-button{border:1px solid var(--line);border-radius:4px;background:var(--white);padding:7px 12px;color:var(--ink);margin-right:8px;cursor:pointer}.file-name{overflow-wrap:anywhere}.image-preview{margin-top:15px;border:1px solid var(--line);padding:10px;border-radius:6px}.image-preview img{max-width:100%;height:200px;object-fit:contain;display:block;margin:auto}.image-preview p{font-size:12px;margin:10px 0;color:var(--muted)}.image-confirm{display:flex;align-items:start;gap:8px;font-size:12px;margin-top:10px}.image-confirm input{margin-top:5px;accent-color:var(--ink)}.message{padding:12px 14px;margin-top:16px;border-radius:6px;background:var(--soft);border:1px solid var(--line);font-size:12px;overflow-wrap:anywhere}.message.error{color:var(--danger);border-color:var(--danger);background:var(--accent-soft)}.principles{padding:0 25px 20px}.principle{display:grid;grid-template-columns:25px 1fr;gap:12px;padding:17px 0;border-bottom:1px solid var(--line)}.principle:first-child{padding-top:5px}.principle:last-child{border-bottom:none;padding-bottom:0}.principle svg{width:21px;height:21px;color:var(--accent);margin-top:3px}.principle h3{font-size:13px}.principle p{font-size:12px;color:var(--muted);margin-top:4px}.principles-foot{border-top:1px solid var(--line);background:var(--paper);padding:14px 25px;display:flex;align-items:center;gap:8px;font-size:10px;color:var(--muted)}.principles-foot svg{height:14px;width:14px;flex-shrink:0}
+    .route-section{margin-top:35px}.section-title{flex-wrap:wrap;display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:15px}.section-title h2{min-width:0;font-size:29px;letter-spacing:-.3px}.section-title h2 span{font:11px var(--font);color:var(--accent);margin-right:10px}.section-title p{font-size:12px;color:var(--muted)}.route-options{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.route-option{position:relative;border:1px solid var(--line);border-radius:8px;padding:18px 21px;background:var(--white)}.route-option:first-child{border-top:3px solid var(--ink);padding-top:16px}.route-topline{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;color:var(--muted);font-size:10px;letter-spacing:.06em}.route-option h3{font-size:16px}.route-option p{font-size:12px;color:var(--muted);margin-top:5px;max-width:340px}.route-status{border-top:1px solid var(--line);padding-top:12px;margin-top:17px;font-size:11px;color:var(--muted);display:flex;gap:8px;align-items:center}.route-status svg{width:13px;height:13px}.coming-note{font-size:11px;color:var(--muted);margin:11px 0 24px}.map-section{margin-top:32px}.map-actions{flex-shrink:0;display:flex;align-items:center;gap:8px}.map-container{position:relative;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--map)}#map{height:clamp(400px,58vh,720px);width:100%;isolation:isolate;background:var(--map)}.map-label{position:absolute;top:18px;left:65px;z-index:500;max-width:calc(100% - 130px);pointer-events:none;border:1px solid var(--line);background:var(--white);padding:8px 12px;border-radius:5px;font-size:11px;box-shadow:var(--shadow)}.map-label strong{font-weight:600}.map-label span{color:var(--muted);margin-left:7px}.map-empty{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);z-index:450;text-align:center;pointer-events:none;width:300px;max-width:calc(100% - 40px);background:var(--white);border:1px solid var(--line);padding:25px;border-radius:8px;box-shadow:var(--shadow)}.map-empty svg{width:32px;height:32px;margin:0 auto 12px;color:var(--accent)}.map-empty h3{font-family:var(--display);font-size:25px;font-weight:400}.map-empty p{font-size:12px;margin-top:8px;color:var(--muted)}.map-bottom{flex-wrap:wrap;display:flex;justify-content:space-between;align-items:center;gap:15px;background:var(--white);padding:12px 17px;border-top:1px solid var(--line)}.map-bottom p{font-size:11px;color:var(--muted)}.map-bottom button{font-size:12px;padding:9px 12px;min-height:44px}.legend{display:flex;gap:15px;align-items:center}.legend-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:5px}.legend-dash{display:inline-block;width:16px;border-top:2px dashed var(--accent);margin:0 5px 3px 0}.number-pin{background:none;border:none}.number-pin span{display:grid;place-items:center;background:var(--ink);color:var(--white);border:3px solid var(--white);height:33px;width:33px;border-radius:50%;font:600 11px var(--font);box-shadow:0 2px 8px #263e3540}.leaflet-container{font-family:var(--font)}.leaflet-control-attribution{font-size:10px!important}.leaflet-popup-content{font-family:var(--font);line-height:1.6}.leaflet-popup-content span{display:block;color:var(--muted);font-size:11px}.map-unavailable{position:absolute;inset:0;display:grid;place-items:center;padding:30px;text-align:center}.map-footer{flex-wrap:wrap;display:flex;justify-content:space-between;gap:20px;align-items:start;padding-top:16px}.export-actions{display:flex;flex-wrap:wrap;gap:8px}.export-note{font-size:11px;color:var(--muted);max-width:460px}.pin-list{margin-top:20px;border:1px solid var(--line);border-radius:8px;background:var(--white);overflow:hidden}.pin-list summary{padding:14px 18px;font-size:13px;font-weight:600;cursor:pointer}.pin-list ol{padding:0 18px 10px;margin:0;list-style:none;max-height:340px;overflow:auto}.pin-row{display:flex;align-items:center;gap:12px;border-top:1px solid var(--line);padding:11px 0;font-size:12px}.pin-index{color:var(--accent);font-size:11px;min-width:23px}.pin-info{flex:1;min-width:0}.pin-info strong{display:block;font-weight:600;overflow-wrap:anywhere}.pin-info span{font-size:11px;color:var(--muted)}.pin-row button{min-height:44px;padding:5px 10px;font-size:11px}
+    .method{border-top:1px solid var(--line);margin-top:42px;padding:30px 0;display:grid;grid-template-columns:1fr 1.8fr;gap:50px}.method h2{font-size:28px}.method-intro p{font-size:12px;color:var(--muted);margin-top:8px;max-width:280px}.method details{border-bottom:1px solid var(--line);padding:13px 0}.method details:first-child{padding-top:3px}.method summary{cursor:pointer;font-size:13px;font-weight:600}.method details p{font-size:12px;color:var(--muted);margin:12px 0;max-width:700px}.footer{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding:24px 0 32px;gap:20px;font-size:11px;color:var(--muted)}.footer-links{display:flex;flex-wrap:wrap;align-items:center;gap:18px}.toast{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--ink);color:var(--white);border:1px solid var(--muted);box-shadow:var(--shadow);z-index:2000;border-radius:7px;padding:12px 20px;max-width:calc(100% - 32px);font-size:12px}.noscript{padding:20px;background:var(--accent-soft);border:1px solid var(--accent);margin:20px}dialog{max-height:calc(100dvh - 48px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));overflow-y:auto;border:1px solid var(--line);border-radius:10px;background:var(--white);color:var(--ink);max-width:420px;width:calc(100% - 40px);padding:26px;box-shadow:var(--shadow)}dialog::backdrop{background:#263e3566}dialog h2{font-size:28px}dialog p{color:var(--muted);font-size:13px;margin:13px 0 20px}.dialog-actions{display:flex;justify-content:flex-end;gap:9px}
     @media(min-width:1600px){.shell{max-width:1560px}.hero{padding-top:65px;padding-bottom:50px}.workspace{grid-template-columns:1.8fr 1fr}}
     @media(max-width:1000px){.shell{width:calc(100% - 48px)}.brand-subtitle{display:none}.hero{gap:20px}.hero-aside{min-height:220px}.workspace{grid-template-columns:minmax(0,1.4fr) minmax(260px,1fr)}.panel-heading,.panel-body{padding-left:20px;padding-right:20px}.principles{padding-left:20px;padding-right:20px}.map-footer{flex-direction:column}.route-option{padding:16px}.route-option:first-child{padding-top:14px}.safety-strip a{display:none}}
-    @media(max-width:720px){.shell{width:calc(100% - 32px)}.topbar-inner{height:72px}.brand-name{font-size:25px}nav{gap:15px}nav .nav-method{display:none}.hero{grid-template-columns:1fr;padding:35px 0 28px}.hero-aside{display:none}h1{font-size:51px;letter-spacing:-1.8px}.hero-copy{margin-top:17px;font-size:14px}.safety-strip{padding:12px 14px;margin-bottom:22px}.workspace{grid-template-columns:1fr;gap:18px}.panel-heading{padding-top:20px}.principles{display:grid;grid-template-columns:1fr;gap:0}.route-section{margin-top:26px}.section-title{align-items:start}.section-title h2{font-size:25px}.section-title p{max-width:130px;font-size:10px;text-align:right}.route-options{grid-template-columns:1fr;gap:10px}.route-option{display:grid;grid-template-columns:1fr auto;gap:0 20px}.route-topline{grid-column:1/-1;margin-bottom:4px}.route-option h3{font-size:15px}.route-option p{grid-column:1;margin-top:2px}.route-status{grid-column:2;grid-row:2/4;border:0;padding:0;margin:0;max-width:95px;font-size:10px}.coming-note{font-size:10px}.map-section{margin-top:25px}.map-section .section-title{align-items:center}.map-actions button{padding:8px 10px;font-size:11px}#map{height:470px}.map-label{top:13px;left:57px;padding:7px 9px;max-width:calc(100% - 75px);font-size:10px}.map-label span{display:none}.map-bottom{align-items:flex-start;padding:12px}.legend{flex-direction:column;align-items:flex-start;gap:3px}.map-footer{gap:12px}.export-actions{width:100%}.export-actions button{flex:1;font-size:11px;padding:9px 10px}.method{grid-template-columns:1fr;gap:22px;margin-top:30px;padding-top:25px}.method-intro p{max-width:none}.footer{align-items:flex-start;flex-direction:column;gap:9px}.pill{font-size:10px;padding:4px 8px}.input-actions{gap:10px}.input-actions button{font-size:12px;padding-inline:12px}}
-    .privacy-button{font-size:11px;padding:0;min-height:auto;border:0;background:transparent;font-weight:400;text-decoration:underline;text-underline-offset:4px;color:var(--muted)}.consent{position:fixed;left:24px;bottom:24px;z-index:1900;background:var(--white);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 40px #263e3526;padding:19px 21px;width:410px;max-width:calc(100% - 32px)}.consent h2{font:600 14px var(--font)}.consent p{font-size:12px;color:var(--muted);margin:8px 0 14px}.consent-actions{display:flex;gap:8px}.consent-actions button{flex:1;font-size:12px}.consent-dismiss{margin-top:9px;font-size:11px}.consent .small{display:block;margin-top:10px}@media(max-width:720px){.consent{left:16px;bottom:16px}.footer-links{flex-wrap:wrap;gap:14px}}
+    @media(max-width:720px){.shell{width:calc(100% - 32px)}.topbar-inner{height:72px}.brand-name{font-size:25px}nav{gap:15px}nav .nav-method{display:none}.hero{grid-template-columns:1fr;padding:35px 0 28px}.hero-aside{display:none}h1{font-size:51px;letter-spacing:-1.8px}.hero-copy{margin-top:17px;font-size:14px}.safety-strip{padding:12px 14px;margin-bottom:22px}.workspace{grid-template-columns:1fr;gap:18px}.panel-heading{padding-top:20px}.principles{display:grid;grid-template-columns:1fr;gap:0}.route-section{margin-top:26px}.section-title{align-items:start}.section-title h2{min-width:0;font-size:25px}.section-title p{max-width:130px;font-size:10px;text-align:right}.route-options{grid-template-columns:1fr;gap:10px}.route-option{display:grid;grid-template-columns:1fr auto;gap:0 20px}.route-topline{grid-column:1/-1;margin-bottom:4px}.route-option h3{font-size:15px}.route-option p{grid-column:1;margin-top:2px}.route-status{grid-column:2;grid-row:2/4;border:0;padding:0;margin:0;max-width:95px;font-size:10px}.coming-note{font-size:10px}.map-section{margin-top:25px}.map-section .section-title{align-items:center;gap:10px}.map-actions button{padding:8px 10px;font-size:11px}#map{height:470px;height:clamp(340px,55svh,550px)}.map-label{top:13px;left:65px;padding:7px 9px;max-width:calc(100% - 80px);font-size:12px}.map-label span{display:block;margin-left:0;font-size:11px}.map-bottom{align-items:flex-start;padding:12px}.legend{flex-direction:column;align-items:flex-start;gap:3px}.map-footer{gap:12px}.export-actions{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.export-actions button{min-width:0;min-height:48px;font-size:13px;padding:11px 12px}.export-actions #discard{grid-column:1/-1}.method{grid-template-columns:1fr;gap:22px;margin-top:30px;padding-top:25px}.method-intro p{max-width:none}.footer{align-items:flex-start;flex-direction:column;gap:9px}.pill{font-size:10px;padding:4px 8px}.input-actions{gap:10px}.input-actions button{font-size:12px;padding-inline:12px}}
+    .privacy-button{font-size:11px;padding:0;min-height:auto;border:0;background:transparent;font-weight:400;text-decoration:underline;text-underline-offset:4px;color:var(--muted)}.consent{position:fixed;left:max(24px,env(safe-area-inset-left,0px));bottom:calc(24px + env(safe-area-inset-bottom,0px));max-height:calc(100dvh - 48px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));overflow-y:auto;z-index:1900;background:var(--white);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 40px #263e3526;padding:19px 21px;width:410px;max-width:calc(100% - 32px)}.consent h2{font:600 14px var(--font)}.consent p{font-size:12px;color:var(--muted);margin:8px 0 14px}.consent-actions{display:flex;gap:8px}.consent-actions button{flex:1;font-size:12px}.consent-dismiss{margin-top:9px;font-size:11px}.consent .small{display:block;margin-top:10px}@media(max-width:720px){.consent{left:max(16px,env(safe-area-inset-left,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px))}.footer-links{flex-wrap:wrap;gap:14px}}
+    .map-tools{display:flex;flex-wrap:wrap;gap:8px}.map-guidance{flex:1;min-width:200px}.map-bottom .map-gesture-note{margin-top:6px;max-width:430px;line-height:1.5}.map-scroll-mode,.map-scroll-mode.leaflet-touch{touch-action:pan-y pinch-zoom}.map-scroll-mode .leaflet-pane{pointer-events:none}.map-tools [aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:var(--white)}.download-ready{display:flex;align-items:center;flex-wrap:wrap;gap:16px;padding:17px 20px;margin-top:16px;border:1px solid var(--line);border-radius:8px;background:var(--soft);font-size:13px}.download-ready>div{flex:1;min-width:0}.download-ready strong{font-weight:600}.download-ready p{font-size:12px;color:var(--muted);margin:5px 0}.download-ready a{display:inline-flex;align-items:center;min-height:44px;max-width:100%;overflow-wrap:anywhere;font-size:12px}.download-ready button{min-width:100px}.map-empty{top:180px;transform:translateX(-50%)}
+    @media(max-width:720px),(pointer:coarse){
+      select,textarea,input[type=text],input[type=date],input[type=file]{font-size:16px}textarea{min-height:160px}
+      button,.button,.text-button,.privacy-button{min-height:44px}button{font-size:14px}
+      nav a,.footer-links a,.method summary{display:inline-flex;align-items:center;min-height:44px}.method summary{display:list-item;padding-block:10px}.method details{padding-block:5px}
+      .footer-links{column-gap:20px;row-gap:4px}.footer-links a,.privacy-button{font-size:13px}
+      .help,.field-top span{font-size:12px}.field-top{align-items:start;flex-wrap:wrap;gap:3px}.field{font-size:13px}
+      .map-guidance{min-width:100%;flex-basis:100%}.map-tools{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.map-tools button{min-height:48px;font-size:13px;padding-inline:10px}
+      .map-empty{top:160px}.map-bottom p{font-size:12px}.export-note{font-size:12px}.map-actions button{min-height:44px;font-size:12px}
+      .leaflet-control-zoom a{width:44px!important;height:44px!important;line-height:44px!important}.leaflet-container a.leaflet-popup-close-button{width:44px;height:44px;line-height:44px}
+      .input-actions{flex-wrap:wrap}.input-actions .primary{flex:1;min-height:48px}.input-actions .text-button{padding:8px}.download-ready{align-items:stretch}.download-ready>div{flex-basis:100%}.download-ready button{width:100%}
+    }
+    @media(max-width:1000px) and (max-height:600px){#map{height:280px;height:clamp(220px,65svh,360px)}.map-empty{top:110px;padding:16px}.map-empty svg{display:none}.map-guidance{flex-basis:100%}.map-tools{flex:1}.map-tools button{flex:1;min-height:44px}.consent{max-width:460px}.hero{padding-block:28px}.hero-aside{display:none}.hero{grid-template-columns:1fr}}
+    @media(max-width:380px){.topbar-inner{gap:10px}.brand{gap:8px}.brand-name{font-size:23px}.brand-mark{width:33px;height:33px}nav{gap:10px}nav>a{display:none}h1{font-size:44px}.panel-heading{gap:9px}.panel-heading h2{font-size:25px}.panel-body{padding-inline:16px}.export-actions{grid-template-columns:1fr}.map-tools{grid-template-columns:1fr}.consent{padding:16px}}
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+    .paste-controls{margin-top:18px}.paste-controls .primary{width:100%}.image-converter{margin-top:24px}.image-converter .panel-heading{flex-wrap:wrap}.image-converter .pill{margin-left:auto}.converter-intro{padding:0 25px 22px;max-width:950px;font-size:13px;color:var(--muted)}.converter-layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,1fr);border-top:1px solid var(--line)}.trace-board{min-width:0;padding:22px;background:var(--paper)}.trace-toolbar{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:14px;font-size:12px}.trace-toolbar strong{font-weight:500}.trace-toolbar label{flex-shrink:0;font-size:11px}.trace-toolbar select{display:block;font-size:13px;height:44px;padding:8px;min-width:110px}.trace-viewport{overflow:auto;max-height:650px;max-height:min(65svh,650px);border:1px solid var(--line);border-radius:6px;background:white}.trace-viewport canvas{display:block;width:100%;height:auto;max-width:none;touch-action:pan-x pan-y pinch-zoom;cursor:crosshair}.trace-controls{min-width:0;padding:22px;border-left:1px solid var(--line)}.trace-controls fieldset{border:0;border-bottom:1px solid var(--line);padding:0 0 20px;margin:0 0 20px;min-width:0}.trace-controls legend{font-family:var(--display);font-size:23px;padding:0}.trace-controls .field{margin-top:14px}.anchor-row{display:grid;grid-template-columns:140px minmax(0,1fr);align-items:end;gap:10px;margin-top:13px}.anchor-row label{font-size:11px}.anchor-row input{margin-top:4px;font-size:13px}.anchor-row button{font-size:12px;padding:10px 8px}.trace-buttons{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.trace-controls [aria-pressed=true]{background:var(--ink);color:var(--white)}.trace-controls input[type=range]{width:100%;min-height:44px;accent-color:var(--ink)}.trace-controls output{float:right;color:var(--accent)}#colour-swatch{width:16px;height:16px;border:1px solid var(--muted);border-radius:50%;background:white}#trace-review{margin-top:20px}#trace-review button{margin-top:12px;width:100%}.image-confirm{align-items:center;min-height:48px}.image-confirm input{width:20px;height:20px;flex-shrink:0}.direction-summary{margin-top:12px;font-size:12px;display:flex;flex-wrap:wrap;gap:6px 18px;overflow-wrap:anywhere}.direction-pin{background:var(--accent);color:white;border:2px solid white;border-radius:5px;text-align:center;font:bold 11px/22px var(--font);box-shadow:0 2px 6px #263e3530}
+    @media(max-width:1100px){.converter-layout{grid-template-columns:minmax(0,1.2fr) minmax(310px,1fr)}.anchor-row{grid-template-columns:1fr}.anchor-row button{justify-content:flex-start}.trace-toolbar{flex-wrap:wrap}}
+    @media(max-width:800px){.converter-layout{grid-template-columns:1fr}.trace-controls{border-left:0;border-top:1px solid var(--line)}.anchor-row{grid-template-columns:140px minmax(0,1fr)}.trace-viewport{max-height:60svh}.trace-board,.trace-controls{padding:18px}.image-converter .pill{margin-left:41px}.trace-toolbar select,.anchor-row input{font-size:16px}.trace-controls button{min-height:48px}.converter-intro{padding-inline:18px}}
+    .trace-controls button[aria-pressed=true]:hover:not(:disabled),.map-tools button[aria-pressed=true]:hover:not(:disabled){background:var(--ink);color:var(--white)}
+    @media(max-width:380px){.anchor-row{grid-template-columns:1fr}.trace-buttons button{width:100%}.map-actions{flex-wrap:wrap}.image-converter .pill{margin-left:0}}
   </style>
 </head>
 <body>
@@ -42,9 +65,10 @@
     <section id="planner" class="workspace" aria-label="Plan your hike">
       <div class="panel"><div class="panel-heading"><span class="step">01</span><h2>Start with your waypoints</h2></div><div class="panel-body">
         <label class="field" for="input-method">How would you like to add them?</label>
-        <select id="input-method"><option value="coordinates">Paste coordinates</option><option value="text">Upload a text or CSV file</option><option value="gpx">Upload a GPX file</option><option value="image">Review a map image or photo</option></select>
+        <select id="input-method"><option value="coordinates">Paste coordinates</option><option value="text">Upload a text or CSV file</option><option value="gpx">Upload a GPX file</option><option value="map-image">Paste a route map → GPX</option><option value="image">Review a map image or photo</option></select>
         <div id="coordinates-panel"><div class="field-top"><label class="field" for="coordinates">Coordinates</label><span>WGS84 · LATITUDE, LONGITUDE</span></div><textarea id="coordinates" spellcheck="false" aria-describedby="coordinate-help" placeholder="22.361976, 114.371535&#10;22.371935, 114.373133&#10;22.394868, 114.360075"></textarea><p class="help" id="coordinate-help">Decimal degrees. One latitude/longitude pair per line, or comma-separated pairs. No trail connections are assumed.</p><div class="input-actions"><button id="preview-points" class="primary">Preview waypoints <span aria-hidden="true">↗</span></button><button id="load-example" class="text-button">Try example pins</button></div></div>
-        <div id="file-panel" hidden><div class="upload-area"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 16V3m-4 4 4-4 4 4M4 14v6h16v-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><strong id="upload-title">Choose your coordinate file</strong><p id="upload-help" class="small">TXT or CSV · maximum 10 MB</p><label class="field" for="file-input">Select a file</label><input id="file-input" type="file" accept=".txt,.csv,text/plain,text/csv" aria-describedby="upload-help"></div><p class="help">Import replaces the current draft. Review your file before using any points.</p><div id="image-review" class="image-preview" hidden><img id="photo" alt="Your uploaded map image for manual location review"><p id="photo-status" role="status"></p><label id="photo-confirm-label" class="image-confirm" hidden><input type="checkbox" id="photo-confirm"><span>I checked this GPS position on an independent map and want to add it as a waypoint. It may be the camera location, not the map location.</span></label><button id="add-photo-gps" hidden disabled>Add confirmed photo position</button><p class="help">Automatic map and waypoint recognition is not available in this release. Use the coordinate input or “Add pins on map” after identifying the area yourself.</p></div></div>
+        <div id="file-panel" hidden><div class="upload-area"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 16V3m-4 4 4-4 4 4M4 14v6h16v-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><strong id="upload-title">Choose your coordinate file</strong><p id="upload-help" class="small">TXT or CSV · maximum 10 MB</p><label class="field" for="file-input">Select a file</label><input id="file-input" type="file" accept=".txt,.csv,text/plain,text/csv" aria-describedby="upload-help"></div><p class="help">Import replaces the current draft. Review your file before using any points.</p><div id="image-review" class="image-preview" hidden><img id="photo" alt="Your uploaded map image for manual location review"><p id="photo-status" role="status"></p><label id="photo-confirm-label" class="image-confirm" hidden><input type="checkbox" id="photo-confirm"><span>I checked this GPS position on an independent map and want to add it as a waypoint. It may be the camera location, not the map location.</span></label><button id="add-photo-gps" hidden disabled>Add confirmed photo position</button><p class="help">To convert a coloured route screenshot, select “Paste a route map → GPX”. That workflow requires three known map locations; photo GPS cannot identify the area shown.</p></div></div>
+        <div id="paste-controls" class="paste-controls" hidden><button id="paste-map" class="primary">Paste map from clipboard</button><p class="help">Copy the image itself, then use this button or ⌘V / Ctrl+V. On iPhone, accept the browser’s Paste prompt. You can also choose a screenshot above. Links and pasted HTML are never opened.</p><p class="help">For flat map screenshots with one continuous coloured route. Three known map coordinates are required. Angled photos, unknown projections and broken or dashed lines are not supported.</p></div>
         <p id="input-message" class="message" role="status" aria-live="polite" hidden></p>
       </div></div>
       <aside class="panel" aria-labelledby="principles-title"><div class="panel-heading"><span class="step">↗</span><h2 id="principles-title">A little more considered</h2></div><div class="principles">
@@ -53,20 +77,51 @@
         <div class="principle"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="6" cy="5" r="2" stroke="currentColor" stroke-width="1.5"/><circle cx="18" cy="19" r="2" stroke="currentColor" stroke-width="1.5"/><path d="M6 7v6c0 5 12-7 12-1v5" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 2"/></svg><div><h3>No made-up connections</h3><p>Waypoints stay separate until a real trail connection can be verified. Fewer qualifying routes is always acceptable.</p></div></div>
       </div><div class="principles-foot"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.5"/></svg>Files are processed in your browser. No file uploads.</div></aside>
     </section>
+    <section id="image-converter" class="image-converter panel" aria-labelledby="converter-title" hidden>
+      <div class="panel-heading"><span class="step">↗</span><h2 id="converter-title">From map image to GPX</h2><span class="pill">On-device conversion</span></div>
+      <p class="converter-intro">Locate three known places, pick the route colour, then mark the start, any via points, and the end. We follow connected coloured pixels; we never fill a gap. The result is an <strong>unverified image trace</strong>, not a verified hiking route.</p>
+      <div class="converter-layout">
+        <div class="trace-board">
+          <div class="trace-toolbar"><strong id="trace-tool-status" role="status">Choose a tool below, then tap the image.</strong><button id="trace-done" hidden>Done marking</button><label for="trace-zoom">Image zoom<select id="trace-zoom"><option value="1">Fit width</option><option value="2">2×</option><option value="4">4×</option></select></label></div>
+          <div class="trace-viewport" id="trace-viewport"><canvas id="trace-canvas" tabindex="0" role="img" aria-label="Route image with calibration markers and extracted overlay" aria-describedby="trace-keyboard">Your browser needs canvas support to convert this map.</canvas></div>
+          <p id="trace-keyboard" class="help">Tap or click to place a point. For precision, zoom and scroll the image. Keyboard: focus the image, use arrow keys (Shift for larger steps), then Enter. Escape cancels the current tool.</p>
+          <p class="help"><strong>A/B/C</strong> = known locations · <strong>1/2/3…</strong> = route order · <strong>cyan</strong> = extracted pixels</p>
+          <button id="trace-reset" class="text-button">Reset image markings</button>
+        </div>
+        <div class="trace-controls">
+          <fieldset><legend>1. Locate the map</legend><p class="help">Use three well-spaced, non-collinear landmarks or grid intersections, ideally around the route. Enter their independently verified WGS84 latitude, longitude. Photo GPS alone cannot calibrate a map.</p>
+            <label class="field" for="trace-projection">Map projection</label><select id="trace-projection"><option value="mercator">Web Mercator (most online maps)</option><option value="geographic">Straight latitude / longitude grid</option></select>
+            <div class="anchor-row"><button id="anchor-a" data-anchor="0" aria-pressed="false">Set A on image</button><label for="anchor-coord-a">A · latitude, longitude<input id="anchor-coord-a" type="text" spellcheck="false" autocomplete="off" placeholder="22.36, 114.37"></label></div>
+            <div class="anchor-row"><button id="anchor-b" data-anchor="1" aria-pressed="false">Set B on image</button><label for="anchor-coord-b">B · latitude, longitude<input id="anchor-coord-b" type="text" spellcheck="false" autocomplete="off" placeholder="22.38, 114.40"></label></div>
+            <div class="anchor-row"><button id="anchor-c" data-anchor="2" aria-pressed="false">Set C on image</button><label for="anchor-coord-c">C · latitude, longitude<input id="anchor-coord-c" type="text" spellcheck="false" autocomplete="off" placeholder="22.40, 114.36"></label></div>
+            <p class="help" id="trace-calibration">0 of 3 image locations marked. Wrong coordinates or projection will produce the wrong GPX.</p>
+          </fieldset>
+          <fieldset><legend>2. Extract the visible line</legend><div class="trace-buttons"><button id="trace-colour" aria-pressed="false">Pick route colour <span id="colour-swatch" aria-hidden="true"></span></button><button id="trace-stops" aria-pressed="false">Mark start → via → end</button><button id="trace-undo" disabled>Undo last route point</button></div>
+            <p id="trace-stop-status" class="help">Mark at least two points in hiking order. Add via points on every intended branch. For a loop, add via points and finish at the start.</p>
+            <label class="field" for="trace-tolerance">Colour tolerance <output id="tolerance-value" for="trace-tolerance">55</output></label><input id="trace-tolerance" type="range" min="20" max="110" value="55" step="5"><p class="help">Lower values isolate the route more strictly. Increase only if the line varies in colour. Black, white, dashed, obscured or disconnected routes need a clearer source image.</p>
+            <button id="extract-trace" class="primary">Extract coloured route</button>
+          </fieldset>
+          <div id="trace-message" class="message" role="status" aria-live="polite">Your image stays on this device. No AI service is called.</div>
+          <div id="trace-review" hidden><h3>3. Review before exporting</h3><p class="help">Inspect the cyan line at every junction: same-colour branches can produce the wrong path. Then compare its position on the independent basemap below. No government status, closures, terrain or transit has been verified.</p><button id="preview-trace">Replace draft with trace for review</button><label class="image-confirm"><input id="confirm-trace" type="checkbox" disabled><span>I checked the complete overlay and map placement. This GPX is an unverified image reference, not suitable for navigation.</span></label><button id="save-trace" class="primary" disabled>Save image trace as GPX ↓</button></div>
+        </div>
+      </div>
+    </section>
     <section class="route-section" aria-labelledby="routes-title"><div class="section-title"><h2 id="routes-title"><span>02</span>Room for three good options</h2><p>Verified routing in development</p></div><div class="route-options">
       <article class="route-option"><div class="route-topline"><span>OPTION 01</span><span>OUR FIRST PRIORITY</span></div><h3>Official trails first</h3><p>Prefer verified government-managed trails with practical transit connections.</p><div class="route-status"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6" stroke="currentColor"/><path d="M8 4v4l3 2" stroke="currentColor"/></svg>Awaiting verified data</div></article>
       <article class="route-option"><div class="route-topline"><span>OPTION 02</span><span>TAKE IT EASIER</span></div><h3>A gentler day out</h3><p>Compare distance and ascent within the same trail and access safeguards.</p><div class="route-status"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6" stroke="currentColor"/><path d="M8 4v4l3 2" stroke="currentColor"/></svg>Awaiting verified data</div></article>
       <article class="route-option"><div class="route-topline"><span>OPTION 03</span><span>MAKE A DAY OF IT</span></div><h3>The scenic alternative</h3><p>Explore worthwhile viewpoints without relaxing the route requirements.</p><div class="route-status"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6" stroke="currentColor"/><path d="M8 4v4l3 2" stroke="currentColor"/></svg>Awaiting verified data</div></article>
-    </div><p class="coming-note">These are planned comparison categories, not generated routes. Route generation and navigation-track export remain unavailable until the safety checks are connected.</p></section>
-    <section class="map-section" aria-labelledby="map-title"><div class="section-title"><h2 id="map-title"><span>03</span>See the bigger picture</h2><div class="map-actions"><button id="fit-points" disabled>Fit all points <span aria-hidden="true">⤢</span></button></div></div>
-      <div id="map-capture" class="map-container"><div id="map" aria-label="Interactive map for reviewing waypoint locations"></div><div class="map-label"><strong id="map-caption">Your planning canvas</strong><span id="map-count">No waypoints added</span></div><div id="map-empty" class="map-empty"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M25 13c0 7-9 16-9 16S7 20 7 13a9 9 0 1 1 18 0Z" stroke="currentColor" stroke-width="1.5"/><circle cx="16" cy="13" r="3" stroke="currentColor" stroke-width="1.5"/></svg><h3>Every hike starts somewhere.</h3><p>Add coordinates above, or place your own pins on the map. Your whole draft will fit here.</p></div><div class="map-bottom"><p class="legend"><span><span class="legend-dot"></span>Waypoints, not a routed trail</span><span id="track-legend" hidden><span class="legend-dash"></span>Unverified imported track</span></p><button id="toggle-pins" aria-pressed="false">+ Add pins on map</button></div></div>
-      <div class="map-footer"><p class="export-note" id="export-note">Exports are planning drafts only. GPX contains waypoints, never an invented trail. PNG includes a visible “not for navigation” warning.</p><div class="export-actions"><button id="save-png" disabled>Save preview as PNG <span aria-hidden="true">↓</span></button><button id="save-gpx" class="primary" disabled>Save waypoints as GPX <span aria-hidden="true">↓</span></button><button id="discard" disabled>Discard</button></div></div>
+    </div><p class="coming-note">These are planned comparison categories, not generated routes. Verified route generation remains unavailable. Imported and image-derived source traces can be saved as unverified GPX references.</p></section>
+    <section class="map-section" aria-labelledby="map-title"><div class="section-title"><h2 id="map-title"><span>03</span>See the bigger picture</h2><div class="map-actions"><button id="reverse-route" disabled>Reverse route ⇄</button><button id="fit-points" disabled>Fit all points <span aria-hidden="true">⤢</span></button></div></div>
+      <div id="map-capture" class="map-container"><div id="map" aria-label="Interactive map for reviewing waypoint locations" aria-describedby="map-gesture-note"></div><div class="map-label"><strong id="map-caption">Your planning canvas</strong><span id="map-count">No waypoints added</span></div><div id="map-empty" class="map-empty"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M25 13c0 7-9 16-9 16S7 20 7 13a9 9 0 1 1 18 0Z" stroke="currentColor" stroke-width="1.5"/><circle cx="16" cy="13" r="3" stroke="currentColor" stroke-width="1.5"/></svg><h3>Every hike starts somewhere.</h3><p>Add coordinates above, or place your own pins on the map. Your whole draft will fit here.</p></div><div class="map-bottom"><div class="map-guidance"><p class="legend"><span><span class="legend-dot"></span>Waypoints, not a routed trail</span><span id="track-legend" hidden><span class="legend-dash"></span>Unverified source track</span></p><p id="map-gesture-note" class="map-gesture-note" hidden>Scroll over the map to move the page. Choose Explore map to pan or pinch.</p></div><div class="map-tools"><button id="toggle-map" aria-pressed="false" aria-controls="map" hidden>Explore map</button><button id="toggle-pins" aria-pressed="false" aria-controls="map">+ Add pins on map</button></div></div></div>
+      <div id="direction-summary" class="direction-summary" aria-live="polite" hidden></div>
+      <div class="map-footer"><p class="export-note" id="export-note">GPX saves the current direction, waypoints and any source track segments. It never creates connections between waypoints or across segment gaps. All exports are unverified; check access and transport independently.</p><div class="export-actions"><button id="save-png" disabled>Save preview as PNG <span aria-hidden="true">↓</span></button><button id="save-gpx" class="primary" disabled>Save GPX draft <span aria-hidden="true">↓</span></button><button id="discard" disabled>Discard</button></div></div>
+      <div id="download-ready" class="download-ready" role="status" hidden><div><strong>Your planning file is ready.</strong><p>If the download did not start, tap the filename below. On supported phones, Share file opens options such as Save to Files.</p><a id="download-link" download></a></div><button id="share-file" hidden>Share file</button></div>
       <details id="waypoint-list" class="pin-list" hidden><summary id="waypoint-summary">Review your waypoints</summary><ol id="waypoints"></ol></details>
     </section>
     <section id="approach" class="method" aria-labelledby="method-title"><div class="method-intro"><p class="eyebrow">Built with care</p><h2 id="method-title">Know what’s behind<br>your route.</h2><p>Clear limits are part of the product.<br>Here’s what this first release can—and cannot—do.</p></div><div>
-      <details open><summary>What works in this preview?</summary><p>Paste decimal coordinates, import TXT/CSV or GPX files, review map images, read supported photo GPS metadata, place map pins, and save a planning PNG or waypoint-only GPX. Imported track segments remain separate and are shown as unverified. Nothing is snapped or repaired automatically.</p></details>
+      <details open><summary>What works in this preview?</summary><p>Paste decimal coordinates, import TXT/CSV or GPX, paste a route screenshot, review photo GPS, and place map pins. Calibrated coloured map lines can be extracted as unverified image references. Reverse the current direction and save PNG or GPX; source track segments and their gaps are preserved. Coordinate-only input stays as separate waypoints. Nothing is snapped or repaired automatically.</p></details>
       <details><summary>What must happen before route generation?</summary><p>We need regional government trail sources, access and closure information, real path-network routing, and dated public-transport checks. The gpx-trail-fix workflow requires real OpenStreetMap geometry, trail-relation checks, honest elevation statistics, and transit caveats. Its Python route repair is not running inside this page. Hiking relations alone do not establish government management.</p><p>Distance, ascent, travel time, and safety scores are intentionally absent until they can be supported. Unknown conditions must not silently pass a safety check.</p></details>
-      <details><summary>How are map photos handled?</summary><p>Images are viewed locally. When readable GPS metadata exists, we show the camera position for your confirmation. This does not identify where a photographed map is located or recognize its waypoints. Automatic image recognition is still to be built; place pins or enter coordinates after independently identifying the map area.</p></details>
+      <details><summary>How are map photos handled?</summary><p>Images are processed locally and never sent to an AI provider. “Paste a route map → GPX” accepts a flat screenshot, three known coordinate references, and a selected continuous route colour. It extracts adjacent matching pixels in the order you mark, then requires a visual review. The converter does not automatically identify an unknown region, correct angled photos, bridge gaps, or verify trails. A wrong projection, calibration or same-colour branch can still produce a wrong result. GPS in a photo may describe the camera location and is never used to locate the depicted map.</p></details>
       <details id="privacy-details"><summary>Where does my data go?</summary><p>This app does not upload your files or store your draft between visits. Google Analytics loads only if you allow optional analytics. It measures page views and fixed app-action names, plus standard browser/device and approximate location data. We do not send coordinates, filenames, photos, GPX contents, typed text, query strings, or referrer URLs to Analytics. Automatic enhanced measurement and advertising features are disabled. You can withdraw consent using “Privacy settings” below. Browser privacy signals and blockers may prevent tracking.</p><p>Your analytics choice is stored locally; analytics cookies, if accepted, are limited to this project. GitHub hosts the page; Google Fonts and the pinned Leaflet and Exifr libraries load from external providers. OpenStreetMap receives requests for the map tiles you view, which reveal the approximate area and your IP address. PNG export uses tiles already displayed; it does not download an offline map. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google privacy policy</a>.</p></details>
     </div></section>
     <footer class="footer"><p>trailcraft &nbsp; / &nbsp; A more considered way outside.</p><div class="footer-links"><button id="privacy-settings" class="privacy-button">Privacy settings</button><a href="https://github.com/StanleyCheng/gpx_design" target="_blank" rel="noopener noreferrer">View source ↗</a><a href="https://github.com/StanleyCheng/gpx_design/issues" target="_blank" rel="noopener noreferrer">Feedback ↗</a><a href="https://www.openstreetmap.org/fixthemap" target="_blank" rel="noopener noreferrer">Map issues ↗</a></div></footer>
@@ -80,9 +135,12 @@
   'use strict';
   (() => {
     const $ = id => document.getElementById(id);
-    const state = { points: [], segments: [], source: '', imageUrl: null, photoGPS: null, adding: false, fileVersion: 0 };
+    const state = { points: [], segments: [], source: '', imageUrl: null, photoGPS: null, adding: false, fileVersion: 0, requiresTraceReview: false };
+    const trace = { bitmap: null, pixels: null, anchors: [null, null, null], stops: [], colour: null, mode: null, route: null, pixelRoute: [], reviewed: false, revision: 0, cursor: { x: 0, y: 0 } };
     const MAX_WAYPOINTS = 500, MAX_TRACKPOINTS = 100000;
     let map = null, markers = null, tracks = null, tileLayer = null, toastTimer;
+    const compactMap = matchMedia('(pointer: coarse), (max-width: 720px), (max-width: 1000px) and (max-height: 600px)');
+    let mapExploring = false, exportUrl = null, exportFile = null, draftRevision = 0;
     const GA_MEASUREMENT_ID = 'G-YF4QD5R18X';
     const GA_PAGE = 'https://stanleycheng.github.io/gpx_design/';
     const CONSENT_KEY = 'trailcraft.analytics-consent.v1';
@@ -152,14 +210,14 @@
       const xml = new DOMParser().parseFromString(text, 'application/xml');
       if (xml.getElementsByTagName('parsererror').length || xml.documentElement.localName !== 'gpx') throw new Error('This file is not valid GPX XML.');
       const child = (el, name) => Array.from(el.children).find(node => node.localName === name);
-      const read = (el, index) => point(el.getAttribute('lat'), el.getAttribute('lon'), child(el, 'name')?.textContent || `Waypoint ${index + 1}`);
+      const read = (el, index) => { const p = point(el.getAttribute('lat'), el.getAttribute('lon'), child(el, 'name')?.textContent || `Waypoint ${index + 1}`); const elevation = child(el, 'ele')?.textContent?.trim(); if (elevation && Number.isFinite(Number(elevation))) p.ele = Number(elevation); return p; };
       const all = Array.from(xml.getElementsByTagName('*'));
       const pts = all.filter(el => el.localName === 'wpt').map(read);
       const groups = all.filter(el => el.localName === 'trkseg' || el.localName === 'rte');
       const segments = groups.map(group => Array.from(group.children).filter(el => el.localName === 'trkpt' || el.localName === 'rtept').map(read)).filter(seg => seg.length);
       if (segments.reduce((sum, seg) => sum + seg.length, 0) > MAX_TRACKPOINTS) throw new Error(`This GPX exceeds ${MAX_TRACKPOINTS.toLocaleString()} trackpoints. Please use a smaller file.`);
       if (!pts.length && segments.length) {
-        segments.forEach((segment, i) => { pts.push({ ...segment[0], name: `Segment ${i + 1} start (unverified)` }); if (segment.length > 1) pts.push({ ...segment.at(-1), name: `Segment ${i + 1} end (unverified)` }); });
+        segments.forEach((segment, i) => { pts.push({ ...segment[0], name: `Segment ${i + 1} endpoint A (unverified)` }); if (segment.length > 1) pts.push({ ...segment.at(-1), name: `Segment ${i + 1} endpoint B (unverified)` }); });
       }
       if (!pts.length) throw new Error('No waypoints or track coordinates were found in this GPX.');
       if (pts.length > MAX_WAYPOINTS) throw new Error(`This GPX has too many waypoints or segments. Maximum ${MAX_WAYPOINTS} planning waypoints.`);
@@ -172,12 +230,19 @@
       map.fitBounds(L.latLngBounds(coords), { padding: [55, 70], maxZoom: 15, animate: false });
     }
     function render(fit = true) {
+      draftRevision++;
+      clearExport();
+      const ordered = state.segments.length ? state.segments.flat() : state.points;
       if (map) {
         markers.clearLayers(); tracks.clearLayers();
         state.segments.forEach(seg => L.polyline(seg.map(p => [p.lat, p.lon]), { color: '#bc4827', weight: 3, dashArray: '7 7', opacity: .8 }).addTo(tracks));
         state.points.forEach((p, i) => {
           const popup = element('div'); popup.append(element('strong', p.name), element('span', `${p.lat.toFixed(6)}, ${p.lon.toFixed(6)}`), element('span', 'Unverified waypoint · not a routed trail'));
           L.marker([p.lat, p.lon], { icon: L.divIcon({ className: 'number-pin', html: `<span>${i + 1}</span>`, iconSize: [33, 33], iconAnchor: [16, 16] }), title: `${i + 1}. ${p.name}`, alt: p.name }).bindPopup(popup).addTo(markers);
+        });
+        if (ordered.length > 1) [ordered[0], ordered.at(-1)].forEach((p, i) => {
+          const label = i ? 'End' : 'Start'; const popup = element('div'); popup.append(element('strong', label), element('span', `${p.lat.toFixed(6)}, ${p.lon.toFixed(6)}`), element('span', 'Current order · access and transport unverified'));
+          L.marker([p.lat, p.lon], { icon: L.divIcon({ className: 'direction-pin', html: label, iconSize: [42, 26], iconAnchor: [i ? -10 : 32, i ? -8 : 44] }), title: `${label} of current draft`, alt: `${label} of current draft` }).bindPopup(popup).addTo(markers);
         });
         if (fit) fitPoints();
       }
@@ -187,46 +252,54 @@
       $('map-caption').textContent = hasGeometry ? 'Unverified planning draft' : 'Your planning canvas';
       $('map-count').textContent = hasGeometry ? `${state.points.length} waypoint${state.points.length === 1 ? '' : 's'} · no verified route` : 'No waypoints added';
       $('track-legend').hidden = !state.segments.length;
-      $('save-gpx').disabled = !hasPoints;
+      $('save-gpx').disabled = !hasGeometry || (state.requiresTraceReview && (!trace.reviewed || !$('confirm-trace').checked));
+      $('reverse-route').disabled = ordered.length < 2;
+      $('direction-summary').hidden = !ordered.length;
+      $('direction-summary').replaceChildren(...(ordered.length ? [element('span', `Start · ${ordered[0].lat.toFixed(6)}, ${ordered[0].lon.toFixed(6)}`), element('span', `End · ${ordered.at(-1).lat.toFixed(6)}, ${ordered.at(-1).lon.toFixed(6)}`), element('span', `${state.segments.length ? `${state.segments.length} separate source segment(s)` : 'Waypoint order only'} · transit unverified`)] : []));
       $('save-png').disabled = !hasGeometry || !map;
       $('fit-points').disabled = !hasGeometry || !map;
       $('discard').disabled = !hasGeometry && !state.imageUrl;
       $('waypoint-list').hidden = !hasPoints;
-      $('waypoint-summary').textContent = `Review ${state.points.length} waypoint${state.points.length === 1 ? '' : 's'}${state.segments.length ? ' · imported track is unverified' : ''}`;
+      $('waypoint-summary').textContent = `Review ${state.points.length} waypoint${state.points.length === 1 ? '' : 's'}${state.segments.length ? ' · source track is unverified' : ''}`;
       const list = document.createDocumentFragment();
       state.points.forEach((p, i) => { const row = element('li', undefined, 'pin-row'), info = element('div', undefined, 'pin-info'); info.append(element('strong', p.name), element('span', `${p.lat.toFixed(6)}, ${p.lon.toFixed(6)}`, 'mono')); const remove = element('button', 'Remove'); remove.type = 'button'; remove.setAttribute('aria-label', `Remove waypoint ${i + 1}: ${p.name}`); remove.addEventListener('click', () => { state.points.splice(i, 1); render(false); toast('Waypoint removed. Any imported track remains unchanged.'); }); row.append(element('span', String(i + 1).padStart(2, '0'), 'pin-index mono'), info, remove); list.append(row); });
       $('waypoints').replaceChildren(list);
     }
-    function replaceDraft(points, segments, source) { state.points = points; state.segments = segments; state.source = source; render(); }
+    function replaceDraft(points, segments, source) { state.points = points; state.segments = segments; state.source = source; state.requiresTraceReview = source === 'Image trace — unverified'; render(); }
     function clearPhoto() {
+      if (trace.bitmap) { resetTrace(); trace.bitmap = null; trace.pixels = null; $('image-converter').hidden = true; $('trace-canvas').width = 1; $('trace-canvas').height = 1; }
       if (state.imageUrl) URL.revokeObjectURL(state.imageUrl);
       state.imageUrl = null; state.photoGPS = null; $('photo').removeAttribute('src'); $('image-review').hidden = true; $('photo-confirm').checked = false; $('photo-confirm-label').hidden = true; $('add-photo-gps').hidden = true; $('add-photo-gps').disabled = true;
     }
     $('input-method').addEventListener('change', () => {
       const method = $('input-method').value; state.fileVersion++;
       $('coordinates-panel').hidden = method !== 'coordinates'; $('file-panel').hidden = method === 'coordinates'; $('input-message').hidden = true; $('file-input').value = '';
-      const config = { text: ['Choose your coordinate file', 'TXT or CSV · maximum 10 MB', '.txt,.csv,text/plain,text/csv'], gpx: ['Choose your GPX file', 'GPX · maximum 10 MB · preview only', '.gpx,application/gpx+xml,application/xml,text/xml'], image: ['Choose your map image or photo', 'JPEG, PNG or WebP · maximum 10 MB · local processing', 'image/jpeg,image/png,image/webp'] }[method];
+      $('paste-controls').hidden = method !== 'map-image';
+      const config = { text: ['Choose your coordinate file', 'TXT or CSV · maximum 10 MB', '.txt,.csv,text/plain,text/csv'], gpx: ['Choose your GPX file', 'GPX · maximum 10 MB · unverified source data', '.gpx,application/gpx+xml,application/xml,text/xml'], image: ['Choose your map image or photo', 'JPEG, PNG or WebP · maximum 10 MB · local processing', 'image/jpeg,image/png,image/webp'], 'map-image': ['Choose a route screenshot, or paste one below', 'JPEG, PNG or WebP · maximum 10 MB · local processing', 'image/jpeg,image/png,image/webp'] }[method];
       if (config) { $('upload-title').textContent = config[0]; $('upload-help').textContent = config[1]; $('file-input').accept = config[2]; }
-      $('image-review').hidden = method !== 'image' || !state.imageUrl;
+      $('image-review').hidden = !['image', 'map-image'].includes(method) || !state.imageUrl;
+      $('image-converter').hidden = method !== 'map-image' || !trace.bitmap;
     });
     $('preview-points').addEventListener('click', () => {
       try { const points = parseCoordinates($('coordinates').value); state.fileVersion++; clearPhoto(); replaceDraft(points, [], 'Entered coordinates'); message(`${points.length} waypoints added. Check every pin. Government trail status and transport are not verified.`); track('waypoints_previewed'); }
       catch (error) { message(error.message, true); }
     });
     $('load-example').addEventListener('click', () => { $('coordinates').value = '22.361976, 114.371535\n22.371935, 114.373133\n22.394868, 114.360075'; $('preview-points').click(); message('Example pins near Sai Kung, Hong Kong—not a recommended hike. No trail or transit connection is implied.'); });
-    $('file-input').addEventListener('change', async event => {
-      const file = event.target.files[0]; if (!file) return;
-      const version = ++state.fileVersion, method = $('input-method').value;
+    $('file-input').addEventListener('change', event => { const file = event.target.files[0]; if (file) importFile(file, $('input-method').value); event.target.value = ''; });
+    async function importFile(file, method) {
+      const version = ++state.fileVersion;
       if (file.size > 10 * 1024 * 1024) { message('Please choose a file smaller than 10 MB.', true); return; }
       try {
-        if (method === 'image') {
+        if (method === 'image' || method === 'map-image') {
           if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) throw new Error('Use a JPEG, PNG, or WebP image. Convert HEIC files to JPEG first.');
           const imageUrl = URL.createObjectURL(file), probe = new Image(); probe.src = imageUrl;
           try { await probe.decode(); if (probe.naturalWidth * probe.naturalHeight > 40000000) throw new Error('Please resize the image below 40 megapixels.'); } catch (error) { URL.revokeObjectURL(imageUrl); throw new Error(error.message.includes('megapixels') ? error.message : 'This image could not be decoded. Try another JPEG or PNG.'); }
           if (version !== state.fileVersion) { URL.revokeObjectURL(imageUrl); return; }
           clearPhoto(); state.imageUrl = imageUrl; $('photo').src = imageUrl; $('image-review').hidden = false; $('photo-status').textContent = 'Checking for photo GPS metadata…'; render(false);
-          message(`Opened ${file.name} locally. Your existing waypoint draft is unchanged. No map recognition has been performed.`);
+          if (method === 'map-image') openConverter(probe);
+          message(method === 'map-image' ? 'Image opened locally. Continue in “From map image to GPX” below: calibrate, extract, and review before export.' : `Opened ${file.name} locally. No location has been inferred from the image.`);
           track('photo_reviewed');
+          if (method === 'map-image') { $('photo-status').textContent = 'Route image ready. Use three known map locations in the converter below; camera GPS is not used for calibration.'; return; }
           if (!window.exifr) { $('photo-status').textContent = 'The metadata reader is unavailable. You can still inspect the image and place waypoints manually.'; return; }
           let gps;
           try { gps = await exifr.gps(file); } catch { if (version === state.fileVersion) $('photo-status').textContent = 'GPS metadata could not be read. Inspect the map and place waypoints manually.'; return; }
@@ -241,10 +314,10 @@
           const result = method === 'gpx' ? parseGPX(text) : { points: parseCoordinates(text), segments: [] };
           clearPhoto(); replaceDraft(result.points, result.segments, file.name);
           track('file_imported');
-          message(`Imported ${result.points.length} waypoints${result.segments.length ? ` and ${result.segments.length} unverified track segments` : ''} from ${file.name}. No routing or repair performed. GPX export contains waypoints only.`);
+          message(`Imported ${result.points.length} waypoints${result.segments.length ? ` and ${result.segments.length} unverified track segments` : ''} from ${file.name}. Reverse changes their order; GPX preserves segment boundaries. No routing or repair performed. Recorded times and unsupported extensions are not exported.`);
         }
       } catch (error) { if (version === state.fileVersion) message(error.message || 'The file could not be read.', true); }
-    });
+    }
     $('photo-confirm').addEventListener('change', () => { $('add-photo-gps').disabled = !$('photo-confirm').checked || !state.photoGPS; });
     $('add-photo-gps').addEventListener('click', () => {
       if (!$('photo-confirm').checked || !state.photoGPS) return;
@@ -252,22 +325,265 @@
       state.points.push({ ...state.photoGPS }); state.source = 'User-confirmed photo GPS'; $('photo-confirm').checked = false; $('add-photo-gps').disabled = true; render(); toast('Confirmed photo position added. Trail access is still unverified.');
       track('photo_gps_confirmed');
     });
-    function setAdding(value) { state.adding = value; $('toggle-pins').setAttribute('aria-pressed', String(value)); $('toggle-pins').textContent = value ? '✓ Finish adding pins' : '+ Add pins on map'; if (map) map.getContainer().style.cursor = value ? 'crosshair' : ''; }
-    $('toggle-pins').addEventListener('click', () => { if (!map) return; setAdding(!state.adding); if (state.adding) toast('Click the map to add waypoints. Finish adding pins when done.'); });
+    // BEGIN IMAGE CONVERSION MATH — pure functions, also exercised by tests.
+    function imageTransform(anchors, width, height, projection) {
+      if (anchors.length !== 3 || anchors.some(p => !p || ![p.x, p.y, p.lat, p.lon].every(Number.isFinite))) throw new Error('Mark A, B and C on the image and enter one coordinate pair for each.');
+      if (anchors.some(p => Math.abs(p.lat) > 85 || Math.abs(p.lon) > 180)) throw new Error('Use valid coordinates between 85°S and 85°N for this converter.');
+      const [a, b, c] = anchors, det = (b.x - a.x) * (c.y - a.y) - (c.x - a.x) * (b.y - a.y);
+      if (Math.abs(det) < width * height * .03) throw new Error('A, B and C are too close or nearly in a line. Spread them across the map.');
+      const span = key => Math.max(...anchors.map(p => p[key])) - Math.min(...anchors.map(p => p[key]));
+      if (span('lat') > 1.5 || span('lon') > 1.5) throw new Error('Use a local map covering less than 1.5° in each direction. World maps and dateline crossings are not supported.');
+      const northing = lat => projection === 'mercator' ? Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360)) * 180 / Math.PI : lat;
+      const values = anchors.map(p => ({ ...p, north: northing(p.lat) }));
+      const geoArea = (values[1].lon - values[0].lon) * (values[2].north - values[0].north) - (values[2].lon - values[0].lon) * (values[1].north - values[0].north);
+      if (Math.abs(geoArea) < 1e-10) throw new Error('The three geographic locations are duplicate or in a line. Check their coordinates.');
+      const convert = p => {
+        const u = ((p.x - a.x) * (c.y - a.y) - (c.x - a.x) * (p.y - a.y)) / det;
+        const v = ((b.x - a.x) * (p.y - a.y) - (p.x - a.x) * (b.y - a.y)) / det;
+        const lon = values[0].lon + u * (values[1].lon - values[0].lon) + v * (values[2].lon - values[0].lon);
+        const north = values[0].north + u * (values[1].north - values[0].north) + v * (values[2].north - values[0].north);
+        const lat = projection === 'mercator' ? (2 * Math.atan(Math.exp(north * Math.PI / 180)) - Math.PI / 2) * 180 / Math.PI : north;
+        if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 85 || Math.abs(lon) > 180) throw new Error('Calibration places the route outside valid map coordinates. Check A, B and C.');
+        return { lat, lon };
+      };
+      const corners = [{ x: 0, y: 0 }, { x: width, y: 0 }, { x: 0, y: height }, { x: width, y: height }].map(convert);
+      if (['lat', 'lon'].some(k => Math.max(...corners.map(p => p[k])) - Math.min(...corners.map(p => p[k])) > 2)) throw new Error('Calibration covers too large an area. Use a closer map or check your reference points.');
+      return convert;
+    }
+    function extractColourPath(rgba, width, height, colour, tolerance, stops) {
+      if (!colour) throw new Error('Pick a clear pixel in the centre of the coloured route first.');
+      if (Math.max(...colour) - Math.min(...colour) < 45) throw new Error('Choose a distinct coloured route. Black, grey and white lines cannot be isolated reliably.');
+      if (stops.length < 2) throw new Error('Mark the route start and end, with via points on any intended branches.');
+      const size = width * height, mask = new Uint8Array(size), limit = tolerance * tolerance;
+      let count = 0;
+      for (let i = 0; i < size; i++) {
+        const j = i * 4, distance = (rgba[j] - colour[0]) ** 2 + (rgba[j + 1] - colour[1]) ** 2 + (rgba[j + 2] - colour[2]) ** 2;
+        if (rgba[j + 3] > 180 && distance <= limit) { mask[i] = 1; count++; }
+      }
+      if (!count) throw new Error('No route pixels match. Pick the route colour again.');
+      if (count > size * .18) throw new Error('Too much of the image matches. Pick a more distinctive route colour or reduce tolerance.');
+      const nearest = (p, index) => {
+        let best = -1, distance = Infinity;
+        for (let y = Math.max(0, p.y - 9); y <= Math.min(height - 1, p.y + 9); y++) for (let x = Math.max(0, p.x - 9); x <= Math.min(width - 1, p.x + 9); x++) {
+          const d = (x - p.x) ** 2 + (y - p.y) ** 2;
+          if (d <= 81 && d < distance && mask[y * width + x]) { best = y * width + x; distance = d; }
+        }
+        if (best < 0) throw new Error(`Route point ${index + 1} is not on the selected colour. Zoom in and mark it again.`);
+        return best;
+      };
+      const seeds = stops.map(nearest), queue = new Int32Array(size), parent = new Int32Array(size);
+      const output = [];
+      for (let leg = 1; leg < seeds.length; leg++) {
+        const start = seeds[leg - 1], end = seeds[leg];
+        if (start === end) throw new Error(`Route points ${leg} and ${leg + 1} coincide. Add via points to describe a loop.`);
+        parent.fill(-1); parent[start] = start; queue[0] = start;
+        let head = 0, tail = 1;
+        // Search only adjacent matching pixels. No gap repair or interpolation.
+        while (head < tail && parent[end] === -1) {
+          const current = queue[head++], x = current % width, y = Math.floor(current / width);
+          for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+            const nx = x + dx, ny = y + dy;
+            if ((!dx && !dy) || nx < 0 || nx >= width || ny < 0 || ny >= height) continue;
+            const next = ny * width + nx;
+            if (mask[next] && parent[next] === -1) { parent[next] = current; queue[tail++] = next; }
+          }
+        }
+        if (parent[end] === -1) throw new Error(`The line between route points ${leg} and ${leg + 1} is disconnected. No GPX was made. Use a continuous, unobscured route or carefully adjust colour tolerance.`);
+        const path = [end]; let current = end;
+        while (current !== start) { current = parent[current]; path.push(current); }
+        path.reverse(); if (leg > 1) path.shift();
+        for (const pixel of path) output.push({ x: pixel % width, y: Math.floor(pixel / width) });
+        if (output.length > 80000) throw new Error('The extracted line is too complex. Use a cropped, clearer source.');
+      }
+      if (output.length < 8) throw new Error('The line is too short to extract reliably. Check the start and end.');
+      // Remove only exactly collinear interior pixels; bends and source geometry remain.
+      const compact = output.filter((p, i) => !i || i === output.length - 1 || (p.x - output[i - 1].x) !== (output[i + 1].x - p.x) || (p.y - output[i - 1].y) !== (output[i + 1].y - p.y));
+      if (compact.length > 12000) throw new Error('Too many route bends were detected. Use a clearer image.');
+      return compact;
+    }
+    // END IMAGE CONVERSION MATH
+
+    function traceMessage(text, error = false) { $('trace-message').textContent = text; $('trace-message').classList.toggle('error', error); }
+    function invalidateTrace() {
+      trace.revision++; trace.route = null; trace.pixelRoute = []; trace.reviewed = false;
+      $('trace-review').hidden = true; $('confirm-trace').checked = false; $('confirm-trace').disabled = true; $('save-trace').disabled = true;
+      if (state.requiresTraceReview) { state.points = []; state.segments = []; state.source = ''; state.requiresTraceReview = false; render(false); }
+      clearExport();
+    }
+    function traceMode(mode) {
+      trace.mode = mode;
+      document.querySelectorAll('[data-anchor]').forEach((button, i) => button.setAttribute('aria-pressed', String(mode === `anchor-${i}`)));
+      $('trace-colour').setAttribute('aria-pressed', String(mode === 'colour')); $('trace-stops').setAttribute('aria-pressed', String(mode === 'stops'));
+      $('trace-tool-status').textContent = mode?.startsWith('anchor-') ? `Tap known location ${'ABC'[Number(mode.slice(-1))]} on the image.` : mode === 'colour' ? 'Tap the centre of the coloured route line.' : mode === 'stops' ? 'Tap start, via points, then end in that order. Select this tool again when finished.' : 'Choose a tool, then tap the image.';
+      $('trace-done').hidden = !mode;
+      if (mode && matchMedia('(max-width: 800px)').matches) $('trace-viewport').scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+    function drawTrace() {
+      if (!trace.bitmap) return;
+      const canvas = $('trace-canvas'), ctx = canvas.getContext('2d'), scale = canvas.width / Math.max(1, canvas.getBoundingClientRect().width);
+      ctx.drawImage(trace.bitmap, 0, 0); ctx.lineWidth = Math.max(2, 2.5 * scale);
+      if (trace.pixelRoute.length) { ctx.strokeStyle = '#00b8d4'; ctx.beginPath(); trace.pixelRoute.forEach((p, i) => i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)); ctx.stroke(); }
+      const pin = (p, label, colour) => { ctx.beginPath(); ctx.arc(p.x, p.y, 11 * scale, 0, 2 * Math.PI); ctx.fillStyle = colour; ctx.fill(); ctx.lineWidth = 2 * scale; ctx.strokeStyle = 'white'; ctx.stroke(); ctx.fillStyle = 'white'; ctx.font = `bold ${11 * scale}px sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(label, p.x, p.y); };
+      trace.anchors.forEach((p, i) => { if (p) pin(p, 'ABC'[i], '#263e35'); }); trace.stops.forEach((p, i) => pin(p, String(i + 1), '#bc4827'));
+      if (document.activeElement === canvas && trace.mode) { const p = trace.cursor; ctx.strokeStyle = '#111'; ctx.lineWidth = scale; ctx.beginPath(); ctx.moveTo(p.x - 16 * scale, p.y); ctx.lineTo(p.x + 16 * scale, p.y); ctx.moveTo(p.x, p.y - 16 * scale); ctx.lineTo(p.x, p.y + 16 * scale); ctx.stroke(); }
+    }
+    function updateTraceLabels() {
+      $('trace-calibration').textContent = `${trace.anchors.filter(Boolean).length} of 3 image locations marked. Check each coordinate against its letter on the image.`;
+      document.querySelectorAll('[data-anchor]').forEach((button, i) => { button.textContent = `${trace.anchors[i] ? 'Move' : 'Set'} ${'ABC'[i]} on image`; });
+      $('trace-stop-status').textContent = trace.stops.length ? `${trace.stops.length} route points: 1 is the start; ${trace.stops.length} is the current end. Add via points on intended branches before the end.` : 'Mark at least two points in hiking order. Add via points on every intended branch. For a loop, add via points and finish at the start.';
+      $('trace-undo').disabled = !trace.stops.length;
+    }
+    function resetTrace() {
+      invalidateTrace(); trace.anchors = [null, null, null]; trace.stops = []; trace.colour = null;
+      ['a', 'b', 'c'].forEach(letter => { $(`anchor-coord-${letter}`).value = ''; });
+      $('colour-swatch').style.background = 'white'; traceMode(null); updateTraceLabels(); drawTrace();
+      traceMessage('Choose three known image locations and their coordinates. No location is inferred from photo GPS.');
+    }
+    function openConverter(image) {
+      const scale = Math.min(1, 1400 / Math.max(image.naturalWidth, image.naturalHeight)), bitmap = document.createElement('canvas');
+      bitmap.width = Math.max(1, Math.round(image.naturalWidth * scale)); bitmap.height = Math.max(1, Math.round(image.naturalHeight * scale));
+      const ctx = bitmap.getContext('2d', { willReadFrequently: true }); ctx.fillStyle = 'white'; ctx.fillRect(0, 0, bitmap.width, bitmap.height); ctx.drawImage(image, 0, 0, bitmap.width, bitmap.height);
+      trace.bitmap = bitmap; trace.pixels = ctx.getImageData(0, 0, bitmap.width, bitmap.height).data; trace.cursor = { x: Math.floor(bitmap.width / 2), y: Math.floor(bitmap.height / 2) };
+      $('trace-canvas').width = bitmap.width; $('trace-canvas').height = bitmap.height; $('trace-canvas').style.width = '100%'; $('trace-zoom').value = '1'; $('image-converter').hidden = false; resetTrace();
+    }
+    function placeTracePoint(p) {
+      if (!trace.bitmap || !trace.mode) return;
+      const mode = trace.mode; invalidateTrace();
+      if (mode.startsWith('anchor-')) { const index = Number(mode.slice(-1)); trace.anchors[index] = p; traceMode(null); if (matchMedia('(max-width: 800px)').matches) $(`anchor-coord-${'abc'[index]}`).focus(); }
+      else if (mode === 'colour') { const i = (p.y * trace.bitmap.width + p.x) * 4; trace.colour = Array.from(trace.pixels.slice(i, i + 3)); $('colour-swatch').style.background = `rgb(${trace.colour.join(',')})`; traceMode(null); }
+      else if (mode === 'stops') { if (trace.stops.length >= 32) { traceMessage('Use 32 route points or fewer.', true); return; } trace.stops.push(p); }
+      updateTraceLabels(); drawTrace(); traceMessage('Markings updated. Extract again after completing the calibration and route points.');
+    }
+    document.querySelectorAll('[data-anchor]').forEach((button, i) => button.addEventListener('click', () => traceMode(trace.mode === `anchor-${i}` ? null : `anchor-${i}`)));
+    $('trace-colour').addEventListener('click', () => traceMode(trace.mode === 'colour' ? null : 'colour'));
+    $('trace-stops').addEventListener('click', () => traceMode(trace.mode === 'stops' ? null : 'stops'));
+    $('trace-undo').addEventListener('click', () => { invalidateTrace(); trace.stops.pop(); updateTraceLabels(); drawTrace(); });
+    $('trace-reset').addEventListener('click', resetTrace);
+    $('trace-done').addEventListener('click', () => { traceMode(null); $('extract-trace').scrollIntoView({ block: 'center', behavior: 'smooth' }); });
+    ['anchor-coord-a', 'anchor-coord-b', 'anchor-coord-c', 'trace-projection', 'trace-tolerance'].forEach(id => $(id).addEventListener('input', () => { invalidateTrace(); $('tolerance-value').value = $('trace-tolerance').value; drawTrace(); traceMessage('Calibration or colour tolerance changed. Extract and review again.'); }));
+    $('trace-zoom').addEventListener('change', () => { $('trace-canvas').style.width = `${Number($('trace-zoom').value) * 100}%`; drawTrace(); });
+    new ResizeObserver(() => drawTrace()).observe($('trace-viewport'));
+    let tracePointer = null;
+    $('trace-canvas').addEventListener('pointerdown', event => { tracePointer = { x: event.clientX, y: event.clientY }; });
+    $('trace-canvas').addEventListener('pointercancel', () => { tracePointer = null; });
+    $('trace-canvas').addEventListener('click', event => {
+      if (!tracePointer || Math.hypot(event.clientX - tracePointer.x, event.clientY - tracePointer.y) > 8 || !trace.bitmap) return;
+      tracePointer = null; const r = $('trace-canvas').getBoundingClientRect();
+      const p = { x: Math.min(trace.bitmap.width - 1, Math.max(0, Math.round((event.clientX - r.left) / r.width * trace.bitmap.width))), y: Math.min(trace.bitmap.height - 1, Math.max(0, Math.round((event.clientY - r.top) / r.height * trace.bitmap.height))) };
+      trace.cursor = p; placeTracePoint(p);
+    });
+    $('trace-canvas').addEventListener('keydown', event => {
+      if (!trace.bitmap) return;
+      const step = event.shiftKey ? 10 : 1, p = trace.cursor;
+      if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Enter', 'Escape'].includes(event.key)) event.preventDefault();
+      if (event.key === 'ArrowLeft') p.x -= step; if (event.key === 'ArrowRight') p.x += step; if (event.key === 'ArrowUp') p.y -= step; if (event.key === 'ArrowDown') p.y += step;
+      p.x = Math.min(trace.bitmap.width - 1, Math.max(0, p.x)); p.y = Math.min(trace.bitmap.height - 1, Math.max(0, p.y));
+      if (event.key === 'Enter') placeTracePoint({ ...p }); if (event.key === 'Escape') traceMode(null); drawTrace();
+    });
+    $('trace-canvas').addEventListener('blur', drawTrace);
+    $('extract-trace').addEventListener('click', async () => {
+      if (!trace.bitmap) return;
+      invalidateTrace(); const revision = trace.revision; $('extract-trace').disabled = true; traceMessage('Following the visible route pixels…');
+      await new Promise(resolve => setTimeout(resolve, 0));
+      try {
+        if (revision !== trace.revision) return;
+        const anchors = trace.anchors.map((p, i) => { if (!p) throw new Error(`Mark location ${'ABC'[i]} on the image first.`); const coords = parseCoordinates($(`anchor-coord-${'abc'[i]}`).value); if (coords.length !== 1) throw new Error(`Enter exactly one coordinate pair for ${'ABC'[i]}.`); return { ...p, ...coords[0] }; });
+        const convert = imageTransform(anchors, trace.bitmap.width, trace.bitmap.height, $('trace-projection').value);
+        const pixels = extractColourPath(trace.pixels, trace.bitmap.width, trace.bitmap.height, trace.colour, Number($('trace-tolerance').value), trace.stops);
+        trace.pixelRoute = pixels; trace.route = pixels.map(convert); traceMode(null); drawTrace(); $('trace-review').hidden = false;
+        traceMessage(`Extracted ${trace.route.length.toLocaleString()} reference points. Inspect the cyan line for wrong branches, then compare it on the map. Accuracy depends on your calibration; no location or trail safety is verified.`);
+      } catch (error) { drawTrace(); traceMessage(error.message, true); }
+      finally { $('extract-trace').disabled = false; }
+    });
+    $('preview-trace').addEventListener('click', () => {
+      if (!trace.route || !map) { traceMessage('The basemap must load before you can review and export the image trace.', true); return; }
+      replaceDraft([{ ...trace.route[0], name: 'Image reference endpoint 1' }, { ...trace.route.at(-1), name: 'Image reference endpoint 2' }], [trace.route.map(p => ({ ...p }))], 'Image trace — unverified');
+      trace.reviewed = true; $('confirm-trace').disabled = false; $('confirm-trace').checked = false; $('save-trace').disabled = true; $('save-gpx').disabled = true;
+      $('map-title').scrollIntoView({ behavior: 'smooth', block: 'start' }); toast('Compare the full trace with the basemap, then return to the image converter to confirm.');
+    });
+    $('confirm-trace').addEventListener('change', () => { const allowed = trace.reviewed && !!trace.route && $('confirm-trace').checked; $('save-trace').disabled = !allowed; if (state.requiresTraceReview) $('save-gpx').disabled = !allowed; });
+    $('save-trace').addEventListener('click', () => {
+      if (!trace.route || !trace.reviewed || !$('confirm-trace').checked) return;
+      const segments = state.requiresTraceReview ? state.segments : [trace.route];
+      download(new Blob([gpxDocument([], segments, 'Image trace — unverified')], { type: 'application/gpx+xml;charset=utf-8' }), 'trailcraft-image-trace-UNVERIFIED.gpx');
+      $('download-ready').scrollIntoView({ behavior: 'smooth', block: 'center' }); toast('Image trace GPX ready. This source transcription is not a verified hiking route.');
+    });
+    document.addEventListener('paste', event => {
+      if ($('input-method').value !== 'map-image') return;
+      const files = Array.from(event.clipboardData?.items || []).filter(item => item.kind === 'file' && item.type.startsWith('image/'));
+      if (files.length) { event.preventDefault(); const file = files[0].getAsFile(); if (file) importFile(file, 'map-image'); }
+      else if (!['INPUT', 'TEXTAREA'].includes(event.target.tagName)) { event.preventDefault(); message('No image was pasted. Copy the image itself or choose a screenshot file; a map link is not an image.', true); }
+    });
+    $('paste-map').addEventListener('click', async () => {
+      const version = state.fileVersion;
+      try {
+        if (!navigator.clipboard?.read) throw new Error('Clipboard image access is unavailable here. Use ⌘V / Ctrl+V or choose a screenshot file above.');
+        const items = await navigator.clipboard.read();
+        for (const item of items) {
+          const type = item.types.find(type => ['image/png', 'image/jpeg', 'image/webp'].includes(type));
+          if (type) { const blob = await item.getType(type); if (version === state.fileVersion && $('input-method').value === 'map-image') await importFile(new File([blob], 'pasted-route-map', { type }), 'map-image'); return; }
+        }
+        throw new Error('The clipboard has no supported image. Copy the image itself, or save and choose a screenshot file.');
+      } catch (error) { if (version === state.fileVersion) message(error.name === 'NotAllowedError' ? 'Paste access was declined or unavailable. Try ⌘V / Ctrl+V, accept the browser’s Paste prompt, or choose a screenshot file.' : error.message, true); }
+    });
+
+    function setMapInteraction(exploring) {
+      if (!map) return;
+      mapExploring = compactMap.matches && exploring;
+      const enabled = !compactMap.matches || mapExploring;
+      for (const handler of [map.dragging, map.touchZoom, map.doubleClickZoom, map.boxZoom, map.keyboard, map.tapHold]) handler?.[enabled ? 'enable' : 'disable']();
+      // With handlers disabled, allow a finger swipe to scroll the page over the map.
+      $('map').classList.toggle('map-scroll-mode', !enabled);
+      $('map').tabIndex = enabled ? 0 : -1;
+      $('toggle-map').hidden = !compactMap.matches;
+      $('toggle-map').setAttribute('aria-pressed', String(mapExploring));
+      $('toggle-map').textContent = mapExploring ? 'Done exploring' : 'Explore map';
+      $('map-gesture-note').hidden = !compactMap.matches;
+      $('map-gesture-note').textContent = state.adding ? 'Tap the map to add a pin. Choose Finish adding pins to scroll the page again.' : mapExploring ? 'Pan or pinch to explore. Choose Done exploring to scroll the page again.' : 'Scroll over the map to move the page. Choose Explore map to pan or pinch.';
+    }
+    function setAdding(value) { state.adding = value; $('toggle-pins').setAttribute('aria-pressed', String(value)); $('toggle-pins').textContent = value ? '✓ Finish adding pins' : '+ Add pins on map'; if (map) map.getContainer().style.cursor = value ? 'crosshair' : ''; setMapInteraction(value); }
+    $('toggle-pins').addEventListener('click', () => { if (!map) return; setAdding(!state.adding); if (state.adding) toast('Tap or click the map to add waypoints. Finish adding pins when done.'); });
+    $('toggle-map').addEventListener('click', () => { const next = !mapExploring; setAdding(false); setMapInteraction(next); });
+    compactMap.addEventListener('change', () => setAdding(false));
+    $('map').addEventListener('keydown', event => { if (event.key === 'Escape') { setAdding(false); if (compactMap.matches) $('toggle-map').focus(); } });
     $('fit-points').addEventListener('click', fitPoints);
-    function download(blob, filename) { const url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url; a.download = filename; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 30000); }
+    function clearExport() { if (exportUrl) URL.revokeObjectURL(exportUrl); exportUrl = null; exportFile = null; $('download-ready').hidden = true; $('download-link').removeAttribute('href'); $('share-file').hidden = true; }
+    function download(blob, filename) {
+      clearExport(); exportUrl = URL.createObjectURL(blob); exportFile = new File([blob], filename, { type: blob.type });
+      const link = $('download-link'); link.href = exportUrl; link.download = filename; link.textContent = filename; $('download-ready').hidden = false;
+      try { $('share-file').hidden = !navigator.canShare?.({ files: [exportFile] }); } catch { $('share-file').hidden = true; }
+      link.click();
+    }
+    $('share-file').addEventListener('click', async () => {
+      if (!exportFile || !navigator.share) return;
+      try { await navigator.share({ files: [exportFile], title: 'Trailcraft — unverified planning file' }); }
+      catch (error) { if (error.name !== 'AbortError') toast('Sharing is unavailable. Use the filename link to download instead.'); }
+    });
     function xmlText(text) { return String(text).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '').replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&apos;'}[c])); }
+    function reverseGeometry(points, segments) { return { points: [...points].reverse(), segments: [...segments].reverse().map(segment => [...segment].reverse()) }; }
+    $('reverse-route').addEventListener('click', () => {
+      const reversed = reverseGeometry(state.points, state.segments); state.points = reversed.points; state.segments = reversed.segments;
+      if (state.requiresTraceReview && trace.route) { trace.route.reverse(); trace.pixelRoute.reverse(); trace.stops.reverse(); updateTraceLabels(); drawTrace(); }
+      render(); toast('Direction reversed. Start and end swapped; segment gaps preserved. Recheck transport for the new direction.');
+    });
+    function gpxDocument(points, segments, source) {
+      const stamp = new Date().toISOString(), image = source === 'Image trace — unverified';
+      const warning = `UNVERIFIED SOURCE DATA — NOT FOR NAVIGATION. ${image ? 'Digitized from user-calibrated image pixels; position and line selection may be wrong.' : 'User-provided source geometry; not routed, repaired or verified.'} Trail status, access, closures, terrain and public transport are unverified. Segment gaps are preserved. Recorded times and unsupported extensions are omitted. No elevation is invented.`;
+      const ele = p => Number.isFinite(p.ele) ? `<ele>${p.ele}</ele>` : '';
+      const waypoints = points.map(p => `  <wpt lat="${p.lat}" lon="${p.lon}">${ele(p)}<name>${xmlText(p.name || 'Unverified waypoint')}</name><desc>Unverified reference point. Its original name does not determine the current travel direction.</desc></wpt>`).join('\n');
+      const track = segments.length ? `  <trk><name>${image ? 'Image reference trace' : 'Imported source track'} — UNVERIFIED</name><desc>${xmlText(warning)}</desc>\n${segments.map(seg => `    <trkseg>\n${seg.map(p => `      <trkpt lat="${p.lat}" lon="${p.lon}">${ele(p)}</trkpt>`).join('\n')}\n    </trkseg>`).join('\n')}\n  </trk>` : '';
+      return `<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="Trailcraft planning preview" xmlns="http://www.topografix.com/GPX/1/1">\n  <metadata><name>Trailcraft — unverified GPX draft</name><desc>${xmlText(warning)}</desc><time>${stamp}</time></metadata>\n${waypoints}\n${track}\n</gpx>\n`;
+    }
     $('save-gpx').addEventListener('click', () => {
-      if (!state.points.length) return;
-      const stamp = new Date().toISOString(), warning = 'UNVERIFIED PLANNING WAYPOINTS — NOT FOR NAVIGATION. No connecting trail, official status, access, closures, terrain, or public transport has been verified. No track is included.';
-      const gpx = `<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="Trailcraft planning preview" xmlns="http://www.topografix.com/GPX/1/1">\n  <metadata><name>Trailcraft — unverified planning waypoints</name><desc>${xmlText(warning)}</desc><time>${stamp}</time></metadata>\n${state.points.map(p => `  <wpt lat="${p.lat}" lon="${p.lon}"><name>${xmlText(p.name)}</name><desc>Unverified planning waypoint. No trail connection or public transport confirmed.</desc></wpt>`).join('\n')}\n</gpx>\n`;
-      download(new Blob([gpx], { type: 'application/gpx+xml;charset=utf-8' }), `trailcraft-waypoints-UNVERIFIED-${stamp.slice(0, 10)}.gpx`); toast('Saved waypoint-only GPX. It contains no navigation track.');
+      if ((!state.points.length && !state.segments.length) || (state.requiresTraceReview && (!trace.reviewed || !$('confirm-trace').checked))) return;
+      const gpx = gpxDocument(state.points, state.segments, state.requiresTraceReview ? 'Image trace — unverified' : state.source);
+      download(new Blob([gpx], { type: 'application/gpx+xml;charset=utf-8' }), `trailcraft-draft-UNVERIFIED-${new Date().toISOString().slice(0, 10)}.gpx`); toast('GPX is ready in the current direction. Use the file link or Share file if it does not save automatically.');
       track('gpx_exported');
     });
     function roundedRect(ctx, x, y, w, h, r, color) { ctx.fillStyle = color; ctx.beginPath(); ctx.roundRect(x, y, w, h, r); ctx.fill(); }
     $('save-png').addEventListener('click', async () => {
       if (!map || (!state.points.length && !state.segments.length)) return;
-      const button = $('save-png'); button.disabled = true;
+      const button = $('save-png'), revision = draftRevision; button.disabled = true;
       try {
         map.stop();
         const bounds = map.getBounds(), allPoints = [...state.points, ...state.segments.flat()];
@@ -285,25 +601,35 @@
         ctx.strokeStyle = '#bc4827'; ctx.lineWidth = 3; ctx.setLineDash([7, 7]);
         state.segments.forEach(seg => { ctx.beginPath(); seg.forEach((p, i) => { const pos = map.latLngToContainerPoint([p.lat, p.lon]); if (i) ctx.lineTo(pos.x, pos.y + header); else ctx.moveTo(pos.x, pos.y + header); }); ctx.stroke(); }); ctx.setLineDash([]);
         state.points.forEach((p, i) => { const pos = map.latLngToContainerPoint([p.lat, p.lon]); ctx.beginPath(); ctx.arc(pos.x, pos.y + header, 16, 0, Math.PI * 2); ctx.fillStyle = '#263e35'; ctx.fill(); ctx.strokeStyle = '#fffefa'; ctx.lineWidth = 3; ctx.stroke(); ctx.fillStyle = '#fffefa'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(String(i + 1), pos.x, pos.y + header); });
+        const ordered = state.segments.length ? state.segments.flat() : state.points;
+        if (ordered.length > 1) [ordered[0], ordered.at(-1)].forEach((p, i) => { const pos = map.latLngToContainerPoint([p.lat, p.lon]), y = pos.y + header + (i ? 21 : -44); roundedRect(ctx, pos.x - 22, y, 44, 23, 4, '#bc4827'); ctx.fillStyle = 'white'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(i ? 'End' : 'Start', pos.x, y + 12); });
         ctx.restore(); ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
         roundedRect(ctx, 12, header + height - 29, Math.min(280, width - 24), 23, 3, '#fffefa'); ctx.fillStyle = '#263e35'; ctx.font = '10px sans-serif'; ctx.fillText('© OpenStreetMap contributors · openstreetmap.org/copyright', 20, header + height - 14, width - 40);
-        ctx.fillStyle = '#bc4827'; ctx.font = 'bold 12px sans-serif'; ctx.fillText('UNVERIFIED · NOT FOR NAVIGATION', 22, header + height + 26, width - 44); ctx.fillStyle = '#667267'; ctx.font = '11px sans-serif'; ctx.fillText('Waypoints are not a connected route. Imported tracks are unverified.', 22, header + height + 46, width - 44); ctx.fillText('Trail access, closures, terrain and public transport have not been checked.', 22, header + height + 63, width - 44);
+        ctx.fillStyle = '#bc4827'; ctx.font = 'bold 12px sans-serif'; ctx.fillText('UNVERIFIED · NOT FOR NAVIGATION', 22, header + height + 26, width - 44); ctx.fillStyle = '#667267'; ctx.font = '11px sans-serif'; ctx.fillText(state.requiresTraceReview ? 'Image reference trace. Calibration and line selection may be wrong.' : 'Separate waypoints / source segments. No connections verified.', 22, header + height + 46, width - 44); ctx.fillText('Access, closures, terrain and public transport are unverified.', 22, header + height + 63, width - 44);
         const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png')); if (!blob) throw new Error('PNG export failed in this browser.');
-        download(blob, 'trailcraft-planning-draft-UNVERIFIED.png'); toast('Saved the current map preview with its planning warning.');
+        if (revision !== draftRevision) throw new Error('The draft changed during export. Save the preview again.');
+        download(blob, 'trailcraft-planning-draft-UNVERIFIED.png'); toast('PNG is ready with its planning warning. A file link is available below the map.');
         track('png_exported');
       } catch (error) { toast(error.name === 'SecurityError' ? 'The map provider blocked image export. No incomplete PNG was saved.' : error.message); }
       finally { button.disabled = (!state.points.length && !state.segments.length) || !map; }
     });
     $('discard').addEventListener('click', () => $('discard-dialog').showModal());
     $('keep-draft').addEventListener('click', () => $('discard-dialog').close());
-    $('confirm-discard').addEventListener('click', () => { state.fileVersion++; clearPhoto(); state.points = []; state.segments = []; state.source = ''; $('coordinates').value = ''; $('file-input').value = ''; $('input-message').hidden = true; setAdding(false); render(false); $('discard-dialog').close(); toast('Draft discarded. Your original files are unchanged.'); track('draft_discarded'); });
+    $('confirm-discard').addEventListener('click', () => { state.fileVersion++; clearPhoto(); state.points = []; state.segments = []; state.source = ''; state.requiresTraceReview = false; $('coordinates').value = ''; $('file-input').value = ''; $('input-message').hidden = true; setAdding(false); render(false); $('discard-dialog').close(); toast('Draft discarded. Your original files are unchanged.'); track('draft_discarded'); });
     if (window.L) {
       map = L.map('map', { scrollWheelZoom: false, worldCopyJump: true, minZoom: 2 }).setView([22.36, 114.24], 10);
       tileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, crossOrigin: 'anonymous', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }).addTo(map);
       markers = L.layerGroup().addTo(map); tracks = L.layerGroup().addTo(map);
       map.on('click', event => { if (!state.adding) return; if (state.points.length >= MAX_WAYPOINTS) { toast(`Maximum ${MAX_WAYPOINTS} waypoints.`); return; } const p = event.latlng.wrap(); state.points.push(point(p.lat, p.lng, `Map waypoint ${state.points.length + 1}`)); state.source = 'Manual map pins'; render(false); track('map_pin_added'); });
       tileLayer.on('tileerror', () => { toast('Some basemap tiles could not load. Check your connection; do not infer paths from missing tiles.'); });
-      new ResizeObserver(() => map.invalidateSize({ animate: false })).observe($('map'));
+      setMapInteraction(false);
+      let resizeFrame, previousWidth = 0, previousHeight = 0;
+      new ResizeObserver(entries => {
+        const { width, height } = entries[0].contentRect;
+        if (Math.abs(width - previousWidth) < 1 && Math.abs(height - previousHeight) < 1) return;
+        previousWidth = width; previousHeight = height; cancelAnimationFrame(resizeFrame);
+        resizeFrame = requestAnimationFrame(() => { map.invalidateSize({ pan: false, animate: false }); fitPoints(); });
+      }).observe($('map'));
     } else { $('map').append(element('p', 'The map library could not load. Check your internet connection and reload. Coordinate import and waypoint GPX export still work.', 'map-unavailable')); $('toggle-pins').disabled = true; }
     render(false);
   })();
