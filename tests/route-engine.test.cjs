@@ -31,6 +31,28 @@ test('three distinct source-geometry routes visit every waypoint and reach servi
 test('off-network mandatory waypoints fail instead of being dropped or joined', () => {
   assert.throws(() => R.plan(fixture(), [...points, { lat: 22.03, lon: 114.03 }]), /Waypoint 3/);
 });
+test('a waypoint on the middle of a mapped path segment is projected onto and routed through that path', () => {
+  const waypoint = { lat: 22.0005, lon: 114.0015 }, graph = R.buildGraph(fixture());
+  assert.equal(R.nearest(graph, waypoint, 30), null, 'the OSM vertices are farther away than the tolerance');
+  const [snap] = R.snapWaypoints(graph, [waypoint], 30);
+  assert.ok(String(snap.id).startsWith('waypoint:'));
+  assert.ok(snap.metres < 0.1);
+  assert.ok(R.pathFrom(R.search(graph, 2, 'distance', new Map()), snap.id));
+  assert.ok(R.pathFrom(R.search(graph, snap.id, 'distance', new Map()), 5));
+  const result = R.plan(fixture(), [waypoint, points[1]]);
+  assert.ok(result.routes.every(route => route.ids.includes('waypoint:0')));
+  assert.ok(result.routes.every(route => route.snaps[0].metres < 0.1));
+});
+test('splitting a path for an interior waypoint preserves its foot direction', () => {
+  const data = { elements: [
+    { type: 'node', id: 1, lat: 22, lon: 114 },
+    { type: 'node', id: 2, lat: 22, lon: 114.002 },
+    { type: 'way', id: 10, nodes: [1, 2], tags: { highway: 'path', 'oneway:foot': 'yes' } }
+  ] };
+  const graph = R.buildGraph(data), [snap] = R.snapWaypoints(graph, [{ lat: 22, lon: 114.001 }], 15);
+  assert.ok(R.pathFrom(R.search(graph, 1, 'distance', new Map()), snap.id));
+  assert.equal(R.pathFrom(R.search(graph, snap.id, 'distance', new Map()), 1), null);
+});
 test('a stop without a transport service never qualifies', () => {
   const data = fixture(); data.elements = data.elements.filter(e => e.type !== 'relation' || e.tags.route === 'hiking');
   assert.throws(() => R.plan(data, points), /No passenger stops linked/);

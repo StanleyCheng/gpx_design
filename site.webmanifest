@@ -1,6 +1,6 @@
 {
-  "name": "trailplaner — GPX planner",
-  "short_name": "trailplaner",
+  "name": "TrailPlanner — GPX planner",
+  "short_name": "TrailPlanner",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

@@ -6,12 +6,12 @@
   <meta name="theme-color" content="#263e35">
   <meta name="description" content="Plan up to three connected hiking routes through every waypoint, with public transport at both ends and private map-image recognition.">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <title>trailplaner — GPX route planner</title>
+  <title>TrailPlanner — GPX route planner</title>
   <link rel="icon" type="image/svg+xml" href="icon.svg?v=2">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=2">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=2">
   <link rel="manifest" href="site.webmanifest">
-  <meta name="apple-mobile-web-app-title" content="trailplaner">
+  <meta name="apple-mobile-web-app-title" content="TrailPlanner">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
@@ -66,7 +66,7 @@
 <body class="map-first">
   <a class="skip" href="#planner">Skip to route planner</a>
   <header class="topbar"><div class="shell topbar-inner">
-    <a href="#" class="brand" aria-label="trailplaner home"><svg class="brand-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="m2 26 12-21 7 12 4-7 7 16Z" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round"/><path d="m9 14 5 2 4-3" stroke="currentColor" stroke-width="1.7"/></svg><span class="brand-name">trailplaner</span></a>
+    <a href="#" class="brand" aria-label="TrailPlanner home"><svg class="brand-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="m2 26 12-21 7 12 4-7 7 16Z" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round"/><path d="m9 14 5 2 4-3" stroke="currentColor" stroke-width="1.7"/></svg><span class="brand-name">TrailPlanner</span></a>
   </div></header>
   <noscript><p class="noscript">JavaScript is required to import files and use the map. Route planning requires JavaScript. No route is certified safe.</p></noscript>
   <main class="shell">
@@ -99,7 +99,7 @@
       <div class="panel-heading"><span class="step">AI</span><h2 id="ai-title">Identify the map &amp; its marked places</h2></div>
       <div class="panel-body">
         <p class="help">Kimi looks for place names, coordinate grids and visible waypoints. Hong Kong, Taiwan, Japan and South Korea are the focus; other regions are possible. A map without readable clues may need more context. Camera GPS does not establish the map’s location.</p>
-        <details id="ai-connection"><summary>Private recognition connection</summary><p class="help">GitHub Pages cannot hold a secret API key. Connect the private trailplaner recognition server, or run the private server on your computer. Never enter your Kimi API key here.</p><label class="field" for="ai-endpoint">Recognition endpoint<input id="ai-endpoint" type="text" spellcheck="false" autocomplete="off" placeholder="https://your-private-server/api/recognize-map"></label><label class="field" for="ai-access">Private app access code (not your Kimi key)<input id="ai-access" type="password" autocomplete="off"></label><p class="help">The connection and access code stay in memory for this visit. The code is sent only to the endpoint you enter.</p></details>
+        <details id="ai-connection"><summary>Private recognition connection</summary><p class="help">GitHub Pages cannot hold a secret API key. Connect the private TrailPlanner recognition server, or run the private server on your computer. Never enter your Kimi API key here.</p><label class="field" for="ai-endpoint">Recognition endpoint<input id="ai-endpoint" type="text" spellcheck="false" autocomplete="off" placeholder="https://your-private-server/api/recognize-map"></label><label class="field" for="ai-access">Private app access code (not your Kimi key)<input id="ai-access" type="password" autocomplete="off"></label><p class="help">The connection and access code stay in memory for this visit. The code is sent only to the endpoint you enter.</p></details>
         <label class="field" for="ai-context">Optional clue: country, town, trail name or printed map title<input id="ai-context" type="text" maxlength="500" placeholder="For example: a trail near Taipei, Taiwan"></label>
         <p id="ai-upload-notice" class="review-notice">Selecting “Identify map &amp; waypoints” sends this map image and your clue to the configured server and Kimi. Images are not sent to Google Analytics.</p>
         <div class="build-actions"><button id="recognize-map" class="primary" aria-describedby="ai-upload-notice" disabled>Identify map &amp; waypoints →</button><button id="cancel-recognition" hidden>Cancel recognition</button><a href="#image-converter" class="text-button">Use manual calibration instead ↓</a></div>
@@ -150,11 +150,11 @@
           <label>Transport search / approach limit<select id="plan-radius"><option value="1000">1 km per end</option><option value="2000">2 km per end</option><option value="4000" selected>4 km per end</option><option value="6000">6 km per end</option></select></label>
           <label>Waypoint-to-path tolerance<select id="plan-tolerance"><option value="15">15 m · strict</option><option value="30" selected>30 m</option><option value="60">60 m · review offsets carefully</option></select></label>
           <label>Maximum mapped road connectors<select id="plan-roads"><option value="0">None · paths only</option><option value="500">500 m total</option><option value="1500" selected>1.5 km total</option><option value="3000">3 km total</option></select></label>
-          <label>OpenStreetMap data provider<select id="plan-provider"><option value="vk">VK Maps Overpass</option><option value="coffee">Private.coffee Overpass</option></select></label>
+          <label>OpenStreetMap data provider<select id="plan-provider"><option value="auto" selected>Automatic fallback · recommended</option><option value="coffee">Private.coffee Overpass</option><option value="vk">VK Maps Overpass</option><option value="fossgis">FOSSGIS Overpass</option></select></label>
         </div>
         <p class="help">Check the suggested region, especially near borders or islands. Searches favour mapped hiking trails and, where available, government trail data. Restricted access, fords, demanding OSM terrain tags and unsuitable roads are excluded. Missing terrain tags are still unknown. Every waypoint must match a real path within your chosen tolerance; there are no invented links.</p>
         <div class="build-actions"><button id="find-routes" class="primary" disabled>Find up to 3 routes ↗</button><button id="cancel-routing" hidden>Cancel search</button><button id="view-inputs" class="text-button" disabled>Review input pins on map ↓</button></div>
-        <p class="help">Finding routes sends the search area to the selected public Overpass provider. Hong Kong searches also check AFCD’s public trail dataset. Your uploaded file and image are not sent by route search. Public services may be slow or unavailable; successful graph routing does not verify timetables, closures or safe access.</p>
+        <p class="help">Automatic mode tries another public Overpass provider when one times out or has a temporary server error. It does not retry oversized or invalid searches. Hong Kong searches also check AFCD’s public trail dataset. Your uploaded file and image are not sent by route search. Public services may be slow or unavailable; successful graph routing does not verify timetables, closures or safe access.</p>
         <div id="routing-status" class="message" role="status" aria-live="polite" hidden></div>
       </div>
     </section>
@@ -183,7 +183,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/lite.umd.js" crossorigin="anonymous"></script>
   <script id="routing-code">
-/* Trailcraft's deterministic routing core. Generated tracks use existing OSM nodes only. */
+/* TrailPlanner's deterministic routing core. Generated tracks follow eligible OSM ways; projected waypoint vertices only split existing way segments. */
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();
   else root.TrailRouter = factory();
@@ -228,10 +228,16 @@
     pop() { const a = this.items, first = a[0], last = a.pop(); if (a.length) { let i = 0; while (i * 2 + 1 < a.length) { let c = i * 2 + 1; if (c + 1 < a.length && a[c + 1][0] < a[c][0]) c++; if (a[c][0] >= last[0]) break; a[i] = a[c]; i = c; } a[i] = last; } return first; }
     get size() { return this.items.length; }
   }
-  function segmentDistance(p, a, b) {
+  function projectToSegment(p, a, b) {
     const cos = Math.cos(p.lat * Math.PI / 180), x = (p.lon - a.lon) * cos, y = p.lat - a.lat, dx = (b.lon - a.lon) * cos, dy = b.lat - a.lat;
     const ratio = Math.max(0, Math.min(1, (x * dx + y * dy) / (dx * dx + dy * dy || 1)));
-    return Math.hypot(x - ratio * dx, y - ratio * dy) * 111195;
+    const point = { lat: a.lat + (b.lat - a.lat) * ratio, lon: a.lon + (b.lon - a.lon) * ratio };
+    return { ratio, point, metres: distance(p, point) };
+  }
+  const segmentDistance = (p, a, b) => projectToSegment(p, a, b).metres;
+  function addDirected(adj, reverse, from, to, edge) {
+    if (!adj.has(from)) adj.set(from, []); if (!reverse.has(to)) reverse.set(to, []);
+    adj.get(from).push({ ...edge, to }); reverse.get(to).push({ ...edge, to: from });
   }
   function officialIndex(features = []) {
     const cells = new Map(), step = .002;
@@ -258,9 +264,8 @@
     const elements = [...unique.values()], nodes = new Map(elements.filter(e => e.type === 'node' && validPoint(e)).map(e => [e.id, e]));
     const relations = elements.filter(e => e.type === 'relation'), hiking = new Map();
     for (const r of relations) if (['hiking', 'foot'].includes(r.tags?.route)) for (const m of r.members || []) if (m.type === 'way') { if (!hiking.has(m.ref)) hiking.set(m.ref, []); hiking.get(m.ref).push({ id: r.id, name: nameOf(r) }); }
-    const adj = new Map(), reverse = new Map(), eligible = new Map(), corridor = officialIndex(features);
+    const adj = new Map(), reverse = new Map(), eligible = new Map(), segments = [], corridor = officialIndex(features);
     let excludedWays = 0, missingNodes = 0;
-    const add = (from, to, edge) => { if (!adj.has(from)) adj.set(from, []); if (!reverse.has(to)) reverse.set(to, []); adj.get(from).push({ ...edge, to }); reverse.get(to).push({ ...edge, to: from }); };
     for (const way of elements.filter(e => e.type === 'way' && e.tags?.highway)) {
       if (!walkable(way.tags)) { excludedWays++; continue; }
       const tags = way.tags, direction = tags['oneway:foot'];
@@ -269,20 +274,57 @@
         if (!a || !b) { missingNodes++; continue; }
         if (!passableNode(a) || !passableNode(b)) continue;
         const metres = distance(a, b); if (metres <= 0) continue;
-        const edge = { key: edgeKey(a.id, b.id), way: way.id, metres, road: ROAD.has(tags.highway), steps: tags.highway === 'steps', hiking: hiking.get(way.id) || [], official: corridor(a, b), unknown: !ROAD.has(tags.highway) && !tags.sac_scale, name: nameOf(way) };
+        const segment = `${way.id}/${i}`, forward = direction !== '-1', backward = !['yes', '1'].includes(direction);
+        const edge = { key: edgeKey(a.id, b.id), segment, way: way.id, metres, road: ROAD.has(tags.highway), steps: tags.highway === 'steps', hiking: hiking.get(way.id) || [], official: corridor(a, b), unknown: !ROAD.has(tags.highway) && !tags.sac_scale, name: nameOf(way) };
         eligible.set(a.id, a); eligible.set(b.id, b);
-        if (direction !== '-1') add(a.id, b.id, edge);
-        if (!['yes', '1'].includes(direction)) add(b.id, a.id, edge);
+        segments.push({ key: segment, a: a.id, b: b.id, edge, forward, backward });
+        if (forward) addDirected(adj, reverse, a.id, b.id, edge);
+        if (backward) addDirected(adj, reverse, b.id, a.id, edge);
       }
     }
     if (missingNodes) throw new Error('Some walking-way geometry is missing. No incomplete graph will be routed. Please retry the map download.');
     if (!eligible.size) throw new Error('No eligible walking network was found. Roads without suitable access, restricted paths and demanding tagged terrain are excluded.');
-    return { nodes: eligible, allNodes: nodes, adj, reverse, relations, features, excludedWays, timestamp: data.osm3s?.timestamp_osm_base || null };
+    return { nodes: eligible, allNodes: nodes, adj, reverse, segments, relations, features, excludedWays, timestamp: data.osm3s?.timestamp_osm_base || null };
   }
   function nearest(graph, point, maxMetres) {
     let match = null;
     for (const node of graph.nodes.values()) { const d = distance(point, node); if (d <= maxMetres && (!match || d < match.metres)) match = { id: node.id, point: { lat: node.lat, lon: node.lon }, metres: d }; }
     return match;
+  }
+  function snapWaypoints(graph, points, maxMetres) {
+    const snaps = points.map((point, index) => {
+      let match = null;
+      for (const segment of graph.segments) {
+        const a = graph.nodes.get(segment.a), b = graph.nodes.get(segment.b), projected = projectToSegment(point, a, b);
+        if (projected.metres <= maxMetres && (!match || projected.metres < match.metres)) match = { ...projected, segment, index, original: point };
+      }
+      if (!match) throw new Error(`Waypoint ${index + 1} has no eligible path within ${maxMetres} m. Move or correct that waypoint, or explicitly change the tolerance; it will not be skipped.`);
+      if (match.ratio <= 1e-8) return { id: match.segment.a, point: { lat: graph.nodes.get(match.segment.a).lat, lon: graph.nodes.get(match.segment.a).lon }, metres: match.metres, index, original: point };
+      if (match.ratio >= 1 - 1e-8) return { id: match.segment.b, point: { lat: graph.nodes.get(match.segment.b).lat, lon: graph.nodes.get(match.segment.b).lon }, metres: match.metres, index, original: point };
+      return match;
+    });
+    const groups = new Map();
+    for (const snap of snaps) if (!snap.id) { if (!groups.has(snap.segment.key)) groups.set(snap.segment.key, []); groups.get(snap.segment.key).push(snap); }
+    for (const group of groups.values()) {
+      const segment = group[0].segment, a = graph.nodes.get(segment.a), b = graph.nodes.get(segment.b), sequence = [{ id: segment.a, point: a }];
+      for (const snap of group.sort((x, y) => x.ratio - y.ratio)) {
+        const prior = sequence.at(-1);
+        if (distance(prior.point, snap.point) < .05) snap.id = prior.id;
+        else { snap.id = `waypoint:${snap.index}`; graph.nodes.set(snap.id, { type: 'node', id: snap.id, ...snap.point, virtual: true }); sequence.push({ id: snap.id, point: snap.point }); }
+      }
+      sequence.push({ id: segment.b, point: b });
+      for (const id of [segment.a, segment.b]) {
+        graph.adj.set(id, (graph.adj.get(id) || []).filter(edge => edge.segment !== segment.key));
+        graph.reverse.set(id, (graph.reverse.get(id) || []).filter(edge => edge.segment !== segment.key));
+      }
+      for (let i = 1; i < sequence.length; i++) {
+        const from = sequence[i - 1], to = sequence[i], metres = distance(from.point, to.point); if (metres <= 0) continue;
+        const edge = { ...segment.edge, key: `${segment.key}@${i}`, metres };
+        if (segment.forward) addDirected(graph.adj, graph.reverse, from.id, to.id, edge);
+        if (segment.backward) addDirected(graph.adj, graph.reverse, to.id, from.id, edge);
+      }
+    }
+    return snaps.map(({ segment, ratio, ...snap }) => snap);
   }
   function transportStops(graph, points, radius) {
     const memberships = new Map(), parentAreas = new Map(), areaNames = new Map();
@@ -393,7 +435,7 @@
     if (settings.optimize && points.length > 8) throw new Error('Order optimisation supports up to 8 waypoints. Keep your entered order for larger drafts.');
     const graph = buildGraph(data, features);
     progress('Checking every waypoint against eligible paths…');
-    const snaps = points.map((point, index) => { const snap = nearest(graph, point, settings.tolerance); if (!snap) throw new Error(`Waypoint ${index + 1} has no eligible path node within ${settings.tolerance} m. Move or correct that waypoint, or explicitly change the tolerance; it will not be skipped.`); return { ...snap, index, original: point }; });
+    const snaps = snapWaypoints(graph, points, settings.tolerance);
     const transit = transportStops(graph, points, settings.radius);
     if (!transit.stops.length) throw new Error(`No passenger stops linked to mapped transit services and within 80 m of the walking network were found. ${transit.unlinked ? `${transit.unlinked} nearby stop(s) lacked service links. ` : ''}Try a wider search area or different waypoints; no convenient endpoint can be claimed from this data.`);
     const selected = [], penalties = new Map(), stopIds = transit.stops.map(s => s.node), n = snaps.length;
@@ -438,7 +480,7 @@
     const bbox = box.join(',');
     return `[out:json][timeout:40][maxsize:67108864];\nway["highway"~"^(path|footway|pedestrian|steps|living_street|track|residential|service|unclassified|tertiary|cycleway)$"](${bbox})->.paths;\n(.paths;node(w.paths););out body;\nrelation["route"~"^(hiking|foot|bus|trolleybus|train|subway|light_rail|tram|ferry|share_taxi)$"](${bbox});out body;\n(node["highway"="bus_stop"](${bbox});node["public_transport"="platform"](${bbox});node["railway"~"^(station|halt|tram_stop|subway_entrance)$"](${bbox});node["amenity"="ferry_terminal"](${bbox});)->.stops;.stops out body;\nrelation(bn.stops)["public_transport"="stop_area"];out body;`;
   }
-  return { distance, walkable, passableNode, buildGraph, nearest, transportStops, search, pathFrom, distinct, optimizeOrder, plan, boundingBox, queryFor };
+  return { distance, walkable, passableNode, buildGraph, nearest, snapWaypoints, transportStops, search, pathFrom, distinct, optimizeOrder, plan, boundingBox, queryFor };
 });
 
   </script>
@@ -460,7 +502,7 @@
     let analyticsChoice = null, analyticsStarted = false;
     try { const stored = JSON.parse(localStorage.getItem(CONSENT_KEY)); if (stored && ['granted','denied'].includes(stored.value) && Date.now() - stored.at < 180 * 86400000) analyticsChoice = stored.value; } catch {}
     function gtag() { window.dataLayer = window.dataLayer || []; window.dataLayer.push(arguments); }
-    function track(name) { if (analyticsStarted && analyticsChoice === 'granted' && !privacySignal && analyticsEvents.has(name)) gtag('event', name, { send_to: GA_MEASUREMENT_ID, page_location: GA_PAGE, page_title: 'trailplaner — GPX route planner', page_referrer: '' }); }
+    function track(name) { if (analyticsStarted && analyticsChoice === 'granted' && !privacySignal && analyticsEvents.has(name)) gtag('event', name, { send_to: GA_MEASUREMENT_ID, page_location: GA_PAGE, page_title: 'TrailPlanner — GPX route planner', page_referrer: '' }); }
     function startAnalytics() {
       if (!analyticsProduction || privacySignal || analyticsChoice !== 'granted') return;
       window['ga-disable-' + GA_MEASUREMENT_ID] = false;
@@ -468,8 +510,8 @@
       analyticsStarted = true;
       gtag('consent', 'default', { analytics_storage: 'granted', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' });
       gtag('js', new Date());
-      gtag('config', GA_MEASUREMENT_ID, { send_page_view: false, page_location: GA_PAGE, page_title: 'trailplaner — GPX route planner', page_referrer: '', allow_google_signals: false, allow_ad_personalization_signals: false, cookie_prefix: 'trailplaner', cookie_domain: 'none', cookie_path: '/gpx_design/', cookie_expires: 90 * 86400, cookie_flags: 'SameSite=Lax;Secure' });
-      gtag('event', 'page_view', { send_to: GA_MEASUREMENT_ID, page_location: GA_PAGE, page_title: 'trailplaner — GPX route planner', page_referrer: '' });
+      gtag('config', GA_MEASUREMENT_ID, { send_page_view: false, page_location: GA_PAGE, page_title: 'TrailPlanner — GPX route planner', page_referrer: '', allow_google_signals: false, allow_ad_personalization_signals: false, cookie_prefix: 'trailplanner', cookie_domain: 'none', cookie_path: '/gpx_design/', cookie_expires: 90 * 86400, cookie_flags: 'SameSite=Lax;Secure' });
+      gtag('event', 'page_view', { send_to: GA_MEASUREMENT_ID, page_location: GA_PAGE, page_title: 'TrailPlanner — GPX route planner', page_referrer: '' });
       const script = document.createElement('script'); script.async = true; script.id = 'trailcraft-google-tag'; script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`; script.referrerPolicy = 'origin'; script.onerror = () => { toast('Analytics could not load. All planning tools still work.'); }; document.head.append(script);
     }
     function analyticsStatus() { $('consent-status').textContent = privacySignal ? 'Your browser privacy signal is respected. Analytics stays off.' : !analyticsProduction ? 'Tracking is off on local and preview copies.' : `Current choice: ${analyticsChoice === 'granted' ? 'analytics allowed' : 'analytics off'}. No ad personalisation.`; $('analytics-accept').disabled = privacySignal; }
@@ -633,7 +675,12 @@
     const ROUTE_COLORS = ['#087f68', '#d4572f', '#6555a5'];
     const routing = { selected: null, result: null, visible: new Set(), fingerprint: '', serial: 0, controller: null, worker: null, cache: new Map(), busy: false, searched: false, evidence: '', blockedUntil: 0 };
     const planFields = ['region', 'order', 'date', 'distance', 'radius', 'tolerance', 'roads', 'provider'];
-    const providers = { coffee: ['Private.coffee', 'https://overpass.private.coffee/api/interpreter'], vk: ['VK Maps', 'https://maps.mail.ru/osm/tools/overpass/api/interpreter'] };
+    const providers = {
+      coffee: { name: 'Private.coffee', url: 'https://overpass.private.coffee/api/interpreter' },
+      vk: { name: 'VK Maps', url: 'https://maps.mail.ru/osm/tools/overpass/api/interpreter' },
+      fossgis: { name: 'FOSSGIS', url: 'https://overpass-api.de/api/interpreter' }
+    };
+    const automaticProviderOrder = ['coffee', 'vk', 'fossgis'];
     const regions = {
       hk: ['Hong Kong', 'AFCD hiking guidance', 'https://www.hiking.gov.hk/'],
       tw: ['Taiwan', 'Forestry and Nature Conservation Agency', 'https://recreation.forest.gov.tw/EN/'],
@@ -690,7 +737,7 @@
         const facts = element('ul', undefined, 'route-facts');
         for (const text of [`All ${state.points.length} places · order ${route.order.map(i => i + 1).join(' → ')}`, `${km(route.start.approach)} approach / ${km(route.end.approach)} exit walk`, `${km(route.roadMetres)} road connectors · ${km(route.repeatedMetres)} retraced`, `Largest waypoint offset: ${Math.ceil(Math.max(...route.snaps.map(s => s.metres)))} m`]) facts.append(element('li', text));
         const select = element('button', routing.selected?.id === route.id ? 'Selected route ✓' : 'Select this route →', 'route-select primary'); select.addEventListener('click', () => selectRoute(route));
-        const save = element('button', `Save Route ${i + 1} GPX ↓`, 'route-select'); save.addEventListener('click', () => { download(new Blob([plannedGPX(route)], { type: 'application/gpx+xml;charset=utf-8' }), `trailplaner-route-${i + 1}-PROVISIONAL.gpx`); track('gpx_exported'); });
+        const save = element('button', `Save Route ${i + 1} GPX ↓`, 'route-select'); save.addEventListener('click', () => { download(new Blob([plannedGPX(route)], { type: 'application/gpx+xml;charset=utf-8' }), `trailplanner-route-${i + 1}-PROVISIONAL.gpx`); track('gpx_exported'); });
         card.append(facts, select, save); cards.append(card);
       });
       $('route-options').replaceChildren(cards); $('route-result-count').textContent = `${routing.result.routes.length} distinct option(s) found`;
@@ -744,12 +791,47 @@
     }
     async function boundedJSON(url, options, maxBytes = 25 * 1024 * 1024) {
       const response = await fetch(url, options);
-      if (!response.ok) { if ([429, 406].includes(response.status)) routing.blockedUntil = Date.now() + 30000; throw new Error(`Map service returned ${response.status}. ${[429, 406].includes(response.status) ? 'Wait at least 30 seconds before retrying.' : 'Try again later or choose another map data provider.'}`); }
+      if (!response.ok) {
+        const paused = [429, 406].includes(response.status), transient = [502, 503, 504].includes(response.status);
+        if (paused) routing.blockedUntil = Date.now() + 30000;
+        const error = new Error(`Map service returned ${response.status}. ${paused ? 'Wait at least 30 seconds before retrying.' : transient ? 'The provider is temporarily unavailable.' : 'Try again later or choose another map data provider.'}`);
+        error.status = response.status; error.transient = transient; throw error;
+      }
       if (Number(response.headers.get('Content-Length')) > maxBytes) throw new Error('Map response is too large. Reduce the search radius.');
       const reader = response.body.getReader(), chunks = []; let size = 0;
       try { while (true) { const { done, value } = await reader.read(); if (done) break; size += value.length; if (size > maxBytes) throw new Error('Map response is too large. Reduce the search radius.'); chunks.push(value); } } catch (e) { await reader.cancel(); throw e; }
       const buffer = new Uint8Array(size); let offset = 0; for (const chunk of chunks) { buffer.set(chunk, offset); offset += chunk.length; }
       return JSON.parse(new TextDecoder().decode(buffer));
+    }
+    function canTryAnotherProvider(error) {
+      return error?.transient || error?.name === 'TimeoutError' || error instanceof TypeError;
+    }
+    async function getMapData(box, selected, signal) {
+      const choices = selected === 'auto' ? automaticProviderOrder : [selected], failures = [];
+      for (let index = 0; index < choices.length; index++) {
+        const provider = providers[choices[index]];
+        if (!provider) throw new Error('Choose a valid map data provider.');
+        if (signal.aborted) throw new DOMException('Route search cancelled', 'AbortError');
+        $('routing-status').textContent = `${index ? 'Trying backup' : 'Contacting'} ${provider.name} for walking paths and public transport…`;
+        const key = provider.url + '/' + box.join(',');
+        let entry = routing.cache.get(key);
+        try {
+          if (!entry || Date.now() - entry.at > 600000) {
+            const data = await boundedJSON(provider.url, { method: 'POST', body: new URLSearchParams({ data: TrailRouter.queryFor(box) }), signal: AbortSignal.any([signal, AbortSignal.timeout(20000)]) });
+            entry = { data, at: Date.now() }; routing.cache.set(key, entry);
+            while (routing.cache.size > 6) routing.cache.delete(routing.cache.keys().next().value);
+          }
+          return { data: entry.data, provider };
+        } catch (error) {
+          if (signal.aborted) throw error;
+          failures.push(`${provider.name}: ${error?.status || (error?.name === 'TimeoutError' ? 'timeout' : 'network error')}`);
+          if (!canTryAnotherProvider(error) || index === choices.length - 1) {
+            if (selected === 'auto' && failures.length > 1 && canTryAnotherProvider(error)) throw new Error(`All automatic map providers were unavailable (${failures.join('; ')}). Try again later or use a smaller search radius.`);
+            throw error;
+          }
+        }
+      }
+      throw new Error('No map data provider is available.');
     }
     async function getOfficialTrails(box, signal) {
       if (activeRegion() !== 'hk') return { features: [], note: 'No government trail geometry is integrated for this region yet.' };
@@ -772,20 +854,19 @@
       $('route-options').replaceChildren(element('div', 'Checking real paths and transport connections. This can take up to a minute; you can cancel.', 'routes-empty')); render(false);
       const timeout = setTimeout(() => controller.abort(), 65000);
       try {
-        const radius = +$('plan-radius').value, box = TrailRouter.boundingBox(state.points, radius), provider = providers[$('plan-provider').value], key = provider[1] + '/' + box.join(',');
+        const radius = +$('plan-radius').value, box = TrailRouter.boundingBox(state.points, radius);
         const settings = { radius, maxApproach: radius, maxDistance: +$('plan-distance').value, maxRoad: +$('plan-roads').value, tolerance: +$('plan-tolerance').value, optimize: $('plan-order').value === 'optimize' };
         const officialPromise = getOfficialTrails(box, controller.signal); officialPromise.catch(() => {});
-        let entry = routing.cache.get(key);
-        if (!entry || Date.now() - entry.at > 600000) { const data = await boundedJSON(provider[1], { method: 'POST', body: new URLSearchParams({ data: TrailRouter.queryFor(box) }), signal: controller.signal }); entry = { data, at: Date.now() }; routing.cache.clear(); routing.cache.set(key, entry); }
+        const mapData = await getMapData(box, $('plan-provider').value, controller.signal);
         const official = await officialPromise; if (serial !== routing.serial) return;
-        clearTimeout(timeout); routing.result = await workerPlan(entry.data, state.points.map(p => ({ ...p })), settings, official.features, serial); if (serial !== routing.serial) return;
-        routing.evidence = `${provider[0]} / OpenStreetMap · ${routing.result.stopCount} service-linked stop candidates. ${official.note}`;
+        clearTimeout(timeout); routing.result = await workerPlan(mapData.data, state.points.map(p => ({ ...p })), settings, official.features, serial); if (serial !== routing.serial) return;
+        routing.evidence = `${mapData.provider.name} / OpenStreetMap · ${routing.result.stopCount} service-linked stop candidates. ${official.note}`;
         routing.result.routes.forEach(route => routing.visible.add(route.id));
         routing.busy = false; $('routing-status').textContent = `Found ${routing.result.routes.length} option(s) through every waypoint. Select one below to review before export.`; showRoutes(); render(); setDockExpanded(false);
         $('route-results').scrollIntoView({ behavior: 'smooth', block: 'start' });
       } catch (e) {
         if (serial !== routing.serial) return;
-        const text = controller.signal.aborted ? 'The map request timed out. No route was produced. Try a smaller search radius or choose the other provider.' : e.message || 'The map service could not be reached. Check your connection or choose another provider.';
+        const text = controller.signal.aborted ? 'The map request timed out. No route was produced. Try a smaller search radius or search again later.' : e.message || 'The map service could not be reached. Check your connection or search again later.';
         $('routing-status').textContent = text; $('route-options').replaceChildren(element('div', text, 'routes-empty')); $('route-result-count').textContent = 'No qualifying routes';
       } finally { clearTimeout(timeout); if (serial === routing.serial) { controller.abort(); routing.busy = false; routing.controller = null; $('cancel-routing').hidden = true; updateGuidance(); } }
     });
@@ -800,13 +881,13 @@
     function plannedGPX(r) {
       const warning = `PROVISIONAL ROUTE — independently check before navigation. Connected OSM walking ways only; no artificial connectors. Start near ${r.start.name} (${Math.ceil(r.start.accessGap)} m unrouted stop gap); end near ${r.end.name} (${Math.ceil(r.end.accessGap)} m gap). All ${state.points.length} mandatory waypoints visited within the explicitly accepted ${$('plan-tolerance').value} m tolerance. OSM snapshot ${r.osmTimestamp || 'unknown'}. Hiking date ${$('plan-date').value}. Timetables, closures, permits, terrain and management are not automatically verified. OpenStreetMap contributors, ODbL: https://www.openstreetmap.org/copyright. AFCD corridor matches, where available, are approximate. No elevation invented.`;
       const decimal = n => n.toFixed(8), wpts = [{ ...r.coords[0], name: 'Start near ' + r.start.name }, ...r.order.map(i => state.points[i]), { ...r.coords.at(-1), name: 'End near ' + r.end.name }];
-      return `<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="trailplaner" xmlns="http://www.topografix.com/GPX/1/1"><metadata><name>${xmlText(r.title)}</name><desc>${xmlText(warning)}</desc><time>${new Date().toISOString()}</time></metadata>${wpts.map(p => `<wpt lat="${decimal(p.lat)}" lon="${decimal(p.lon)}"><name>${xmlText(p.name)}</name></wpt>`).join('')}<trk><name>${xmlText(r.title)} — provisional</name><desc>${xmlText(warning)}</desc><trkseg>${r.coords.map(p => `<trkpt lat="${decimal(p.lat)}" lon="${decimal(p.lon)}"></trkpt>`).join('')}</trkseg></trk></gpx>`;
+      return `<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="TrailPlanner" xmlns="http://www.topografix.com/GPX/1/1"><metadata><name>${xmlText(r.title)}</name><desc>${xmlText(warning)}</desc><time>${new Date().toISOString()}</time></metadata>${wpts.map(p => `<wpt lat="${decimal(p.lat)}" lon="${decimal(p.lon)}"><name>${xmlText(p.name)}</name></wpt>`).join('')}<trk><name>${xmlText(r.title)} — provisional</name><desc>${xmlText(warning)}</desc><trkseg>${r.coords.map(p => `<trkpt lat="${decimal(p.lat)}" lon="${decimal(p.lon)}"></trkpt>`).join('')}</trkseg></trk></gpx>`;
     }
     function allRoutesGPX(routes) {
       const stamp = new Date().toISOString(), decimal = n => n.toFixed(8), warning = `PROVISIONAL ROUTE OPTIONS — independently check before navigation. Each track uses connected OpenStreetMap walking ways and visits every mandatory waypoint. Timetables, closures, permits, terrain, current access and government management are not automatically verified. OpenStreetMap contributors, ODbL: https://www.openstreetmap.org/copyright. No elevation invented.`;
       const waypoints = state.points.map((p, i) => `<wpt lat="${decimal(p.lat)}" lon="${decimal(p.lon)}"><name>${xmlText(`${i + 1}. ${p.name}`)}</name></wpt>`).join('');
       const tracksXML = routes.map((r, i) => `<trk><name>${xmlText(`Route ${i + 1} — ${r.title} — provisional`)}</name><desc>${xmlText(`${warning} Start near ${r.start.name}; end near ${r.end.name}.`)}</desc><trkseg>${r.coords.map(p => `<trkpt lat="${decimal(p.lat)}" lon="${decimal(p.lon)}"></trkpt>`).join('')}</trkseg></trk>`).join('');
-      return `<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="trailplaner" xmlns="http://www.topografix.com/GPX/1/1"><metadata><name>trailplaner route options</name><desc>${xmlText(warning)}</desc><time>${stamp}</time></metadata>${waypoints}${tracksXML}</gpx>`;
+      return `<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="TrailPlanner" xmlns="http://www.topografix.com/GPX/1/1"><metadata><name>TrailPlanner route options</name><desc>${xmlText(warning)}</desc><time>${stamp}</time></metadata>${waypoints}${tracksXML}</gpx>`;
     }
     $('show-all-routes').addEventListener('click', () => { routing.result?.routes.forEach(route => routing.visible.add(route.id)); showRouteVisibility(); render(false); });
     $('hide-all-routes').addEventListener('click', () => { routing.visible.clear(); showRouteVisibility(); render(false); });
@@ -1288,7 +1369,7 @@
     $('save-trace').addEventListener('click', () => {
       if (!trace.route || !trace.reviewed) return;
       const segments = state.requiresTraceReview ? state.segments : [trace.route];
-      download(new Blob([gpxDocument([], segments, 'Image trace — unverified')], { type: 'application/gpx+xml;charset=utf-8' }), 'trailplaner-image-trace-UNVERIFIED.gpx');
+      download(new Blob([gpxDocument([], segments, 'Image trace — unverified')], { type: 'application/gpx+xml;charset=utf-8' }), 'trailplanner-image-trace-UNVERIFIED.gpx');
       $('download-ready').scrollIntoView({ behavior: 'smooth', block: 'center' }); toast('Image trace GPX ready. This source transcription is not a verified hiking route.');
     });
     document.addEventListener('paste', event => {
@@ -1334,7 +1415,7 @@
     }
     $('share-file').addEventListener('click', async () => {
       if (!exportFile || !navigator.share) return;
-      try { await navigator.share({ files: [exportFile], title: 'trailplaner — unverified planning file' }); }
+      try { await navigator.share({ files: [exportFile], title: 'TrailPlanner — unverified planning file' }); }
       catch (error) { if (error.name !== 'AbortError') toast('Sharing is unavailable. Use the filename link to download instead.'); }
     });
     function xmlText(text) { return String(text).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '').replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&apos;'}[c])); }
@@ -1353,18 +1434,18 @@
       const ele = p => Number.isFinite(p.ele) ? `<ele>${decimal(p.ele)}</ele>` : '';
       const waypoints = points.map(p => `  <wpt lat="${decimal(p.lat)}" lon="${decimal(p.lon)}">${ele(p)}<name>${xmlText(p.name || 'Unverified waypoint')}</name><desc>Unverified reference point. Its original name does not determine the current travel direction.</desc></wpt>`).join('\n');
       const track = segments.length ? `  <trk><name>${image ? 'Image reference trace' : 'Imported source track'} — UNVERIFIED</name><desc>${xmlText(warning)}</desc>\n${segments.map(seg => `    <trkseg>\n${seg.map(p => `      <trkpt lat="${decimal(p.lat)}" lon="${decimal(p.lon)}">${ele(p)}</trkpt>`).join('\n')}\n    </trkseg>`).join('\n')}\n  </trk>` : '';
-      return `<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="trailplaner planning preview" xmlns="http://www.topografix.com/GPX/1/1">\n  <metadata><name>trailplaner — unverified GPX draft</name><desc>${xmlText(warning)}</desc><time>${stamp}</time></metadata>\n${waypoints}\n${track}\n</gpx>\n`;
+      return `<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="TrailPlanner planning preview" xmlns="http://www.topografix.com/GPX/1/1">\n  <metadata><name>TrailPlanner — unverified GPX draft</name><desc>${xmlText(warning)}</desc><time>${stamp}</time></metadata>\n${waypoints}\n${track}\n</gpx>\n`;
     }
     $('save-gpx').addEventListener('click', () => {
-      if (routing.selected) { download(new Blob([plannedGPX(routing.selected)], { type: 'application/gpx+xml;charset=utf-8' }), 'trailplaner-route-PROVISIONAL.gpx'); track('gpx_exported'); return; }
+      if (routing.selected) { download(new Blob([plannedGPX(routing.selected)], { type: 'application/gpx+xml;charset=utf-8' }), 'trailplanner-route-PROVISIONAL.gpx'); track('gpx_exported'); return; }
       if ((!state.points.length && !state.segments.length) || (state.requiresTraceReview && !trace.reviewed)) return;
       const gpx = gpxDocument(state.points, state.segments, state.requiresTraceReview ? 'Image trace — unverified' : state.source);
-      download(new Blob([gpx], { type: 'application/gpx+xml;charset=utf-8' }), `trailplaner-draft-UNVERIFIED-${new Date().toISOString().slice(0, 10)}.gpx`); toast('GPX is ready in the current direction. Use the file link or Share file if it does not save automatically.');
+      download(new Blob([gpx], { type: 'application/gpx+xml;charset=utf-8' }), `trailplanner-draft-UNVERIFIED-${new Date().toISOString().slice(0, 10)}.gpx`); toast('GPX is ready in the current direction. Use the file link or Share file if it does not save automatically.');
       track('gpx_exported');
     });
     $('save-all-gpx').addEventListener('click', () => {
       const routes = routing.result?.routes || []; if (!routes.length) return;
-      download(new Blob([allRoutesGPX(routes)], { type: 'application/gpx+xml;charset=utf-8' }), `trailplaner-all-${routes.length}-routes-PROVISIONAL.gpx`); toast(`GPX with ${routes.length} separate route tracks is ready.`); track('gpx_exported');
+      download(new Blob([allRoutesGPX(routes)], { type: 'application/gpx+xml;charset=utf-8' }), `trailplanner-all-${routes.length}-routes-PROVISIONAL.gpx`); toast(`GPX with ${routes.length} separate route tracks is ready.`); track('gpx_exported');
     });
     function roundedRect(ctx, x, y, w, h, r, color) { ctx.fillStyle = color; ctx.beginPath(); ctx.roundRect(x, y, w, h, r); ctx.fill(); }
     $('save-png').addEventListener('click', async () => {
@@ -1380,7 +1461,7 @@
         const rect = map.getContainer().getBoundingClientRect(), width = Math.round(rect.width), height = Math.round(rect.height), header = 80, footer = 82;
         const canvas = document.createElement('canvas'), scale = Math.min(2, 4096 / (height + header + footer), 4096 / width); canvas.width = width * scale; canvas.height = (height + header + footer) * scale;
         const ctx = canvas.getContext('2d'); ctx.scale(scale, scale); ctx.fillStyle = '#f7f6f0'; ctx.fillRect(0, 0, width, height + header + footer);
-        ctx.fillStyle = '#263e35'; ctx.font = '28px Georgia'; ctx.fillText('trailplaner / planning draft', 22, 35, width - 44); ctx.font = '12px sans-serif'; ctx.fillText(`${state.points.length} waypoints · ${new Date().toISOString().slice(0, 10)} · NOT FOR NAVIGATION`, 22, 59, width - 44);
+        ctx.fillStyle = '#263e35'; ctx.font = '28px Georgia'; ctx.fillText('TrailPlanner / planning draft', 22, 35, width - 44); ctx.font = '12px sans-serif'; ctx.fillText(`${state.points.length} waypoints · ${new Date().toISOString().slice(0, 10)} · NOT FOR NAVIGATION`, 22, 59, width - 44);
         ctx.save(); ctx.beginPath(); ctx.rect(0, header, width, height); ctx.clip(); ctx.fillStyle = '#e3e9df'; ctx.fillRect(0, header, width, height);
         const tiles = Array.from(map.getContainer().querySelectorAll('.leaflet-tile'));
         const visible = tiles.filter(img => { const r = img.getBoundingClientRect(); return r.right > rect.left && r.left < rect.right && r.bottom > rect.top && r.top < rect.bottom; });
@@ -1395,7 +1476,7 @@
         ctx.fillStyle = '#bc4827'; ctx.font = 'bold 12px sans-serif'; ctx.fillText('UNVERIFIED · NOT FOR NAVIGATION', 22, header + height + 26, width - 44); ctx.fillStyle = '#667267'; ctx.font = '11px sans-serif'; ctx.fillText(visibleRoutes.length ? `${visibleRoutes.length} connected OSM route option(s). Stop and waypoint offsets need checking.` : state.requiresTraceReview ? 'Image reference trace. Calibration and line selection may be wrong.' : 'Separate waypoints / source segments. No connections verified.', 22, header + height + 46, width - 44); ctx.fillText('Access, closures, terrain and public transport are unverified.', 22, header + height + 63, width - 44);
         const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png')); if (!blob) throw new Error('PNG export failed in this browser.');
         if (revision !== draftRevision) throw new Error('The draft changed during export. Save the preview again.');
-        download(blob, 'trailplaner-planning-draft-UNVERIFIED.png'); toast('PNG is ready with its planning warning. A file link is available in the controls.');
+        download(blob, 'trailplanner-planning-draft-UNVERIFIED.png'); toast('PNG is ready with its planning warning. A file link is available in the controls.');
         track('png_exported');
       } catch (error) { toast(error.name === 'SecurityError' ? 'The map provider blocked image export. No incomplete PNG was saved.' : error.message); }
       finally { button.disabled = (!state.points.length && !state.segments.length) || !map; }
