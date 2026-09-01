@@ -5,9 +5,9 @@
 ## Workflow
 
 1. Add mandatory places using decimal coordinates, TXT/CSV, GPX, image recognition, or map pins.
-2. Review each place and its order. Select regional guidance, hike date, distance, transport approach, waypoint tolerance and road-connector limits. Confirm the places.
+2. Review each place and its order. Select regional guidance, hike date, distance, transport approach, waypoint tolerance and road-connector limits.
 3. Find up to three distinct routes. Every route must include every place within the accepted tolerance, follow real connected OSM walking ways, and start/end near passenger stops linked to mapped transit services.
-4. Choose a route, inspect the full map and evidence, independently check access and transport, then save GPX. Reversing a route resets export checks; reversal is disabled when mapped foot direction or boarding rules prohibit it. PNG remains a clearly labelled planning preview.
+4. Choose a route, inspect the full map and evidence, independently check access and transport, then save GPX. After reversing, review arrival and departure services for the new direction; reversal is disabled when mapped foot direction or boarding rules prohibit it. PNG remains a clearly labelled planning preview.
 
 The engine returns fewer options or an actionable failure instead of inventing routes or silently relaxing limits. Candidate ranking prefers hiking relations and nearby official trail corridors, penalises roads and retracing, and considers endpoint access distance and mapped services. It is a bounded heuristic, not a globally optimal itinerary or timetable planner. A 30 m default waypoint tolerance is explicit, reviewable and adjustable. No synthetic connectors fill waypoint or transport-stop gaps.
 
@@ -21,7 +21,7 @@ Up to 16 mandatory places in entered order, or 8 with order optimisation. All li
 
 ## Image input
 
-[Kimi recognition](AI_SETUP.md) identifies a suggested area and visible marked places only through a private server, explicit image-upload consent, and individual coordinate confirmation. It never supplies the routing graph. Unsupported coordinates remain blank. Kimi recognition on the public site needs a separately deployed HTTPS backend; no endpoint or secret is shipped.
+[Kimi recognition](AI_SETUP.md) identifies a suggested area and visible marked places only through a private server and a user-initiated Identify action. It never supplies the routing graph. Each selected place still needs one valid coordinate; unsupported coordinates remain blank. Kimi recognition on the public site needs a separately deployed HTTPS backend; no endpoint or secret is shipped.
 
 [Manual image conversion](IMAGE_CONVERSION.md) still works locally: calibrate three known locations, select a continuous route colour, trace and review. Image traces and imported tracks are unverified source references, not traversability evidence. GPX import preserves segments and numeric elevations; if no waypoints exist, only segment endpoints become mandatory places. Add any other must-visit locations explicitly.
 
@@ -35,13 +35,13 @@ node --test tests/*.test.cjs tests/*.test.mjs
 node --env-file=.env server/recognition.mjs
 ```
 
-Open `http://127.0.0.1:8787/`. Copy `.env.example` to a private `.env` if one does not already exist; never overwrite a populated key file. The server serves an explicit public-file allowlist and will not serve `.env`, source files, tests or its usage ledger. No Kimi calls are possible without a configured key and image consent.
+Open `http://127.0.0.1:8787/`. Copy `.env.example` to a private `.env` if one does not already exist; never overwrite a populated key file. The server serves an explicit public-file allowlist and will not serve `.env`, source files, tests or its usage ledger. No Kimi calls are possible without a configured key and the user selecting Identify.
 
 The authored routing engine and UI fragments in `lib/` are embedded into `index.html` by the build script. The deployed frontend stays one HTML file plus icons. Leaflet 1.9.4, Exifr 7.1.3, fonts and map tiles load online. No offline navigation is claimed. Publish the repository's `main` branch root via GitHub Pages; no private server can run on Pages.
 
 ## Privacy and operations
 
-Drafts and files stay in browser memory except explicitly consented recognition images/clues. Recognition serializes a resized canvas, stripping camera metadata; the server forwards to Kimi and does not write images to disk. The server stores only a date and request count for its budget. Remote hosting requires a separate app access token, one process and persistent storage; see setup notes.
+Drafts and files stay in browser memory except recognition images/clues sent when the user selects Identify. Recognition serializes a resized canvas, stripping camera metadata; the server forwards to Kimi and does not write images to disk. The server stores only a date and request count for its budget. Remote hosting requires a separate app access token, one process and persistent storage; see setup notes.
 
 Routing sends a bounding box to the selected Overpass provider and (Hong Kong only) the AFCD service. Providers see the area and IP address. OSM tiles reveal the viewed area; PNG reuses displayed tiles. A ten-minute, one-area memory cache, bounded downloads, one request at a time and a pause after rate-limit responses reduce public-service load. High-traffic deployment needs a dedicated routing data service.
 

@@ -1,8 +1,8 @@
-# Routing and recognition validation — 2026-08-31
+# Routing and recognition validation — 2026-09-01
 
 ## Automated checks
 
-`node --test tests/*.test.cjs tests/*.test.mjs`: **21 passing tests**.
+`node --test tests/*.test.cjs tests/*.test.mjs`: **26 passing tests**.
 
 - Three distinct candidates visit every mandatory point and contain only existing source graph nodes/ways.
 - Missing geometry, disconnected paths, an off-network waypoint or a stop without a service fails closed.
@@ -12,7 +12,9 @@
 - Existing image calibration, connected-pixel tracing, segment reversal and XML escaping tests still pass.
 - Recognition rejects absent consent, arbitrary image URLs, bad signatures and unsupported/invalid coordinates.
 - Private server rejects other origins and invalid app tokens, will not serve `.env` or source, and reserves a persisted daily quota before provider calls.
-- All inline scripts parse; DOM IDs are unique; the inline build is reproducible; Git diff has no whitespace errors. Candidate tracked files contain no detected key/token literals. `.env` and QA outputs are ignored.
+- No checkbox controls or removed confirmation gates remain. Route search and export use the existing action buttons, while AI candidates still require explicit selection and a valid coordinate.
+- Authored planner and recognition fragments exactly match the generated single-file page; all static DOM IDs remain unique and all inline scripts parse.
+- The inline build is reproducible; Git diff has no whitespace errors. Candidate tracked files contain no detected key/token literals. `.env` and QA outputs are ignored.
 
 ## Real map-data checks
 
@@ -33,9 +35,9 @@ Private.coffee was unavailable during several probes; VK Maps worked and is the 
 
 ## Browser checks
 
-The real browser workflow produced three candidates from a live OSM request, displayed selected-route geometry and evidence, downloaded a labelled route PNG, and reset all GPX checkboxes on reversal. An observed GPX file parsed as GPX 1.1 with one continuous 341-point track and a provisional warning. A subsequent reversed-route export remained disabled because its real-world access and transport prerequisites had not been checked; those prerequisites were not bypassed. No timetable or field safety validation was performed.
+The real browser workflow produced three candidates from a live OSM request, displayed selected-route geometry and evidence, and downloaded a labelled route PNG. An observed GPX file parsed as GPX 1.1 with one continuous 341-point track and a provisional warning. Reversal swapped the route direction and repeated the instruction to review arrival, departure and trail access. No timetable or field safety validation was performed.
 
-A synthetic provider fixture, clearly labelled as a test and never deployed, exercised the recognition UI. The supported candidate showed its coordinate and independent map link; the unknown candidate stayed blank with its checkbox disabled. “Use confirmed places” stayed disabled. After the private key was supplied, the real Kimi backend returned structured JSON for the synthetic calibrated-map fixture. It read A/B/C coordinates exactly and estimated the labelled START/END positions within about 25 m of their known synthetic values, with medium confidence and explicit approximation warnings. A second live call used a real OSM route-preview image from the Hong Kong browser test. Kimi identified the Sai Wan / Sai Kung area at medium confidence, but its suggested area centre was about 2 km from the known route and it left all three visible marker coordinates blank, with low-confidence evidence and questions. This is the intended fail-safe behavior: approximate area recognition does not become route input. These two tests do not establish performance on photographed, rotated, blurry or unfamiliar maps. The candidate UI now requires explicit inclusion and independent verification for every selected mandatory mark; calibration references can be excluded.
+A synthetic provider fixture, clearly labelled as a test and never deployed, exercised the recognition UI. The supported candidate showed its coordinate and independent map link; the unknown candidate stayed blank. “Use selected places” stayed disabled whenever an included candidate lacked exactly one valid coordinate. After the private key was supplied, the real Kimi backend returned structured JSON for the synthetic calibrated-map fixture. It read A/B/C coordinates exactly and estimated the labelled START/END positions within about 25 m of their known synthetic values, with medium confidence and explicit approximation warnings. A second live call used a real OSM route-preview image from the Hong Kong browser test. Kimi identified the Sai Wan / Sai Kung area at medium confidence, but its suggested area centre was about 2 km from the known route and it left all three visible marker coordinates blank, with low-confidence evidence and questions. This is the intended fail-safe behavior: approximate area recognition does not become route input. These two tests do not establish performance on photographed, rotated, blurry or unfamiliar maps. The candidate UI requires explicit inclusion for every mandatory mark and a valid coordinate for every included candidate; calibration references can be excluded.
 
 New UI inspected at 440 × 956 (iPhone 16 Pro Max CSS viewport), 1440 × 900, 1280 × 800, and 320 × 740; no horizontal document overflow. New controls use readable phone input sizes and touch targets. These are desktop-browser viewport checks, not physical iPhone Safari, GPS accuracy, offline navigation or device performance certification. Existing responsive QA notes remain applicable for earlier image and raw GPX features.
 

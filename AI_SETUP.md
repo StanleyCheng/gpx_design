@@ -6,8 +6,8 @@ The implementation is in `server/recognition.mjs` and the embedded recognition U
 
 1. Put your key in the ignored `.env` as `MOONSHOT_API_KEY=...`. Never put it in browser code, the endpoint field, an app access-code field, GitHub, screenshots or chat.
 2. Run `node --env-file=.env server/recognition.mjs` with Node 24.
-3. Open `http://127.0.0.1:8787/`. Its recognition endpoint is filled automatically. Upload/paste a map, optionally add a place-name clue, consent to sending the image, and choose Identify.
-4. Review the suggested area and image markers. Independently verify or correct **each** coordinate. Unknown positions remain blank. Only then use the confirmed places for routing.
+3. Open `http://127.0.0.1:8787/`. Its recognition endpoint is filled automatically. Upload/paste a map and optionally add a place-name clue. The disclosure beside the Identify button explains that selecting it sends the image and clue to the configured server and Kimi.
+4. Review the suggested area and image markers. Select only the places the route must visit, and independently verify or correct each selected coordinate. Unknown positions remain blank and block use while selected.
 
 The repository's ignored `.env` now contains a configured key. A successful live call on the synthetic calibrated-map fixture is recorded below and in `ROUTING_QA.md`; it proves the private request/response path, not accuracy on arbitrary real maps.
 
@@ -26,7 +26,7 @@ Set the endpoint ending `/api/recognize-map` and app access code in the page's p
 
 ## Security and accuracy controls
 
-The server accepts only consented base64 PNG/JPEG/WebP images up to 2 MB, checks the file signature, rejects arbitrary image URLs, forwards only to the fixed Kimi endpoint, caps context length, accepts at most 16 returned markers, validates coordinates and confidence/basis fields, rejects truncated model output, and redacts upstream errors. The browser reserializes an image canvas before upload, stripping EXIF. Neither image bytes, clues, tokens nor model responses are written to server logs or storage.
+The server accepts only user-initiated requests marked with the consent protocol flag and base64 PNG/JPEG/WebP images up to 2 MB, checks the file signature, rejects arbitrary image URLs, forwards only to the fixed Kimi endpoint, caps context length, accepts at most 16 returned markers, validates coordinates and confidence/basis fields, rejects truncated model output, and redacts upstream errors. The browser sends that request only when Identify is selected and reserializes the image canvas before upload, stripping EXIF. Neither image bytes, clues, tokens nor model responses are written to server logs or storage.
 
 One recognition request runs at a time, with three attempts/minute and a persistent daily request ledger. Different origins are rejected. Public files are allowlisted; `.env`, the usage ledger and server source cannot be read via the server. Keys are never sent to the browser. The private server's operator and Kimi still receive the image; the app makes no promise about the provider's retention policy.
 
