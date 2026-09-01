@@ -96,7 +96,7 @@ test('map-first route controls support colored combinations and individual or co
 });
 
 test('route limits include the compact transport search and long-hike choices', () => {
-  assert.match(html, /<option value="1000">1 km per end<\/option>/);
+  assert.match(html, /<option value="1000" selected>1 km per end<\/option>/);
   assert.match(html, /<option value="80000">80 km<\/option>/);
 });
 
@@ -104,7 +104,7 @@ test('map data providers offer automatic transient-error fallback', () => {
   assert.match(html, /<option value="auto" selected>Automatic fallback · recommended<\/option>/);
   for (const provider of ['coffee', 'vk', 'fossgis']) assert.match(html, new RegExp(`<option value="${provider}">`));
   assert.match(planner, /https:\/\/overpass-api\.de\/api\/interpreter/);
-  assert.match(planner, /const automaticProviderOrder = \['coffee', 'vk', 'fossgis'\]/);
+  assert.match(planner, /const automaticProviderOrder = \['fossgis', 'coffee', 'vk'\]/);
   assert.match(planner, /\[502, 503, 504\]\.includes\(response\.status\)/);
   assert.match(planner, /async function getMapData\(/);
   assert.match(planner, /https:\/\/gpxdesign\.vercel\.app\/api\/plan-routes/);

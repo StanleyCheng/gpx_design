@@ -152,7 +152,7 @@
           <label>Visit order<select id="plan-order"><option value="keep">Keep the listed order</option><option value="optimize">Optimise order · up to 8 places</option></select></label>
           <label>Hike date<input id="plan-date" type="date"></label>
           <label>Maximum hike distance<select id="plan-distance"><option value="10000">10 km</option><option value="20000">20 km</option><option value="30000" selected>30 km</option><option value="50000">50 km</option><option value="80000">80 km</option></select></label>
-          <label>Transport search / approach limit<select id="plan-radius"><option value="1000">1 km per end</option><option value="2000">2 km per end</option><option value="4000" selected>4 km per end</option><option value="6000">6 km per end</option></select></label>
+          <label>Transport search / approach limit<select id="plan-radius"><option value="1000" selected>1 km per end</option><option value="2000">2 km per end</option><option value="4000">4 km per end</option><option value="6000">6 km per end</option></select></label>
           <label>Waypoint-to-path tolerance<select id="plan-tolerance"><option value="15">15 m · strict</option><option value="30" selected>30 m</option><option value="60">60 m · review offsets carefully</option></select></label>
           <label>Maximum mapped road connectors<select id="plan-roads"><option value="0">None · paths only</option><option value="500">500 m total</option><option value="1500" selected>1.5 km total</option><option value="3000">3 km total</option></select></label>
           <label>OpenStreetMap data provider<select id="plan-provider"><option value="auto" selected>Automatic fallback · recommended</option><option value="coffee">Private.coffee Overpass</option><option value="vk">VK Maps Overpass</option><option value="fossgis">FOSSGIS Overpass</option></select></label>
@@ -688,7 +688,7 @@
       vk: { name: 'VK Maps', url: 'https://maps.mail.ru/osm/tools/overpass/api/interpreter' },
       fossgis: { name: 'FOSSGIS', url: 'https://overpass-api.de/api/interpreter' }
     };
-    const automaticProviderOrder = ['coffee', 'vk', 'fossgis'];
+    const automaticProviderOrder = ['fossgis', 'coffee', 'vk'];
     const regions = {
       hk: ['Hong Kong', 'AFCD hiking guidance', 'https://www.hiking.gov.hk/'],
       tw: ['Taiwan', 'Forestry and Nature Conservation Agency', 'https://recreation.forest.gov.tw/EN/'],

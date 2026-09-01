@@ -13,7 +13,7 @@ const PROVIDERS = {
   vk: { name: 'VK Maps', url: 'https://maps.mail.ru/osm/tools/overpass/api/interpreter' },
   fossgis: { name: 'FOSSGIS', url: 'https://overpass-api.de/api/interpreter' }
 };
-const PROVIDER_ORDER = ['coffee', 'vk', 'fossgis'];
+const PROVIDER_ORDER = ['fossgis', 'coffee', 'vk'];
 const PUBLIC_ORIGINS = new Set(['https://gpxdesign.vercel.app', 'https://stanleycheng.github.io', 'null']);
 const mapCache = new Map();
 const officialCache = new Map();

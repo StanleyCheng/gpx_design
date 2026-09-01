@@ -53,8 +53,11 @@ test('route backend rotates providers and returns only compact planned routes', 
   assert.equal(response.status, 200);
   const body = await response.json();
   assert.equal(body.result.routes.length, 3);
-  assert.match(body.source, /FOSSGIS \/ OpenStreetMap/);
+  assert.match(body.source, /VK Maps \/ OpenStreetMap/);
   assert.equal(calls.length, 3);
+  assert.match(calls[0], /overpass-api\.de/);
+  assert.match(calls[1], /overpass\.private\.coffee/);
+  assert.match(calls[2], /maps\.mail\.ru/);
   assert.ok(body.result.routes.every(route => route.coords.length > 1));
   assert.equal(response.headers.get('cache-control'), 'private, no-store');
 });
