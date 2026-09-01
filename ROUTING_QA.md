@@ -2,7 +2,7 @@
 
 ## Automated checks
 
-`node --test tests/*.test.cjs tests/*.test.mjs`: **26 passing tests**.
+`node --test tests/*.test.cjs tests/*.test.mjs`: **31 passing tests**.
 
 - Three distinct candidates visit every mandatory point and contain only existing source graph nodes/ways.
 - Missing geometry, disconnected paths, an off-network waypoint or a stop without a service fails closed.
@@ -13,7 +13,9 @@
 - Recognition rejects absent consent, arbitrary image URLs, bad signatures and unsupported/invalid coordinates.
 - Private server rejects other origins and invalid app tokens, will not serve `.env` or source, and reserves a persisted daily quota before provider calls.
 - No checkbox controls or removed confirmation gates remain. Route search and export use the existing action buttons, while AI candidates still require explicit selection and a valid coordinate.
-- Authored planner and recognition fragments exactly match the generated single-file page; all static DOM IDs remain unique and all inline scripts parse.
+- Authored planner, recognition and guidance fragments exactly match the generated single-file page; all static DOM IDs remain unique and all inline scripts parse.
+- English and Traditional Chinese guidance cover all five input methods, every action state and each four-step route path. Language is presentation state and does not change the planning draft.
+- The empty-map blocker is absent. Static interaction checks cover manual-pin right-click removal, the tap-accessible Remove button, bounded Ctrl/Command-wheel zoom and Leaflet touch-zoom wiring.
 - The inline build is reproducible; Git diff has no whitespace errors. Candidate tracked files contain no detected key/token literals. `.env` and QA outputs are ignored.
 
 ## Real map-data checks
@@ -39,7 +41,7 @@ The real browser workflow produced three candidates from a live OSM request, dis
 
 A synthetic provider fixture, clearly labelled as a test and never deployed, exercised the recognition UI. The supported candidate showed its coordinate and independent map link; the unknown candidate stayed blank. “Use selected places” stayed disabled whenever an included candidate lacked exactly one valid coordinate. After the private key was supplied, the real Kimi backend returned structured JSON for the synthetic calibrated-map fixture. It read A/B/C coordinates exactly and estimated the labelled START/END positions within about 25 m of their known synthetic values, with medium confidence and explicit approximation warnings. A second live call used a real OSM route-preview image from the Hong Kong browser test. Kimi identified the Sai Wan / Sai Kung area at medium confidence, but its suggested area centre was about 2 km from the known route and it left all three visible marker coordinates blank, with low-confidence evidence and questions. This is the intended fail-safe behavior: approximate area recognition does not become route input. These two tests do not establish performance on photographed, rotated, blurry or unfamiliar maps. The candidate UI requires explicit inclusion for every mandatory mark and a valid coordinate for every included candidate; calibration references can be excluded.
 
-New UI inspected at 440 × 956 (iPhone 16 Pro Max CSS viewport), 1440 × 900, 1280 × 800, and 320 × 740; no horizontal document overflow. New controls use readable phone input sizes and touch targets. These are desktop-browser viewport checks, not physical iPhone Safari, GPS accuracy, offline navigation or device performance certification. Existing responsive QA notes remain applicable for earlier image and raw GPX features.
+The earlier responsive UI was inspected at 440 × 956 (iPhone 16 Pro Max CSS viewport), 1440 × 900, 1280 × 800, and 320 × 740 with no horizontal document overflow. The new guide and map controls use the same responsive grid, readable phone input sizes and 44–48 px touch targets. The new gesture paths have automated/static coverage but have not been tested on a physical iPhone Safari. Existing checks do not certify GPS accuracy, offline navigation or device performance.
 
 ## Remaining activation and product limits
 

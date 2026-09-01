@@ -9,6 +9,8 @@
 3. Find up to three distinct routes. Every route must include every place within the accepted tolerance, follow real connected OSM walking ways, and start/end near passenger stops linked to mapped transit services.
 4. Choose a route, inspect the full map and evidence, independently check access and transport, then save GPX. After reversing, review arrival and departure services for the new direction; reversal is disabled when mapped foot direction or boarding rules prohibit it. PNG remains a clearly labelled planning preview.
 
+The “Your next step” field card follows the selected input method and the current planning state. Its four short steps, safety reminders and main action can switch between English and Traditional Chinese without changing the draft or route logic.
+
 The engine returns fewer options or an actionable failure instead of inventing routes or silently relaxing limits. Candidate ranking prefers hiking relations and nearby official trail corridors, penalises roads and retracing, and considers endpoint access distance and mapped services. It is a bounded heuristic, not a globally optimal itinerary or timetable planner. A 30 m default waypoint tolerance is explicit, reviewable and adjustable. No synthetic connectors fill waypoint or transport-stop gaps.
 
 ## Regional coverage and evidence
@@ -21,9 +23,11 @@ Up to 16 mandatory places in entered order, or 8 with order optimisation. All li
 
 ## Image input
 
-[Kimi recognition](AI_SETUP.md) identifies a suggested area and visible marked places only through a private server and a user-initiated Identify action. It never supplies the routing graph. Each selected place still needs one valid coordinate; unsupported coordinates remain blank. Kimi recognition on the public site needs a separately deployed HTTPS backend; no endpoint or secret is shipped.
+[Kimi recognition](AI_SETUP.md) is the main route-map workflow: it identifies a suggested area and visible marked places only through a private server and a user-initiated Identify action. After review, the selected places feed the same three-option route planner. Kimi never supplies the routing graph. Each selected place still needs one valid coordinate; unsupported coordinates remain blank. Kimi recognition on the public site needs a separately deployed HTTPS backend; no endpoint or secret is shipped.
 
 [Manual image conversion](IMAGE_CONVERSION.md) still works locally: calibrate three known locations, select a continuous route colour, trace and review. Image traces and imported tracks are unverified source references, not traversability evidence. GPX import preserves segments and numeric elevations; if no waypoints exist, only segment endpoints become mandatory places. Add any other must-visit locations explicitly.
+
+The planning map stays clear when empty. On desktop, drag to pan and hold Ctrl or Command while scrolling to zoom. Right-click a manually added pin to remove it. On iPhone, choose Explore map or Add pins, drag with one finger, pinch with two, and tap an added pin to open its Remove button. Ordinary swipes still scroll the page when map exploration is off.
 
 ## Run, test and publish
 

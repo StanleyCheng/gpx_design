@@ -51,6 +51,7 @@ htmlcov/
 *.tsbuildinfo
 playwright-report/
 test-results/
+.playwright-cli/
 
 # Logs, temporary files and editor metadata
 *.log

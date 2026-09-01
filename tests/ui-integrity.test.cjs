@@ -8,6 +8,7 @@ const read = file => readFileSync(join(root, file), 'utf8');
 const html = read('index.html');
 const planner = read('lib/planner-ui.js').trim();
 const recognition = read('lib/recognition-ui.js').trim();
+const guidance = read('lib/guidance-ui.js').trim();
 
 function inlineFragment(marker) {
   const start = html.indexOf(`// BEGIN ${marker}`);
@@ -43,6 +44,19 @@ test('AI place selection and server consent protocol remain fail-closed', () => 
 test('single-file build embeds the authored UI fragments exactly', () => {
   assert.equal(inlineFragment('PLANNER UI'), planner);
   assert.equal(inlineFragment('RECOGNITION UI'), recognition);
+  assert.equal(inlineFragment('GUIDANCE UI'), guidance);
+});
+
+test('method guidance and map gestures use the existing planning controls', () => {
+  for (const id of ['guide-title', 'guide-language', 'guide-list', 'guide-action', 'guide-secondary']) assert.match(html, new RegExp(`id=["']${id}["']`));
+  assert.match(guidance, /function guideStateFor\(/);
+  assert.match(guidance, /'zh-Hant'/);
+  for (const method of ['coordinates', 'text', 'gpx', 'map-image', 'image']) assert.equal(guidance.includes(method), true, `${method} guidance is authored`);
+  assert.doesNotMatch(html, /id=["']map-empty["']/);
+  assert.match(html, /marker\.on\('contextmenu'/);
+  assert.match(html, /Remove this pin/);
+  assert.match(html, /event\.ctrlKey.*event\.metaKey/);
+  assert.match(html, /touchZoom/);
 });
 
 test('static DOM ids remain unique', () => {
