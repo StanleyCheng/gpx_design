@@ -6,6 +6,9 @@
   "functions": {
     "api/recognize-map.mjs": {
       "maxDuration": 120
+    },
+    "api/plan-routes.mjs": {
+      "maxDuration": 120
     }
   }
 }
