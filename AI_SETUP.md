@@ -1,6 +1,6 @@
 # Private Kimi image recognition
 
-The implementation is in `server/recognition.mjs` and the embedded recognition UI. It uses **kimi-k3**, vision input and JSON output, at the fixed official `https://api.moonshot.ai/v1/chat/completions` endpoint. It does not send the unsupported `thinking` override to K3. A model response is only a suggestion, never routing geometry or verified location evidence.
+The implementation is in `server/recognition.mjs` and the embedded recognition UI. It uses **kimi-k3**, vision input and JSON output, at the fixed official `https://api.moonshot.ai/v1/chat/completions` endpoint. It does not send the unsupported `thinking` override to K3. Image extraction uses K3’s supported `reasoning_effort: "low"` setting to reduce latency and cost while keeping structured vision output. A model response is only a suggestion, never routing geometry or verified location evidence.
 
 ## Local use
 
@@ -9,7 +9,7 @@ The implementation is in `server/recognition.mjs` and the embedded recognition U
 3. Open `http://127.0.0.1:8787/`. Its recognition endpoint is filled automatically. Upload/paste a map, optionally add a place-name clue, consent to sending the image, and choose Identify.
 4. Review the suggested area and image markers. Independently verify or correct **each** coordinate. Unknown positions remain blank. Only then use the confirmed places for routing.
 
-The repository's existing `.env` contained an empty key during this implementation. No successful live Kimi recognition has been verified. The backend and frontend failure path and mocked provider contract are tested; they do not substitute for a real model test.
+The repository's ignored `.env` now contains a configured key. A successful live call on the synthetic calibrated-map fixture is recorded below and in `ROUTING_QA.md`; it proves the private request/response path, not accuracy on arbitrary real maps.
 
 ## GitHub Pages deployment boundary
 
