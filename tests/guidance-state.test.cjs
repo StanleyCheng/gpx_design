@@ -15,6 +15,7 @@ const state = model => JSON.parse(JSON.stringify(guideStateFor(model)));
 const base = method => ({ method, hasCoordinatesText: false, hasImage: false, hasRecognitionEndpoint: false, recognitionBusy: false, hasRecognitionResult: false, hasPhotoGPS: false, pointCount: 0, routingBusy: false, hasRoutes: false, hasSelectedRoute: false });
 
 test('each empty input method points to its own first action', () => {
+  assert.deepEqual(state(base('map-pins')), { step: 1, action: 'add-map-pins' });
   assert.deepEqual(state(base('coordinates')), { step: 1, action: 'focus-coordinates' });
   assert.deepEqual(state(base('text')), { step: 1, action: 'choose-text' });
   assert.deepEqual(state(base('gpx')), { step: 1, action: 'choose-gpx' });
@@ -45,10 +46,10 @@ test('English and Traditional Chinese cover every method, state and four-step pa
   const copyContext = {};
   vm.runInNewContext(source.slice(copyStart, copyEnd).replace('const guideCopy =', 'guideCopy ='), copyContext);
   const copies = copyContext.guideCopy;
-  const actions = ['focus-coordinates', 'preview-coordinates', 'choose-text', 'choose-gpx', 'choose-image', 'setup-recognition', 'identify-image', 'waiting-recognition', 'review-candidates', 'add-photo-gps', 'review-remove', 'route-settings', 'waiting-routes', 'compare-routes', 'review-save'];
+  const actions = ['add-map-pins', 'focus-coordinates', 'preview-coordinates', 'choose-text', 'choose-gpx', 'choose-image', 'setup-recognition', 'identify-image', 'waiting-recognition', 'review-candidates', 'add-photo-gps', 'review-remove', 'route-settings', 'waiting-routes', 'compare-routes', 'review-save'];
   for (const language of ['en', 'zh-Hant']) {
     const copy = copies[language];
-    for (const method of ['coordinates', 'text', 'gpx', 'map-image', 'image']) assert.equal(copy.methods[method].steps.length, 4);
+    for (const method of ['map-pins', 'coordinates', 'text', 'gpx', 'map-image', 'image']) assert.equal(copy.methods[method].steps.length, 4);
     for (const action of actions) { assert.ok(copy.prompts[action][0]); assert.ok(copy.actions[action]); }
   }
 });

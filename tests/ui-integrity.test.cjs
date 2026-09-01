@@ -53,12 +53,20 @@ test('method guidance and map gestures use the existing planning controls', () =
   for (const id of ['guide-title', 'guide-language', 'guide-list', 'guide-action', 'guide-secondary']) assert.match(html, new RegExp(`id=["']${id}["']`));
   assert.match(guidance, /function guideStateFor\(/);
   assert.match(guidance, /'zh-Hant'/);
-  for (const method of ['coordinates', 'text', 'gpx', 'map-image', 'image']) assert.equal(guidance.includes(method), true, `${method} guidance is authored`);
+  for (const method of ['map-pins', 'coordinates', 'text', 'gpx', 'map-image', 'image']) assert.equal(guidance.includes(method), true, `${method} guidance is authored`);
   assert.doesNotMatch(html, /id=["']map-empty["']/);
   assert.match(html, /marker\.on\('contextmenu'/);
-  assert.match(html, /Remove this pin/);
-  assert.match(html, /event\.ctrlKey.*event\.metaKey/);
+  assert.match(html, /Delete this waypoint/);
+  assert.match(html, /draggable: true/);
+  assert.match(html, /scrollWheelZoom: true/);
   assert.match(html, /touchZoom/);
+});
+
+test('map-first route controls support colored combinations and individual or combined GPX', () => {
+  for (const id of ['control-dock', 'map-pins-panel', 'route-visibility', 'show-all-routes', 'hide-all-routes', 'save-all-gpx']) assert.match(html, new RegExp(`id=["']${id}["']`));
+  assert.match(planner, /ROUTE_COLORS/);
+  assert.match(planner, /routing\.visible/);
+  assert.match(planner, /function allRoutesGPX/);
 });
 
 test('static DOM ids remain unique', () => {

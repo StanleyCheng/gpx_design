@@ -4,14 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#263e35">
-  <meta name="description" content="A careful start to your next hike. Import waypoints, review a map, and prepare a GPX planning draft. Verified trail routing is in development.">
+  <meta name="description" content="Plan up to three connected hiking routes through every waypoint, with public transport at both ends and private map-image recognition.">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <title>Trailcraft — GPX route planner</title>
+  <title>trailplaner — GPX route planner</title>
   <link rel="icon" type="image/svg+xml" href="icon.svg?v=2">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=2">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=2">
   <link rel="manifest" href="site.webmanifest">
-  <meta name="apple-mobile-web-app-title" content="Trailcraft">
+  <meta name="apple-mobile-web-app-title" content="trailplaner">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
@@ -53,27 +53,35 @@
     @media(max-width:1000px){.plan-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.route-choice h3{font-size:23px}}
     @media(max-width:720px){.workflow-nav{grid-template-columns:1fr 1fr;gap:4px 16px}.workflow-nav a{font-size:12px}.plan-fields{gap:13px}.plan-fields select,.plan-fields input{font-size:16px}.plan-fields label{font-size:12px}.route-options{grid-template-columns:1fr}.evidence-grid{grid-template-columns:1fr}.selected-route-detail{padding:16px}.route-choice h3{font-size:27px}.build-actions{align-items:stretch}.build-actions .primary{width:100%}.route-export-review{padding:16px}.pin-row{flex-wrap:wrap}.pin-info{min-width:160px}.pin-reorder{margin-left:auto}.route-result-count{font-size:12px}.routes-empty{padding:20px}.route-builder .panel-heading h2{font-size:25px}.method-guide{padding:18px}.guide-safety{padding-inline:18px}.guide-prompt{font-size:26px}.guide-list li{font-size:13px}}
     @media(max-width:380px){.plan-fields{grid-template-columns:1fr}.pill{white-space:normal;text-align:center}.brand-name{font-size:22px}.workflow-nav a{font-size:11px}}
+
+    /* Map-first application shell */
+    html,body{height:100%;overflow:hidden}.topbar{position:fixed;inset:0 0 auto;z-index:1300;height:64px;background:color-mix(in srgb,var(--paper) 94%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}.topbar .shell{width:100%;max-width:none;padding-inline:max(18px,env(safe-area-inset-left,0px)) max(18px,env(safe-area-inset-right,0px))}.topbar-inner{height:64px}.brand{gap:10px}.brand-mark{width:38px;height:38px}.brand-name{font:30px/1 var(--display);letter-spacing:-.7px}.brand-subtitle,.topbar nav,.hero,.safety-strip,.workflow-nav,#approach,.footer,.guide-panel{display:none!important}main.shell{position:fixed;inset:64px 0 0;width:100%;max-width:none;margin:0}.map-section{position:absolute;inset:0;margin:0}.map-section>.section-title{display:none}.map-container{position:absolute;inset:0;border:0;border-radius:0}.map-container #map{width:100%;height:100%;min-height:0}.map-label{top:16px;left:auto;right:16px;max-width:min(330px,calc(100% - 88px));border-radius:12px;padding:9px 12px}.map-label span{display:block;margin-left:0}.number-pin span{cursor:grab}.number-pin:active span{cursor:grabbing}.direction-pin{background:var(--accent);border:2px solid var(--white);border-radius:7px;color:var(--white);display:grid!important;place-items:center;font:700 10px var(--font);box-shadow:0 2px 8px #263e3545}.route-line-label{background:transparent;border:0}.route-line-label span{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;padding:4px 8px;border:2px solid var(--white);border-radius:999px;color:#fff;font:700 11px var(--font);box-shadow:0 2px 9px #263e3555}.leaflet-control-zoom{margin-top:16px!important}.leaflet-bottom{bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+    .control-dock{position:fixed;z-index:1200;left:50%;bottom:0;transform:translateX(-50%);width:min(920px,calc(100% - 24px));max-height:min(72dvh,760px);display:flex;flex-direction:column;background:var(--white);border:1px solid var(--line);border-bottom:0;border-radius:18px 18px 0 0;box-shadow:0 -12px 44px #263e3530;transition:max-height .24s ease}.control-dock.collapsed{max-height:76px}.dock-toggle{flex:none;width:100%;min-height:76px;display:grid;grid-template-columns:34px minmax(0,1fr) 34px;gap:10px;align-items:center;text-align:left;border:0;border-radius:18px 18px 0 0;background:var(--white);padding:10px 16px}.dock-toggle:hover:not(:disabled){background:var(--soft)}.dock-grip{width:30px;height:4px;border-radius:4px;background:var(--line)}.dock-heading{display:flex;flex-direction:column;min-width:0}.dock-heading strong{font-size:14px}.dock-heading span{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dock-chevron{font-size:22px;text-align:center;transition:transform .2s}.control-dock.collapsed .dock-chevron{transform:rotate(180deg)}.dock-body{overflow:auto;overscroll-behavior:contain;padding:0 18px calc(20px + env(safe-area-inset-bottom,0px));scrollbar-gutter:stable}.control-dock.collapsed .dock-body{display:none}.dock-section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:18px 0 9px}.dock-section-title h2{font:22px/1.2 var(--display)}
+    #planner.workspace{display:block}.workspace>.panel{border:0;border-radius:0;overflow:visible;background:transparent}.workspace>.panel>.panel-heading{display:none}.workspace>.panel>.panel-body{padding:6px 0 12px}.workspace #input-method{background:var(--soft);font-weight:600}.map-pin-panel{padding:14px 0 2px}.map-pin-panel p{font-size:13px;color:var(--muted);margin-bottom:12px}.map-pin-panel .pin-instructions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 14px;padding:0;list-style:none;counter-reset:pin-steps}.map-pin-panel .pin-instructions li{position:relative;padding:10px 10px 10px 34px;border:1px solid var(--line);border-radius:8px;background:var(--paper);font-size:11px}.map-pin-panel .pin-instructions li::before{counter-increment:pin-steps;content:counter(pin-steps);position:absolute;left:10px;top:9px;display:grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--ink);color:#fff;font-size:10px}.pin-actions{display:flex;gap:8px;flex-wrap:wrap}.pin-actions button{flex:1}.pin-help{font-size:11px!important;margin-top:9px!important}
+    #ai-review,#image-converter,#route-builder,#route-results,.dock-map-controls{margin:14px 0 0}.control-dock .panel{box-shadow:none}.control-dock .panel-heading{padding:16px 18px 10px}.control-dock .panel-body{padding:0 18px 18px}.control-dock #route-builder[hidden],.control-dock #route-results[hidden],.control-dock .dock-map-controls[hidden]{display:none!important}.route-builder .plan-fields{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:12px}.route-options{grid-template-columns:repeat(3,minmax(220px,1fr));overflow-x:auto;padding-bottom:6px;scroll-snap-type:x proximity}.route-choice{scroll-snap-align:start}.route-visibility-controls{margin:14px 0;padding:14px;border:1px solid var(--line);border-radius:9px;background:var(--soft)}.route-visibility-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.route-visibility-head strong{font-size:13px}.route-visibility{display:flex;flex-wrap:wrap;gap:8px}.route-toggle{--route-color:var(--ink);border-color:var(--route-color);background:var(--white)}.route-toggle::before{content:'';width:11px;height:11px;border-radius:50%;background:var(--route-color)}.route-toggle[aria-pressed=true]{background:var(--route-color);color:#fff}.route-toggle[aria-pressed=true]::before{background:#fff}.route-visibility-actions{display:flex;gap:6px}.route-visibility-actions button{padding:6px 9px;min-height:36px;font-size:11px}.dock-map-controls{border-top:1px solid var(--line);padding-top:14px}.dock-map-controls .map-actions,.dock-map-controls .map-tools,.dock-map-controls .export-actions{display:flex;flex-wrap:wrap;gap:8px}.dock-map-controls .map-bottom{display:block;padding:12px 0;border:0}.dock-map-controls .map-tools{margin-top:10px}.dock-map-controls .map-footer{padding-top:10px}.dock-map-controls .export-actions{width:100%}.dock-map-controls .export-actions button{flex:1}.dock-map-controls .export-note{max-width:none}.dock-map-controls .download-ready{margin-top:12px}.direction-summary{margin-top:6px}.routes-empty{padding:18px}.selected-route-detail{padding:16px}.analytics-consent-open .control-dock{visibility:hidden}.consent{z-index:2000}
+    @media(max-width:720px){.topbar{height:58px}.topbar-inner{height:58px}.topbar .shell{padding-inline:max(12px,env(safe-area-inset-left,0px)) max(12px,env(safe-area-inset-right,0px))}.brand-mark{width:34px;height:34px}.brand-name{font-size:27px}main.shell{inset:58px 0 0}.map-label{top:12px;right:10px;max-width:calc(100% - 74px);font-size:11px}.leaflet-control-zoom{margin-top:12px!important;margin-left:10px!important}.leaflet-bottom{bottom:calc(70px + env(safe-area-inset-bottom,0px))}.control-dock{width:100%;max-height:min(70dvh,680px);border-inline:0}.control-dock.collapsed{max-height:70px}.dock-toggle{min-height:70px;padding-inline:13px}.dock-body{padding-inline:14px}.map-pin-panel .pin-instructions{grid-template-columns:1fr}.route-builder .plan-fields{grid-template-columns:1fr}.route-options{grid-template-columns:repeat(3,minmax(82vw,1fr))}.control-dock .panel-heading{padding-inline:14px}.control-dock .panel-body{padding-inline:14px}.dock-map-controls .export-actions{display:grid;grid-template-columns:1fr 1fr}.dock-map-controls .export-actions button{min-width:0}.dock-map-controls .export-actions #discard{grid-column:1/-1}.route-visibility-head{align-items:flex-start;flex-direction:column}.map-actions button,.map-tools button{flex:1}.toast{bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:1800}}
+    @media(max-width:380px){.brand-name{font-size:25px}.dock-heading strong{font-size:13px}.dock-heading span{font-size:10px}.dock-body{padding-inline:10px}.control-dock .panel-body{padding-inline:10px}.route-options{grid-template-columns:repeat(3,minmax(88vw,1fr))}}
   </style>
 </head>
-<body>
+<body class="map-first">
   <a class="skip" href="#planner">Skip to route planner</a>
   <header class="topbar"><div class="shell topbar-inner">
-    <a href="#" class="brand" aria-label="Trailcraft home"><svg class="brand-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="m2 26 12-21 7 12 4-7 7 16Z" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round"/><path d="m9 14 5 2 4-3" stroke="currentColor" stroke-width="1.7"/></svg><span class="brand-name">trailcraft</span><span class="brand-subtitle">GPX ROUTE PLANNER</span></a>
-    <nav aria-label="Main navigation"><a href="#planner">Planner</a><a href="#approach" class="nav-method">Our approach</a></nav>
+    <a href="#" class="brand" aria-label="trailplaner home"><svg class="brand-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="m2 26 12-21 7 12 4-7 7 16Z" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round"/><path d="m9 14 5 2 4-3" stroke="currentColor" stroke-width="1.7"/></svg><span class="brand-name">trailplaner</span></a>
   </div></header>
   <noscript><p class="noscript">JavaScript is required to import files and use the map. Route planning requires JavaScript. No route is certified safe.</p></noscript>
   <main class="shell">
-    <section class="hero" aria-labelledby="hero-title">
-      <div><p class="eyebrow">Thoughtful routes. Better days outside.</p><h1 id="hero-title">Find your way.<br><em>Keep to the trail.</em></h1><p class="hero-copy">Bring your must-visit places. Compare real walking connections with public transport at both ends, then check the evidence before saving your route.</p></div>
-      <div class="hero-aside" aria-hidden="true"><svg class="contours" viewBox="0 0 450 260" fill="none" stroke="currentColor" stroke-width="1"><path d="M-20 170C40 270 163 12 240 52S374 328 480 155M-20 149C41 247 158-7 249 32S380 303 480 135M-20 127C56 229 164-28 260 12S397 273 480 112M-20 106C69 218 167-47 270-9S420 250 480 90M-20 84C80 198 170-68 279-30S442 234 480 70M-20 194C25 291 155 35 229 73S353 345 480 182M-20 215C21 309 144 64 219 94S337 368 480 203M-20 237C17 329 125 87 209 116S322 381 480 223M-20 257C16 350 115 108 197 137S299 400 480 245"/></svg><div class="field-note"><p class="eyebrow">A note from the trail</p><strong>The best route<br>is one you can verify.</strong><p>A map is a starting point.<br>Evidence makes the difference.</p><span class="note-number">FIELD NOTES &nbsp; / &nbsp; Nº 001</span></div></div>
+    <section class="map-section" aria-labelledby="map-title"><h1 id="map-title" class="skip">Planning map</h1>
+      <div id="map-capture" class="map-container"><div id="map" aria-label="Interactive map for reviewing and editing waypoint locations" aria-describedby="map-gesture-note"></div><div class="map-label"><strong id="map-caption">Your planning canvas</strong><span id="map-count">No waypoints added</span></div></div>
     </section>
-    <div class="safety-strip"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6Z" stroke="currentColor" stroke-width="1.5"/><path d="m8 12 3 3 5-6" stroke="currentColor" stroke-width="1.5"/></svg><p><strong>Planning preview, not a navigation tool.</strong> Routes use mapped paths and service-linked transport stops. Current services, closures, permits and trail conditions still require your checks. No route is certified safe.</p><a href="#approach">Read the safeguards ↗</a></div>
-    <nav class="workflow-nav" aria-label="Route planning steps"><a href="#planner"><span>1</span>Add places</a><a href="#route-builder"><span>2</span>Review &amp; search</a><a href="#route-results"><span>3</span>Compare routes</a><a href="#map-title"><span>4</span>Review &amp; save</a></nav>
+    <section id="control-dock" class="control-dock" aria-label="Route planning controls">
+      <button id="control-dock-toggle" class="dock-toggle" type="button" aria-expanded="true" aria-controls="control-dock-body"><span class="dock-grip" aria-hidden="true"></span><span class="dock-heading"><strong id="dock-title">Add your waypoints</strong><span id="dock-summary">Choose how you want to add places</span></span><span class="dock-chevron" aria-hidden="true">⌄</span></button>
+      <div id="control-dock-body" class="dock-body">
     <section id="planner" class="workspace" aria-label="Plan your hike">
       <div class="panel"><div class="panel-heading"><span class="step">01</span><h2>Add your must-visit places</h2></div><div class="panel-body">
         <label class="field" for="input-method">How would you like to add them?</label>
-        <select id="input-method"><option value="coordinates">Paste coordinates</option><option value="text">Upload TXT or CSV</option><option value="gpx">Upload GPX</option><option value="map-image">Paste or upload a route map</option><option value="image">Review a map image or photo</option></select>
-        <div id="coordinates-panel"><div class="field-top"><label class="field" for="coordinates">Coordinates</label><span>WGS84 · LATITUDE, LONGITUDE</span></div><textarea id="coordinates" spellcheck="false" aria-describedby="coordinate-help" placeholder="22.3893078, 114.3664416&#10;22.3913284, 114.3663188"></textarea><p class="help" id="coordinate-help">Decimal degrees. One latitude/longitude pair per line, or comma-separated pairs. No trail connections are assumed.</p><div class="input-actions"><button id="preview-points" class="primary">Preview waypoints <span aria-hidden="true">↗</span></button><button id="load-example" class="text-button">Try example pins</button></div></div>
+        <select id="input-method"><option value="map-pins">Put pins on the map</option><option value="coordinates">Paste coordinates</option><option value="text">Upload TXT or CSV</option><option value="gpx">Upload GPX</option><option value="map-image">Paste or upload a route map</option><option value="image">Review a map image or photo</option></select>
+        <div id="map-pins-panel" class="map-pin-panel"><p>Place every spot your hike must visit. You can adjust them before and after route planning.</p><ol class="pin-instructions"><li>Move and zoom the map.</li><li>Tap or click to add each pin.</li><li>Drag to move; tap or right-click to delete.</li></ol><div class="pin-actions"><button id="start-pin-mode" class="primary" type="button">Start adding pins</button><button id="finish-pin-mode" type="button" hidden>Finish adding pins</button></div><p class="pin-help">iPhone: pinch to zoom, drag the map with one finger, drag a pin to move it, or tap a pin for Delete. Computer: wheel or trackpad to zoom, drag to pan, drag a pin to move it, or right-click a pin to delete it.</p></div>
+        <div id="coordinates-panel" hidden><div class="field-top"><label class="field" for="coordinates">Coordinates</label><span>WGS84 · LATITUDE, LONGITUDE</span></div><textarea id="coordinates" spellcheck="false" aria-describedby="coordinate-help" placeholder="22.3893078, 114.3664416&#10;22.3913284, 114.3663188"></textarea><p class="help" id="coordinate-help">Decimal degrees. One latitude/longitude pair per line, or comma-separated pairs. No trail connections are assumed.</p><div class="input-actions"><button id="preview-points" class="primary">Preview waypoints <span aria-hidden="true">↗</span></button><button id="load-example" class="text-button">Try example pins</button></div></div>
         <div id="file-panel" hidden><div class="upload-area"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 16V3m-4 4 4-4 4 4M4 14v6h16v-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><strong id="upload-title">Choose your coordinate file</strong><p id="upload-help" class="small">TXT or CSV · maximum 10 MB</p><label class="field" for="file-input">Select a file</label><input id="file-input" type="file" accept=".txt,.csv,text/plain,text/csv" aria-describedby="upload-help"></div><p class="help">Import replaces the current draft. Review your file before using any points.</p><div id="image-review" class="image-preview" hidden><img id="photo" alt="Your uploaded map image for manual location review"><p id="photo-status" role="status"></p><p id="photo-gps-warning" class="review-notice" hidden>Check this GPS position on an independent map before adding it. It may be the camera location, not the map location.</p><button id="add-photo-gps" hidden disabled>Add photo position</button><p class="help">To copy a coloured line exactly, select “Paste or upload a route map”, then open the secondary image-tracing tool. It requires three known map locations; photo GPS cannot identify the area shown.</p></div></div>
         <div id="paste-controls" class="paste-controls" hidden><button id="paste-map" class="primary">Paste map from clipboard</button><p class="help">Copy the image itself, then use this button or ⌘V / Ctrl+V. On iPhone, accept the browser’s Paste prompt. You can also choose a screenshot above. Links and pasted HTML are never opened.</p><p class="help">AI recognition can suggest the area and marked places when readable clues are present. Manual coloured-line tracing needs a flat map, three known coordinates and a continuous route line.</p></div>
         <p id="input-message" class="message" role="status" aria-live="polite" hidden></p>
@@ -91,7 +99,7 @@
       <div class="panel-heading"><span class="step">AI</span><h2 id="ai-title">Identify the map &amp; its marked places</h2></div>
       <div class="panel-body">
         <p class="help">Kimi looks for place names, coordinate grids and visible waypoints. Hong Kong, Taiwan, Japan and South Korea are the focus; other regions are possible. A map without readable clues may need more context. Camera GPS does not establish the map’s location.</p>
-        <details id="ai-connection"><summary>Private recognition connection</summary><p class="help">GitHub Pages cannot hold a secret API key. Connect a separately hosted Trailcraft recognition server, or run the private server on your computer. Never enter your Kimi API key here.</p><label class="field" for="ai-endpoint">Recognition endpoint<input id="ai-endpoint" type="text" spellcheck="false" autocomplete="off" placeholder="https://your-private-server/api/recognize-map"></label><label class="field" for="ai-access">Private app access code (not your Kimi key)<input id="ai-access" type="password" autocomplete="off"></label><p class="help">The connection and access code stay in memory for this visit. The code is sent only to the endpoint you enter.</p></details>
+        <details id="ai-connection"><summary>Private recognition connection</summary><p class="help">GitHub Pages cannot hold a secret API key. Connect the private trailplaner recognition server, or run the private server on your computer. Never enter your Kimi API key here.</p><label class="field" for="ai-endpoint">Recognition endpoint<input id="ai-endpoint" type="text" spellcheck="false" autocomplete="off" placeholder="https://your-private-server/api/recognize-map"></label><label class="field" for="ai-access">Private app access code (not your Kimi key)<input id="ai-access" type="password" autocomplete="off"></label><p class="help">The connection and access code stay in memory for this visit. The code is sent only to the endpoint you enter.</p></details>
         <label class="field" for="ai-context">Optional clue: country, town, trail name or printed map title<input id="ai-context" type="text" maxlength="500" placeholder="For example: a trail near Taipei, Taiwan"></label>
         <p id="ai-upload-notice" class="review-notice">Selecting “Identify map &amp; waypoints” sends this map image and your clue to the configured server and Kimi. Images are not sent to Google Analytics.</p>
         <div class="build-actions"><button id="recognize-map" class="primary" aria-describedby="ai-upload-notice" disabled>Identify map &amp; waypoints →</button><button id="cancel-recognition" hidden>Cancel recognition</button><a href="#image-converter" class="text-button">Use manual calibration instead ↓</a></div>
@@ -152,24 +160,22 @@
     </section>
     <section id="route-results" class="route-section" aria-labelledby="routes-title">
       <div class="section-title"><h2 id="routes-title"><span>03</span>Compare your route options</h2><p id="route-result-count">Add your places to get started</p></div>
+      <div id="route-visibility-controls" class="route-visibility-controls" hidden><div class="route-visibility-head"><strong>Routes shown on the map</strong><div class="route-visibility-actions"><button id="show-all-routes" type="button">Show all</button><button id="hide-all-routes" type="button">Hide all</button></div></div><div id="route-visibility" class="route-visibility" aria-label="Choose routes to show"></div></div>
       <div id="route-options" class="route-options"><div class="routes-empty"><strong>Your route options will appear here.</strong><p>Each option must visit every listed waypoint and connect to mapped public transport at both ends. We show fewer than three when fewer distinct routes meet your settings.</p></div></div>
       <p id="routing-evidence-note" class="help">No placeholder routes, assumed trail connections, or guaranteed service claims.</p>
       <div id="selected-route-detail" class="selected-route-detail" hidden></div>
       <div id="route-export-review" class="route-export-review" hidden><h3>Before exporting this route</h3><p>These are provisional routes built from map data. Review the linked sources and the complete map before using an export.</p><ul class="route-review-list"><li>Check actual arrival and return services for the hike date, including the last departure and walking access to both stops.</li><li>Check official trail access, closures, permits, conditions and suitability. Government status shown as unknown remains unverified.</li><li>Check every waypoint offset and the complete route on the map. No required place is silently skipped.</li></ul><p id="route-export-status" role="status">The provisional route can be saved in the direction shown. These review reminders are not a safety certification.</p></div>
     </section>
-    <section class="map-section" aria-labelledby="map-title"><div class="section-title"><h2 id="map-title"><span>04</span>Review the complete route</h2><div class="map-actions"><button id="reverse-route" disabled>Reverse route ⇄</button><button id="fit-points" disabled>Fit all points <span aria-hidden="true">⤢</span></button></div></div>
-      <div id="map-capture" class="map-container"><div id="map" aria-label="Interactive map for reviewing waypoint locations" aria-describedby="map-gesture-note"></div><div class="map-label"><strong id="map-caption">Your planning canvas</strong><span id="map-count">No waypoints added</span></div><div class="map-bottom"><div class="map-guidance"><p class="legend"><span><span class="legend-dot"></span>Numbered mandatory places</span><span id="track-legend" hidden><span class="legend-dash"></span>Unverified source track</span></p><p id="map-gesture-note" class="map-gesture-note">Drag to pan. Hold Ctrl or Command while scrolling to zoom.</p></div><div class="map-tools"><a id="map-next-step" class="text-button" href="#route-builder" hidden>Route settings ↑</a><button id="toggle-map" aria-pressed="false" aria-controls="map" hidden>Explore map</button><button id="toggle-pins" aria-pressed="false" aria-controls="map">+ Add pins on map</button></div></div></div>
+    <section id="dock-map-controls" class="dock-map-controls" aria-label="Map and export controls" hidden>
+      <div class="dock-section-title"><h2>Map &amp; files</h2><div class="map-actions"><button id="reverse-route" disabled>Reverse route ⇄</button><button id="fit-points" disabled>Fit all points <span aria-hidden="true">⤢</span></button></div></div>
+      <div class="map-bottom"><div class="map-guidance"><p class="legend"><span><span class="legend-dot"></span>Numbered mandatory places</span><span id="track-legend" hidden><span class="legend-dash"></span>Unverified source track</span></p><p id="map-gesture-note" class="map-gesture-note">Wheel or pinch to zoom. Drag to pan. Drag a pin to move it; tap or right-click a pin to delete it.</p></div><div class="map-tools"><a id="map-next-step" class="text-button" href="#route-builder" hidden>Route settings</a><button id="toggle-map" aria-pressed="true" aria-controls="map" hidden>Map active</button><button id="toggle-pins" aria-pressed="false" aria-controls="map">+ Add pins on map</button></div></div>
       <div id="direction-summary" class="direction-summary" aria-live="polite" hidden></div>
-      <div class="map-footer"><p class="export-note" id="export-note">GPX saves the current direction, waypoints and any source track segments. It never creates connections between waypoints or across segment gaps. All exports are unverified; check access and transport independently.</p><div class="export-actions"><button id="save-png" disabled>Save preview as PNG <span aria-hidden="true">↓</span></button><button id="save-gpx" class="primary" disabled>Save GPX draft <span aria-hidden="true">↓</span></button><button id="discard" disabled>Discard</button></div></div>
+      <div class="map-footer"><p class="export-note" id="export-note">GPX saves the current direction, waypoints and any source track segments. It never creates connections between waypoints or across segment gaps. All exports are unverified; check access and transport independently.</p><div class="export-actions"><button id="save-png" disabled>Save preview as PNG <span aria-hidden="true">↓</span></button><button id="save-gpx" class="primary" disabled>Save selected route as GPX <span aria-hidden="true">↓</span></button><button id="save-all-gpx" disabled>Save all routes as GPX <span aria-hidden="true">↓</span></button><button id="discard" disabled>Discard</button></div></div>
       <div id="download-ready" class="download-ready" role="status" hidden><div><strong>Your planning file is ready.</strong><p>If the download did not start, tap the filename below. On supported phones, Share file opens options such as Save to Files.</p><a id="download-link" download></a></div><button id="share-file" hidden>Share file</button></div>
     </section>
-    <section id="approach" class="method" aria-labelledby="method-title"><div class="method-intro"><p class="eyebrow">Built with care</p><h2 id="method-title">Know what’s behind<br>your route.</h2><p>Clear limits are part of the product.<br>Here’s what the planner can—and cannot—verify.</p></div><div>
-      <details open><summary>How do I create and save a route?</summary><p>Add your must-visit places, check the numbered pins and visit order, choose your limits, and select “Find up to 3 routes”. Each candidate follows connected OpenStreetMap walking geometry through every listed place within the tolerance you chose. Choose a route, inspect its transport and trail evidence, then save GPX. After reversing, review the arrival and departure services again. Input-only GPX export remains separate and does not create a walking route.</p></details>
-      <details><summary>What is verified, and what still needs checking?</summary><p>The routing engine checks graph connectivity, every mandatory waypoint, known access and difficulty restrictions, foot direction, mapped transit-service membership, distance and road limits. Search is limited to 250 km², 16 places in entered order, or 8 with order optimisation. Hiking date is a reminder for your checks; it does not filter timetables. A nearby transport stop can still be inaccessible or out of service.</p><p>Hong Kong’s AFCD trail geometry is checked when its public service is available. Taiwan, Japan and South Korea use the same worldwide OSM graph with regional official guidance links; government management is not automatically established there. No live closures, permits, weather, timetables or terrain inspection are integrated. Missing information stays unknown. No ascent, walking-time estimate or safety score is invented. The gpx-trail-fix principle is retained: generated track geometry comes only from actual mapped ways.</p></details>
-      <details><summary>How are map photos handled?</summary><p>Images stay local unless you select Kimi recognition through a private server. Kimi can suggest the map area and marked places, but each coordinate needs independent review. A server connection is required on GitHub Pages. The secondary image-tracing tool accepts a flat screenshot, three known coordinate references, and a selected continuous route colour. It extracts adjacent matching pixels in the order you mark, then requires a visual review. The converter does not automatically identify an unknown region, correct angled photos, bridge gaps, or verify trails. A wrong projection, calibration or same-colour branch can still produce a wrong result. GPS in a photo may describe the camera location and is never used to locate the depicted map.</p></details>
-      <details id="privacy-details"><summary>Where does my data go?</summary><p>This app does not store your draft between visits. Files stay local except when you explicitly send a map image and optional clue to your configured recognition server and Kimi. Camera metadata is stripped from that upload. Route search sends a bounding box to the selected Overpass provider and, for Hong Kong, the AFCD public map service. These services see the requested area and your IP address. Never put private details in image clues. Google Analytics loads only if you allow optional analytics. It measures page views and fixed app-action names, plus standard browser/device and approximate location data. We do not send coordinates, filenames, photos, GPX contents, typed text, query strings, or referrer URLs to Analytics. Automatic enhanced measurement and advertising features are disabled. You can withdraw consent using “Privacy settings” below. Browser privacy signals and blockers may prevent tracking.</p><p>Your analytics choice is stored locally; analytics cookies, if accepted, are limited to this project. GitHub hosts the page; Google Fonts and the pinned Leaflet and Exifr libraries load from external providers. OpenStreetMap receives requests for the map tiles you view, which reveal the approximate area and your IP address. PNG export uses tiles already displayed; it does not download an offline map. <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google privacy policy</a>.</p></details>
-    </div></section>
-    <footer class="footer"><p>trailcraft &nbsp; / &nbsp; A more considered way outside.</p><div class="footer-links"><button id="privacy-settings" class="privacy-button">Privacy settings</button><a href="https://github.com/StanleyCheng/gpx_design" target="_blank" rel="noopener noreferrer">View source ↗</a><a href="https://github.com/StanleyCheng/gpx_design/issues" target="_blank" rel="noopener noreferrer">Feedback ↗</a><a href="https://www.openstreetmap.org/fixthemap" target="_blank" rel="noopener noreferrer">Map issues ↗</a></div></footer>
+    <button id="privacy-settings" class="privacy-button" type="button">Privacy settings</button>
+      </div>
+    </section>
   </main>
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
   <aside id="analytics-consent" class="consent" aria-labelledby="consent-title" hidden><h2 id="consent-title">Help improve the next hike?</h2><p>Optional Google Analytics measures visits and basic app actions. Your coordinates, files, and photos are excluded. The planner works the same either way.</p><div class="consent-actions"><button id="analytics-decline">No thanks</button><button id="analytics-accept">Allow analytics</button></div><button id="consent-close" class="text-button consent-dismiss" hidden>Keep current choice</button><span class="small" id="consent-status"></span></aside>
@@ -444,8 +450,7 @@
     const trace = { bitmap: null, pixels: null, anchors: [null, null, null], stops: [], colour: null, mode: null, route: null, pixelRoute: [], reviewed: false, revision: 0, cursor: { x: 0, y: 0 } };
     const MAX_WAYPOINTS = 500, MAX_TRACKPOINTS = 100000;
     let map = null, markers = null, tracks = null, tileLayer = null, toastTimer;
-    const compactMap = matchMedia('(pointer: coarse), (max-width: 720px), (max-width: 1000px) and (max-height: 600px)');
-    let mapExploring = false, exportUrl = null, exportFile = null, draftRevision = 0;
+    let exportUrl = null, exportFile = null, draftRevision = 0;
     const GA_MEASUREMENT_ID = 'G-YF4QD5R18X';
     const GA_PAGE = 'https://stanleycheng.github.io/gpx_design/';
     const CONSENT_KEY = 'trailcraft.analytics-consent.v1';
@@ -455,7 +460,7 @@
     let analyticsChoice = null, analyticsStarted = false;
     try { const stored = JSON.parse(localStorage.getItem(CONSENT_KEY)); if (stored && ['granted','denied'].includes(stored.value) && Date.now() - stored.at < 180 * 86400000) analyticsChoice = stored.value; } catch {}
     function gtag() { window.dataLayer = window.dataLayer || []; window.dataLayer.push(arguments); }
-    function track(name) { if (analyticsStarted && analyticsChoice === 'granted' && !privacySignal && analyticsEvents.has(name)) gtag('event', name, { send_to: GA_MEASUREMENT_ID, page_location: GA_PAGE, page_title: 'Trailcraft — GPX route planner', page_referrer: '' }); }
+    function track(name) { if (analyticsStarted && analyticsChoice === 'granted' && !privacySignal && analyticsEvents.has(name)) gtag('event', name, { send_to: GA_MEASUREMENT_ID, page_location: GA_PAGE, page_title: 'trailplaner — GPX route planner', page_referrer: '' }); }
     function startAnalytics() {
       if (!analyticsProduction || privacySignal || analyticsChoice !== 'granted') return;
       window['ga-disable-' + GA_MEASUREMENT_ID] = false;
@@ -463,8 +468,8 @@
       analyticsStarted = true;
       gtag('consent', 'default', { analytics_storage: 'granted', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' });
       gtag('js', new Date());
-      gtag('config', GA_MEASUREMENT_ID, { send_page_view: false, page_location: GA_PAGE, page_title: 'Trailcraft — GPX route planner', page_referrer: '', allow_google_signals: false, allow_ad_personalization_signals: false, cookie_prefix: 'trailcraft', cookie_domain: 'none', cookie_path: '/gpx_design/', cookie_expires: 90 * 86400, cookie_flags: 'SameSite=Lax;Secure' });
-      gtag('event', 'page_view', { send_to: GA_MEASUREMENT_ID, page_location: GA_PAGE, page_title: 'Trailcraft — GPX route planner', page_referrer: '' });
+      gtag('config', GA_MEASUREMENT_ID, { send_page_view: false, page_location: GA_PAGE, page_title: 'trailplaner — GPX route planner', page_referrer: '', allow_google_signals: false, allow_ad_personalization_signals: false, cookie_prefix: 'trailplaner', cookie_domain: 'none', cookie_path: '/gpx_design/', cookie_expires: 90 * 86400, cookie_flags: 'SameSite=Lax;Secure' });
+      gtag('event', 'page_view', { send_to: GA_MEASUREMENT_ID, page_location: GA_PAGE, page_title: 'trailplaner — GPX route planner', page_referrer: '' });
       const script = document.createElement('script'); script.async = true; script.id = 'trailcraft-google-tag'; script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`; script.referrerPolicy = 'origin'; script.onerror = () => { toast('Analytics could not load. All planning tools still work.'); }; document.head.append(script);
     }
     function analyticsStatus() { $('consent-status').textContent = privacySignal ? 'Your browser privacy signal is respected. Analytics stays off.' : !analyticsProduction ? 'Tracking is off on local and preview copies.' : `Current choice: ${analyticsChoice === 'granted' ? 'analytics allowed' : 'analytics off'}. No ad personalisation.`; $('analytics-accept').disabled = privacySignal; }
@@ -477,14 +482,14 @@
         if (analyticsStarted) gtag('consent', 'update', { analytics_storage: 'denied', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' });
         for (const cookie of document.cookie.split(';')) { const name = cookie.split('=')[0].trim(); if (name.startsWith('trailcraft_')) document.cookie = `${name}=; Max-Age=0; Path=/gpx_design/; SameSite=Lax; Secure`; }
       }
-      $('analytics-consent').hidden = true; analyticsStatus();
+      $('analytics-consent').hidden = true; document.body.classList.remove('analytics-consent-open'); analyticsStatus();
     }
     $('analytics-accept').addEventListener('click', () => chooseAnalytics('granted'));
     $('analytics-decline').addEventListener('click', () => chooseAnalytics('denied'));
-    $('privacy-settings').addEventListener('click', () => { analyticsStatus(); $('consent-close').hidden = !analyticsChoice; $('analytics-consent').hidden = false; $('analytics-decline').focus(); });
-    $('consent-close').addEventListener('click', () => { $('analytics-consent').hidden = true; });
+    $('privacy-settings').addEventListener('click', () => { analyticsStatus(); $('consent-close').hidden = !analyticsChoice; $('analytics-consent').hidden = false; document.body.classList.add('analytics-consent-open'); $('analytics-decline').focus(); });
+    $('consent-close').addEventListener('click', () => { $('analytics-consent').hidden = true; document.body.classList.remove('analytics-consent-open'); });
     analyticsStatus();
-    if (!analyticsChoice && !privacySignal && analyticsProduction) $('analytics-consent').hidden = false;
+    if (!analyticsChoice && !privacySignal && analyticsProduction) { $('analytics-consent').hidden = false; document.body.classList.add('analytics-consent-open'); }
     if (analyticsChoice === 'granted') startAnalytics();
     const element = (tag, text, className) => { const el = document.createElement(tag); if (text !== undefined) el.textContent = text; if (className) el.className = className; return el; };
     const point = (lat, lon, name) => {
@@ -495,6 +500,21 @@
     };
     function message(text, error = false) { $('input-message').textContent = text; $('input-message').classList.toggle('error', error); $('input-message').hidden = false; }
     function toast(text) { clearTimeout(toastTimer); $('toast').textContent = text; $('toast').hidden = false; toastTimer = setTimeout(() => { $('toast').hidden = true; }, 5500); }
+    function setDockExpanded(expanded, focus = false) {
+      $('control-dock').classList.toggle('collapsed', !expanded); $('control-dock-toggle').setAttribute('aria-expanded', String(expanded));
+      if (map) requestAnimationFrame(() => map.invalidateSize({ pan: false, animate: false }));
+      if (focus && expanded) setTimeout(() => $('input-method').focus({ preventScroll: true }), 220);
+    }
+    $('control-dock-toggle').addEventListener('click', () => setDockExpanded($('control-dock').classList.contains('collapsed'), true));
+    function updateDockState() {
+      const n = state.points.length, routes = routing.result?.routes?.length || 0;
+      $('route-builder').hidden = !n; $('route-results').hidden = !routing.busy && !routing.searched && !routes; $('dock-map-controls').hidden = !n && !state.segments.length && !state.imageUrl;
+      if (routing.busy) { $('dock-title').textContent = 'Finding safe route options'; $('dock-summary').textContent = 'Checking paths and public transport at both ends'; }
+      else if (routing.selected) { $('dock-title').textContent = `Selected: ${routing.selected.title}`; $('dock-summary').textContent = `${n} mandatory waypoint${n === 1 ? '' : 's'} · edit pins or export GPX`; }
+      else if (routes) { $('dock-title').textContent = `Compare ${routes} route option${routes === 1 ? '' : 's'}`; $('dock-summary').textContent = 'Show any combination, select one, or export all'; }
+      else if (n) { $('dock-title').textContent = `${n} waypoint${n === 1 ? '' : 's'} ready`; $('dock-summary').textContent = 'Check their order and create up to 3 routes'; }
+      else { $('dock-title').textContent = 'Add your waypoints'; $('dock-summary').textContent = $('input-method').selectedOptions[0]?.textContent || 'Choose how to add places'; }
+    }
     function parseCoordinates(text) {
       text = text.trim().replace(/^\uFEFF/, '').replace(/^lat(?:itude)?\s*[,;\t]\s*(?:lon(?:gitude)?|lng)\s*(?:\r?\n|\r)/i, '');
       if (!text) throw new Error('Add at least one latitude/longitude pair first.');
@@ -610,7 +630,8 @@
     // END RECOGNITION UI
 
     // BEGIN PLANNER UI
-    const routing = { selected: null, result: null, fingerprint: '', serial: 0, controller: null, worker: null, cache: new Map(), busy: false, evidence: '', blockedUntil: 0 };
+    const ROUTE_COLORS = ['#087f68', '#d4572f', '#6555a5'];
+    const routing = { selected: null, result: null, visible: new Set(), fingerprint: '', serial: 0, controller: null, worker: null, cache: new Map(), busy: false, searched: false, evidence: '', blockedUntil: 0 };
     const planFields = ['region', 'order', 'date', 'distance', 'radius', 'tolerance', 'roads', 'provider'];
     const providers = { coffee: ['Private.coffee', 'https://overpass.private.coffee/api/interpreter'], vk: ['VK Maps', 'https://maps.mail.ru/osm/tools/overpass/api/interpreter'] };
     const regions = {
@@ -633,9 +654,9 @@
     }
     function stopRouting() { routing.serial++; routing.controller?.abort(); routing.worker?.terminate(); routing.controller = null; routing.worker = null; routing.busy = false; $('cancel-routing').hidden = true; }
     function invalidateRoutes() {
-      stopRouting(); routing.selected = null; routing.result = null;
+      stopRouting(); routing.selected = null; routing.result = null; routing.visible.clear(); routing.searched = false;
       $('route-options').replaceChildren(element('div', 'Review your places, then search for up to three distinct walking connections. Every option must include all your waypoints and mapped transport services at both ends.', 'routes-empty'));
-      $('route-result-count').textContent = 'No routes searched yet'; $('selected-route-detail').hidden = true; $('route-export-review').hidden = true; $('routing-status').hidden = true;
+      $('route-result-count').textContent = 'No routes searched yet'; $('selected-route-detail').hidden = true; $('route-export-review').hidden = true; $('route-visibility-controls').hidden = true; $('save-all-gpx').disabled = true; $('routing-status').hidden = true;
       $('routing-evidence-note').textContent = 'Routes use mapped walking paths. Timetables, current access and suitability need your review.';
     }
     function updateGuidance() {
@@ -647,9 +668,19 @@
         $('save-gpx').disabled = false; $('save-gpx').textContent = 'Save selected route as GPX ↓';
         $('route-export-status').textContent = 'The provisional route can be saved in the direction shown. Review the evidence and warnings first; they are not a safety certification.';
       } else $('save-gpx').textContent = 'Save input GPX (unrouted) ↓';
+      $('save-all-gpx').disabled = !routing.result?.routes?.length;
       updateInputGuide();
     }
     function externalLink(label, href) { const a = element('a', label + ' ↗'); a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer'; return a; }
+    function showRouteVisibility() {
+      const routes = routing.result?.routes || [], controls = $('route-visibility-controls'), items = document.createDocumentFragment();
+      controls.hidden = !routes.length;
+      routes.forEach((route, i) => {
+        const button = element('button', `Route ${i + 1}`, 'route-toggle'); button.type = 'button'; button.style.setProperty('--route-color', ROUTE_COLORS[i]); button.setAttribute('aria-pressed', String(routing.visible.has(route.id)));
+        button.addEventListener('click', () => { routing.visible.has(route.id) ? routing.visible.delete(route.id) : routing.visible.add(route.id); showRouteVisibility(); render(false); }); items.append(button);
+      });
+      $('route-visibility').replaceChildren(items);
+    }
     function showRoutes() {
       const cards = document.createDocumentFragment();
       routing.result.routes.forEach((route, i) => {
@@ -658,13 +689,16 @@
         for (const [label, stop] of [['Start near', route.start], ['Finish near', route.end]]) { const p = element('p', undefined, 'route-stop'); p.append(element('strong', `${label} · ${stop.name}`), element('span', [...new Set(stop.services.filter(s => label === 'Start near' ? s.alight : s.board).map(s => s.ref))].slice(0, 6).join(' / '))); card.append(p); }
         const facts = element('ul', undefined, 'route-facts');
         for (const text of [`All ${state.points.length} places · order ${route.order.map(i => i + 1).join(' → ')}`, `${km(route.start.approach)} approach / ${km(route.end.approach)} exit walk`, `${km(route.roadMetres)} road connectors · ${km(route.repeatedMetres)} retraced`, `Largest waypoint offset: ${Math.ceil(Math.max(...route.snaps.map(s => s.metres)))} m`]) facts.append(element('li', text));
-        const select = element('button', routing.selected?.id === route.id ? 'Viewing this route ✓' : 'View route & evidence →', 'route-select primary'); select.addEventListener('click', () => selectRoute(route)); card.append(facts, select); cards.append(card);
+        const select = element('button', routing.selected?.id === route.id ? 'Selected route ✓' : 'Select this route →', 'route-select primary'); select.addEventListener('click', () => selectRoute(route));
+        const save = element('button', `Save Route ${i + 1} GPX ↓`, 'route-select'); save.addEventListener('click', () => { download(new Blob([plannedGPX(route)], { type: 'application/gpx+xml;charset=utf-8' }), `trailplaner-route-${i + 1}-PROVISIONAL.gpx`); track('gpx_exported'); });
+        card.append(facts, select, save); cards.append(card);
       });
       $('route-options').replaceChildren(cards); $('route-result-count').textContent = `${routing.result.routes.length} distinct option(s) found`;
       $('routing-evidence-note').textContent = `${routing.result.routes.length < 3 ? 'Fewer than three distinct options met your limits. No duplicates or invented connections were added. ' : ''}${routing.evidence}`;
+      showRouteVisibility();
     }
     function selectRoute(route) {
-      routing.selected = route; showRoutes(); routeDetails(); render(); $('selected-route-detail').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      routing.selected = route; routing.visible.add(route.id); showRoutes(); routeDetails(); render(); setDockExpanded(false);
     }
     function routeDetails() {
       const r = routing.selected; if (!r) return;
@@ -690,12 +724,19 @@
       $('route-export-review').hidden = false;
     }
     function paintPlannedRoute() {
-      const r = routing.selected; if (!r) return;
+      const routes = routing.result?.routes || []; if (!routes.length) return;
       if (map) {
-        tracks.clearLayers(); markers.clearLayers(); L.polyline(r.coords.map(p => [p.lat, p.lon]), { color: '#263e35', weight: 5, opacity: .95 }).addTo(tracks);
-        state.points.forEach((p, i) => L.marker([p.lat, p.lon], { icon: L.divIcon({ className: 'number-pin', html: `<span>${i + 1}</span>`, iconSize: [33, 33], iconAnchor: [16, 16] }), title: p.name }).bindPopup(element('div', `${p.name} · mandatory input; offset ${Math.ceil(r.snaps[i].metres)} m`)).addTo(markers));
-        [r.coords[0], r.coords.at(-1)].forEach((p, i) => L.marker([p.lat, p.lon], { icon: L.divIcon({ className: 'direction-pin', html: i ? 'End' : 'Start', iconSize: [42, 26], iconAnchor: [i ? -10 : 32, i ? -8 : 44] }), title: i ? r.end.name : r.start.name }).bindPopup(element('div', `${i ? 'End near' : 'Start near'} ${i ? r.end.name : r.start.name} · check access to stop`)).addTo(markers));
+        routes.forEach((route, i) => {
+          if (!routing.visible.has(route.id)) return;
+          const selected = routing.selected?.id === route.id, color = ROUTE_COLORS[i];
+          L.polyline(route.coords.map(p => [p.lat, p.lon]), { color, weight: selected ? 7 : 5, opacity: selected ? 1 : .78 }).bindPopup(`Route ${i + 1} · ${route.title} · ${km(route.metres)}`).addTo(tracks);
+          const midpoint = route.coords[Math.floor(route.coords.length / 2)];
+          if (midpoint) L.marker([midpoint.lat, midpoint.lon], { interactive: false, icon: L.divIcon({ className: 'route-line-label', html: `<span style="background:${color}">Route ${i + 1}</span>`, iconSize: [76, 26], iconAnchor: [38, 13] }) }).addTo(markers);
+        });
+        const r = routing.selected;
+        if (r && routing.visible.has(r.id)) [r.coords[0], r.coords.at(-1)].forEach((p, i) => L.marker([p.lat, p.lon], { icon: L.divIcon({ className: 'direction-pin', html: i ? 'End' : 'Start', iconSize: [42, 26], iconAnchor: [21, 13] }), title: i ? r.end.name : r.start.name }).bindPopup(element('div', `${i ? 'End near' : 'Start near'} ${i ? r.end.name : r.start.name} · check access to stop`)).addTo(markers));
       }
+      const r = routing.selected; if (!r) { $('map-caption').textContent = `${routes.length} proposed route${routes.length === 1 ? '' : 's'}`; $('map-count').textContent = 'Choose any combination below'; return; }
       $('map-caption').textContent = `${r.title} · provisional`; $('map-count').textContent = `${km(r.metres)} · all ${state.points.length} mandatory places`;
       $('track-legend').hidden = true; $('reverse-route').disabled = !r.reversible;
       $('direction-summary').replaceChildren(element('span', `Start · ${r.start.name}`), element('span', `End · ${r.end.name}`), element('span', r.reversible ? 'Reverse available · recheck both services' : 'Reverse unavailable: walking direction or service boarding rules'));
@@ -726,7 +767,7 @@
     $('find-routes').addEventListener('click', async () => {
       if ($('find-routes').disabled) return;
       if (Date.now() < routing.blockedUntil) { toast('The map provider asked us to pause. Wait 30 seconds before retrying.'); return; }
-      stopRouting(); const serial = routing.serial, controller = new AbortController(); routing.controller = controller; routing.busy = true; routing.selected = null; routing.result = null; $('selected-route-detail').hidden = true; $('route-export-review').hidden = true; clearExport();
+      stopRouting(); const serial = routing.serial, controller = new AbortController(); routing.controller = controller; routing.busy = true; routing.searched = true; routing.selected = null; routing.result = null; routing.visible.clear(); $('selected-route-detail').hidden = true; $('route-export-review').hidden = true; $('route-visibility-controls').hidden = true; clearExport();
       $('cancel-routing').hidden = false; $('routing-status').hidden = false; $('routing-status').textContent = 'Downloading walking paths and mapped passenger services…';
       $('route-options').replaceChildren(element('div', 'Checking real paths and transport connections. This can take up to a minute; you can cancel.', 'routes-empty')); render(false);
       const timeout = setTimeout(() => controller.abort(), 65000);
@@ -739,7 +780,8 @@
         const official = await officialPromise; if (serial !== routing.serial) return;
         clearTimeout(timeout); routing.result = await workerPlan(entry.data, state.points.map(p => ({ ...p })), settings, official.features, serial); if (serial !== routing.serial) return;
         routing.evidence = `${provider[0]} / OpenStreetMap · ${routing.result.stopCount} service-linked stop candidates. ${official.note}`;
-        routing.busy = false; $('routing-status').textContent = `Found ${routing.result.routes.length} option(s) through every waypoint. Select one below to review before export.`; showRoutes();
+        routing.result.routes.forEach(route => routing.visible.add(route.id));
+        routing.busy = false; $('routing-status').textContent = `Found ${routing.result.routes.length} option(s) through every waypoint. Select one below to review before export.`; showRoutes(); render(); setDockExpanded(false);
         $('route-results').scrollIntoView({ behavior: 'smooth', block: 'start' });
       } catch (e) {
         if (serial !== routing.serial) return;
@@ -758,8 +800,16 @@
     function plannedGPX(r) {
       const warning = `PROVISIONAL ROUTE — independently check before navigation. Connected OSM walking ways only; no artificial connectors. Start near ${r.start.name} (${Math.ceil(r.start.accessGap)} m unrouted stop gap); end near ${r.end.name} (${Math.ceil(r.end.accessGap)} m gap). All ${state.points.length} mandatory waypoints visited within the explicitly accepted ${$('plan-tolerance').value} m tolerance. OSM snapshot ${r.osmTimestamp || 'unknown'}. Hiking date ${$('plan-date').value}. Timetables, closures, permits, terrain and management are not automatically verified. OpenStreetMap contributors, ODbL: https://www.openstreetmap.org/copyright. AFCD corridor matches, where available, are approximate. No elevation invented.`;
       const decimal = n => n.toFixed(8), wpts = [{ ...r.coords[0], name: 'Start near ' + r.start.name }, ...r.order.map(i => state.points[i]), { ...r.coords.at(-1), name: 'End near ' + r.end.name }];
-      return `<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="Trailcraft" xmlns="http://www.topografix.com/GPX/1/1"><metadata><name>${xmlText(r.title)}</name><desc>${xmlText(warning)}</desc><time>${new Date().toISOString()}</time></metadata>${wpts.map(p => `<wpt lat="${decimal(p.lat)}" lon="${decimal(p.lon)}"><name>${xmlText(p.name)}</name></wpt>`).join('')}<trk><name>${xmlText(r.title)} — provisional</name><desc>${xmlText(warning)}</desc><trkseg>${r.coords.map(p => `<trkpt lat="${decimal(p.lat)}" lon="${decimal(p.lon)}"></trkpt>`).join('')}</trkseg></trk></gpx>`;
+      return `<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="trailplaner" xmlns="http://www.topografix.com/GPX/1/1"><metadata><name>${xmlText(r.title)}</name><desc>${xmlText(warning)}</desc><time>${new Date().toISOString()}</time></metadata>${wpts.map(p => `<wpt lat="${decimal(p.lat)}" lon="${decimal(p.lon)}"><name>${xmlText(p.name)}</name></wpt>`).join('')}<trk><name>${xmlText(r.title)} — provisional</name><desc>${xmlText(warning)}</desc><trkseg>${r.coords.map(p => `<trkpt lat="${decimal(p.lat)}" lon="${decimal(p.lon)}"></trkpt>`).join('')}</trkseg></trk></gpx>`;
     }
+    function allRoutesGPX(routes) {
+      const stamp = new Date().toISOString(), decimal = n => n.toFixed(8), warning = `PROVISIONAL ROUTE OPTIONS — independently check before navigation. Each track uses connected OpenStreetMap walking ways and visits every mandatory waypoint. Timetables, closures, permits, terrain, current access and government management are not automatically verified. OpenStreetMap contributors, ODbL: https://www.openstreetmap.org/copyright. No elevation invented.`;
+      const waypoints = state.points.map((p, i) => `<wpt lat="${decimal(p.lat)}" lon="${decimal(p.lon)}"><name>${xmlText(`${i + 1}. ${p.name}`)}</name></wpt>`).join('');
+      const tracksXML = routes.map((r, i) => `<trk><name>${xmlText(`Route ${i + 1} — ${r.title} — provisional`)}</name><desc>${xmlText(`${warning} Start near ${r.start.name}; end near ${r.end.name}.`)}</desc><trkseg>${r.coords.map(p => `<trkpt lat="${decimal(p.lat)}" lon="${decimal(p.lon)}"></trkpt>`).join('')}</trkseg></trk>`).join('');
+      return `<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="trailplaner" xmlns="http://www.topografix.com/GPX/1/1"><metadata><name>trailplaner route options</name><desc>${xmlText(warning)}</desc><time>${stamp}</time></metadata>${waypoints}${tracksXML}</gpx>`;
+    }
+    $('show-all-routes').addEventListener('click', () => { routing.result?.routes.forEach(route => routing.visible.add(route.id)); showRouteVisibility(); render(false); });
+    $('hide-all-routes').addEventListener('click', () => { routing.visible.clear(); showRouteVisibility(); render(false); });
     // END PLANNER UI
 
     // BEGIN GUIDANCE UI
@@ -770,6 +820,7 @@
       if (model.routingBusy) return { step: 3, action: 'waiting-routes' };
       if (model.pointCount > 16) return { step: 3, action: 'review-remove' };
       if (model.pointCount > 0) return { step: 3, action: 'route-settings' };
+      if (model.method === 'map-pins') return { step: 1, action: 'add-map-pins' };
       if (model.method === 'coordinates') return model.hasCoordinatesText ? { step: 2, action: 'preview-coordinates' } : { step: 1, action: 'focus-coordinates' };
       if (model.method === 'text') return { step: 1, action: 'choose-text' };
       if (model.method === 'gpx') return { step: 1, action: 'choose-gpx' };
@@ -789,6 +840,7 @@
       en: {
         title: 'Your next step', language: 'Guidance language', switchLanguage: '繁體中文', stepOf: step => `Step ${step} of 4`,
         methods: {
+          'map-pins': { label: 'Put pins on the map', steps: ['Move the map to your hiking area.', 'Tap or click every place the hike must visit.', 'Check the pin order and find up to 3 routes.', 'Choose a route, check the map, and save GPX.'] },
           coordinates: { label: 'Paste coordinates', steps: ['Paste latitude and longitude.', 'Show the places as numbered pins.', 'Check route settings and find up to 3 routes.', 'Choose a route, check the map, and save GPX.'] },
           text: { label: 'Upload TXT or CSV', steps: ['Choose a TXT or CSV file with coordinates.', 'Check the imported places and their order.', 'Check route settings and find up to 3 routes.', 'Choose a route, check the map, and save GPX.'] },
           gpx: { label: 'Upload GPX', steps: ['Choose a GPX file.', 'Check its listed places and reference track.', 'Check route settings and find up to 3 routes.', 'Choose a route, check the map, and save GPX.'] },
@@ -796,6 +848,7 @@
           image: { label: 'Review a map image or photo', steps: ['Add a clear map image or photo.', 'Use Kimi or photo GPS to find its location.', 'Choose every place the hike must visit.', 'Compare routes, check the full map, and save GPX.'] }
         },
         prompts: {
+          'add-map-pins': ['Add the places your hike must visit.', 'Tap Start adding pins, then tap the map. Drag a pin to move it; tap or right-click it to delete.'],
           'focus-coordinates': ['Put one place on each line.', 'Start with latitude, then longitude.'],
           'preview-coordinates': ['Ready to show your places.', 'The app will turn each pair into a numbered pin.'],
           'choose-text': ['Choose your coordinate file.', 'Use a TXT or CSV file with latitude and longitude.'],
@@ -813,6 +866,7 @@
           'review-save': ['Review the complete route before saving.', 'Check actual transport times, trail access, closures and conditions for your hiking day.']
         },
         actions: {
+          'add-map-pins': 'Start adding pins',
           'focus-coordinates': 'Enter my places', 'preview-coordinates': 'Show my places', 'choose-text': 'Choose TXT or CSV', 'choose-gpx': 'Choose GPX', 'choose-image': 'Add map picture', 'setup-recognition': 'Set up map reading', 'identify-image': 'Go to map identification', 'waiting-recognition': 'Reading the map…', 'review-candidates': 'Review suggested places', 'add-photo-gps': 'Review photo location', 'review-remove': 'Review and remove places', 'route-settings': 'Check settings and find routes', 'waiting-routes': 'Finding routes…', 'compare-routes': 'Compare route options', 'review-save': 'Review route and save'
         },
         paste: 'Or paste from clipboard', trace: 'Need an exact copy of the coloured line? Use image tracing.', coordinatesInstead: 'Enter coordinates instead',
@@ -832,6 +886,7 @@
       'zh-Hant': {
         title: '下一步', language: '指示語言', switchLanguage: 'English', stepOf: step => `第 ${step} 步，共 4 步`,
         methods: {
+          'map-pins': { label: '在地圖加入圖釘', steps: ['把地圖移到行山地區。', '點按行程一定要經過的每個地點。', '檢查圖釘次序，再尋找最多 3 條路線。', '選擇路線、查看地圖，再儲存 GPX。'] },
           coordinates: { label: '貼上座標', steps: ['貼上緯度和經度。', '把地點顯示為編號圖釘。', '查看路線設定，並尋找最多 3 條路線。', '選擇路線、查看完整地圖，再儲存 GPX。'] },
           text: { label: '上載 TXT 或 CSV', steps: ['選擇有座標的 TXT 或 CSV 檔案。', '檢查匯入的地點和次序。', '查看路線設定，並尋找最多 3 條路線。', '選擇路線、查看完整地圖，再儲存 GPX。'] },
           gpx: { label: '上載 GPX', steps: ['選擇 GPX 檔案。', '檢查地點清單和參考線。', '查看路線設定，並尋找最多 3 條路線。', '選擇路線、查看完整地圖，再儲存 GPX。'] },
@@ -839,6 +894,7 @@
           image: { label: '查看地圖圖片或相片', steps: ['加入清晰的地圖圖片或相片。', '用 Kimi 或相片 GPS 找出位置。', '選擇行程一定要經過的地點。', '比較路線、查看完整地圖，再儲存 GPX。'] }
         },
         prompts: {
+          'add-map-pins': ['加入行程一定要經過的地點。', '按「開始加入圖釘」，再點按地圖。拖曳可移動圖釘；點按或右鍵可刪除。'],
           'focus-coordinates': ['每行輸入一個地點。', '先輸入緯度，再輸入經度。'],
           'preview-coordinates': ['可以顯示地點了。', '程式會把每組座標變成編號圖釘。'],
           'choose-text': ['選擇座標檔案。', '使用有緯度和經度的 TXT 或 CSV 檔案。'],
@@ -856,6 +912,7 @@
           'review-save': ['儲存前先查看完整路線。', '請查看行山當日的交通時間、山徑通行、封閉和實際情況。']
         },
         actions: {
+          'add-map-pins': '開始加入圖釘',
           'focus-coordinates': '輸入我的地點', 'preview-coordinates': '顯示我的地點', 'choose-text': '選擇 TXT 或 CSV', 'choose-gpx': '選擇 GPX', 'choose-image': '加入地圖圖片', 'setup-recognition': '設定地圖識別', 'identify-image': '前往地圖識別', 'waiting-recognition': '正在閱讀地圖…', 'review-candidates': '檢查建議地點', 'add-photo-gps': '檢查相片位置', 'review-remove': '檢查並刪除地點', 'route-settings': '檢查設定並尋找路線', 'waiting-routes': '正在尋找路線…', 'compare-routes': '比較路線選項', 'review-save': '查看路線並儲存'
         },
         paste: '或從剪貼簿貼上', trace: '想準確複製彩色路線？使用圖片描線。', coordinatesInstead: '改為輸入座標',
@@ -915,6 +972,7 @@
     }
     function runGuideAction() {
       const action = guideAction;
+      if (action === 'add-map-pins') return $('start-pin-mode').click();
       if (action === 'focus-coordinates') return guideScroll('planner', 'coordinates');
       if (action === 'preview-coordinates') return $('preview-points').click();
       if (action === 'choose-text' || action === 'choose-gpx' || action === 'choose-image') return $('file-input').click();
@@ -936,9 +994,19 @@
 
     function fitPoints() {
       if (!map) return;
-      const coords = [...state.points.map(p => [p.lat, p.lon]), ...(routing.selected ? routing.selected.coords.map(p => [p.lat, p.lon]) : state.segments.flatMap(seg => seg.map(p => [p.lat, p.lon])))];
+      const visibleRoutes = (routing.result?.routes || []).filter(route => routing.visible.has(route.id));
+      const coords = [...state.points.map(p => [p.lat, p.lon]), ...(visibleRoutes.length ? visibleRoutes.flatMap(route => route.coords.map(p => [p.lat, p.lon])) : state.segments.flatMap(seg => seg.map(p => [p.lat, p.lon])))];
       if (!coords.length) return;
       map.fitBounds(L.latLngBounds(coords), { padding: [55, 70], maxZoom: 15, animate: false });
+    }
+    let routeRefreshTimer = 0;
+    function mutateWaypoints(change, notice) {
+      const refreshRoutes = !!routing.result || routing.busy; change(); render(false); if (notice) toast(notice);
+      clearTimeout(routeRefreshTimer);
+      if (refreshRoutes && state.points.length && state.points.length <= 16) {
+        $('routing-status').hidden = false; $('routing-status').textContent = 'Waypoints changed. Updating up to 3 route options…';
+        routeRefreshTimer = setTimeout(() => { if (!$('find-routes').disabled) $('find-routes').click(); }, 320);
+      }
     }
     function render(fit = true) {
       const fingerprint = routingFingerprint(); if (fingerprint !== routing.fingerprint) { invalidateRoutes(); routing.fingerprint = fingerprint; }
@@ -950,16 +1018,11 @@
         state.segments.forEach(seg => L.polyline(seg.map(p => [p.lat, p.lon]), { color: '#bc4827', weight: 3, dashArray: '7 7', opacity: .8 }).addTo(tracks));
         state.points.forEach((p, i) => {
           const popup = element('div'); popup.append(element('strong', p.name), element('span', `${p.lat.toFixed(6)}, ${p.lon.toFixed(6)}`), element('span', 'Unverified waypoint · not a routed trail'));
-          const marker = L.marker([p.lat, p.lon], { icon: L.divIcon({ className: 'number-pin', html: `<span>${i + 1}</span>`, iconSize: [33, 33], iconAnchor: [16, 16] }), title: `${i + 1}. ${p.name}`, alt: p.name });
-          if (p.manual) {
-            const removePin = element('button', 'Remove this pin'); removePin.type = 'button'; removePin.addEventListener('click', event => { event.stopPropagation(); removeManualMapPin(i); }); popup.append(removePin);
-            marker.on('contextmenu', () => removeManualMapPin(i));
-          }
+          const marker = L.marker([p.lat, p.lon], { draggable: true, icon: L.divIcon({ className: 'number-pin', html: `<span>${i + 1}</span>`, iconSize: [33, 33], iconAnchor: [16, 16] }), title: `${i + 1}. ${p.name}`, alt: p.name });
+          const removePin = element('button', 'Delete this waypoint'); removePin.type = 'button'; removePin.addEventListener('click', event => { event.stopPropagation(); removeMapPin(i); }); popup.append(removePin);
+          marker.on('contextmenu', () => removeMapPin(i));
+          marker.on('dragend', event => { const moved = event.target.getLatLng().wrap(); mutateWaypoints(() => { state.points[i] = { ...state.points[i], lat: moved.lat, lon: moved.lng, manual: true }; state.source = 'Edited waypoints'; }, `Waypoint ${i + 1} moved. Route options will update.`); });
           marker.bindPopup(popup).addTo(markers);
-        });
-        if (ordered.length > 1) [ordered[0], ordered.at(-1)].forEach((p, i) => {
-          const label = i ? 'End' : 'Start'; const popup = element('div'); popup.append(element('strong', label), element('span', `${p.lat.toFixed(6)}, ${p.lon.toFixed(6)}`), element('span', 'Current order · access and transport unverified'));
-          L.marker([p.lat, p.lon], { icon: L.divIcon({ className: 'direction-pin', html: label, iconSize: [42, 26], iconAnchor: [i ? -10 : 32, i ? -8 : 44] }), title: `${label} of current draft`, alt: `${label} of current draft` }).bindPopup(popup).addTo(markers);
         });
         if (fit) fitPoints();
       }
@@ -978,11 +1041,11 @@
       $('waypoint-list').hidden = !hasPoints;
       $('waypoint-summary').textContent = `Review ${state.points.length} waypoint${state.points.length === 1 ? '' : 's'}${state.segments.length ? ' · source track is unverified' : ''}`;
       const list = document.createDocumentFragment();
-      state.points.forEach((p, i) => { const row = element('li', undefined, 'pin-row'), info = element('div', undefined, 'pin-info'); info.append(element('strong', p.name), element('span', `${p.lat.toFixed(6)}, ${p.lon.toFixed(6)}`, 'mono')); const remove = element('button', 'Remove'); remove.type = 'button'; remove.setAttribute('aria-label', `Remove waypoint ${i + 1}: ${p.name}`); remove.addEventListener('click', () => { state.points.splice(i, 1); render(false); toast('Waypoint removed. Any imported track remains unchanged.'); }); const reorder = element('div', undefined, 'pin-reorder'); for (const [delta, label] of [[-1, 'Move up'], [1, 'Move down']]) { const button = element('button', delta < 0 ? '↑' : '↓'); button.setAttribute('aria-label', `${label} waypoint ${i + 1}`); button.disabled = i + delta < 0 || i + delta >= state.points.length; button.addEventListener('click', () => { [state.points[i], state.points[i + delta]] = [state.points[i + delta], state.points[i]]; render(false); }); reorder.append(button); } reorder.append(remove); row.append(element('span', String(i + 1).padStart(2, '0'), 'pin-index mono'), info, reorder); list.append(row); });
+      state.points.forEach((p, i) => { const row = element('li', undefined, 'pin-row'), info = element('div', undefined, 'pin-info'); info.append(element('strong', p.name), element('span', `${p.lat.toFixed(6)}, ${p.lon.toFixed(6)}`, 'mono')); const remove = element('button', 'Delete'); remove.type = 'button'; remove.setAttribute('aria-label', `Delete waypoint ${i + 1}: ${p.name}`); remove.addEventListener('click', () => removeMapPin(i)); const reorder = element('div', undefined, 'pin-reorder'); for (const [delta, label] of [[-1, 'Move up'], [1, 'Move down']]) { const button = element('button', delta < 0 ? '↑' : '↓'); button.setAttribute('aria-label', `${label} waypoint ${i + 1}`); button.disabled = i + delta < 0 || i + delta >= state.points.length; button.addEventListener('click', () => mutateWaypoints(() => { [state.points[i], state.points[i + delta]] = [state.points[i + delta], state.points[i]]; }, 'Waypoint order changed. Route options will update.')); reorder.append(button); } reorder.append(remove); row.append(element('span', String(i + 1).padStart(2, '0'), 'pin-index mono'), info, reorder); list.append(row); });
       $('waypoints').replaceChildren(list);
       $('map-next-step').hidden = !hasPoints; $('map-next-step').href = routing.selected ? '#route-export-review' : '#route-builder'; $('map-next-step').textContent = routing.selected ? 'Review route evidence ↑' : 'Next: route settings ↑';
       $('export-note').textContent = 'Input GPX saves only your waypoints and original segments; it does not create a walking route. Use “Find up to 3 routes” above for connected walking geometry.';
-      paintPlannedRoute(); updateGuidance(); if (fit && routing.selected) fitPoints();
+      paintPlannedRoute(); updateGuidance(); updateDockState(); if (fit && (routing.selected || routing.result)) fitPoints();
     }
     function replaceDraft(points, segments, source) { state.points = points; state.segments = segments; state.source = source; state.requiresTraceReview = source === 'Image trace — unverified'; render(); }
     function clearPhoto() {
@@ -993,13 +1056,13 @@
     }
     $('input-method').addEventListener('change', () => {
       const method = $('input-method').value; state.fileVersion++;
-      $('coordinates-panel').hidden = method !== 'coordinates'; $('file-panel').hidden = method === 'coordinates'; $('input-message').hidden = true; $('file-input').value = '';
+      setAdding(false); $('map-pins-panel').hidden = method !== 'map-pins'; $('coordinates-panel').hidden = method !== 'coordinates'; $('file-panel').hidden = ['coordinates', 'map-pins'].includes(method); $('input-message').hidden = true; $('file-input').value = '';
       $('paste-controls').hidden = method !== 'map-image';
       const config = { text: ['Choose your coordinate file', 'TXT or CSV · maximum 10 MB', '.txt,.csv,text/plain,text/csv'], gpx: ['Choose your GPX file', 'GPX · maximum 10 MB · unverified source data', '.gpx,application/gpx+xml,application/xml,text/xml'], image: ['Choose your map image or photo', 'JPEG, PNG or WebP · maximum 10 MB · local processing', 'image/jpeg,image/png,image/webp'], 'map-image': ['Choose a route screenshot, or paste one below', 'JPEG, PNG or WebP · maximum 10 MB · local processing', 'image/jpeg,image/png,image/webp'] }[method];
       if (config) { $('upload-title').textContent = config[0]; $('upload-help').textContent = config[1]; $('file-input').accept = config[2]; }
       $('image-review').hidden = !['image', 'map-image'].includes(method) || !state.imageUrl;
       $('image-converter').hidden = !['map-image', 'image'].includes(method) || !trace.bitmap; $('ai-review').hidden = !['map-image', 'image'].includes(method) || !ai.image;
-      updateInputGuide();
+      updateInputGuide(); updateDockState();
     });
     $('preview-points').addEventListener('click', () => {
       try { const points = parseCoordinates($('coordinates').value); state.fileVersion++; clearPhoto(); replaceDraft(points, [], 'Entered coordinates'); message(`${points.length} waypoints added. Check every pin. Government trail status and transport are not verified.`); track('waypoints_previewed'); }
@@ -1225,7 +1288,7 @@
     $('save-trace').addEventListener('click', () => {
       if (!trace.route || !trace.reviewed) return;
       const segments = state.requiresTraceReview ? state.segments : [trace.route];
-      download(new Blob([gpxDocument([], segments, 'Image trace — unverified')], { type: 'application/gpx+xml;charset=utf-8' }), 'trailcraft-image-trace-UNVERIFIED.gpx');
+      download(new Blob([gpxDocument([], segments, 'Image trace — unverified')], { type: 'application/gpx+xml;charset=utf-8' }), 'trailplaner-image-trace-UNVERIFIED.gpx');
       $('download-ready').scrollIntoView({ behavior: 'smooth', block: 'center' }); toast('Image trace GPX ready. This source transcription is not a verified hiking route.');
     });
     document.addEventListener('paste', event => {
@@ -1249,23 +1312,18 @@
 
     function setMapInteraction(exploring) {
       if (!map) return;
-      mapExploring = compactMap.matches && exploring;
-      const enabled = !compactMap.matches || mapExploring;
-      for (const handler of [map.dragging, map.touchZoom, map.doubleClickZoom, map.boxZoom, map.keyboard, map.tapHold]) handler?.[enabled ? 'enable' : 'disable']();
-      // With handlers disabled, allow a finger swipe to scroll the page over the map.
-      $('map').classList.toggle('map-scroll-mode', !enabled);
-      $('map').tabIndex = enabled ? 0 : -1;
-      $('toggle-map').hidden = !compactMap.matches;
-      $('toggle-map').setAttribute('aria-pressed', String(mapExploring));
-      $('toggle-map').textContent = mapExploring ? 'Done exploring' : 'Explore map';
+      for (const handler of [map.dragging, map.touchZoom, map.doubleClickZoom, map.boxZoom, map.keyboard, map.tapHold, map.scrollWheelZoom]) handler?.enable();
+      $('map').classList.remove('map-scroll-mode'); $('map').tabIndex = 0; $('toggle-map').hidden = true; $('toggle-map').setAttribute('aria-pressed', 'true');
       $('map-gesture-note').hidden = false;
-      $('map-gesture-note').textContent = state.adding ? 'Tap empty map space to add a pin. Drag to pan; pinch or hold Ctrl/Command while scrolling to zoom. Tap a pin to remove it.' : compactMap.matches ? mapExploring ? 'Drag with one finger and pinch with two. Tap an added pin to remove it. Choose Done exploring to scroll the page.' : 'Swipe to scroll the page. Choose Explore map to pan or pinch. Tap an added pin to remove it.' : 'Drag to pan. Hold Ctrl or Command while scrolling to zoom. Right-click an added pin to remove it.';
+      $('map-gesture-note').textContent = state.adding ? 'Tap empty map space to add a pin. Pinch or use the wheel to zoom; drag the map to pan. Drag a pin to move it, or tap/right-click it to delete.' : 'Pinch or use the wheel/trackpad to zoom. Drag to pan. Drag a pin to move it; tap or right-click it to delete.';
     }
-    function setAdding(value) { state.adding = value; $('toggle-pins').setAttribute('aria-pressed', String(value)); $('toggle-pins').textContent = value ? '✓ Finish adding pins' : '+ Add pins on map'; if (map) map.getContainer().style.cursor = value ? 'crosshair' : ''; setMapInteraction(value); }
-    $('toggle-pins').addEventListener('click', () => { if (!map) return; setAdding(!state.adding); if (state.adding) toast('Tap or click the map to add waypoints. Finish adding pins when done.'); });
-    $('toggle-map').addEventListener('click', () => { const next = !mapExploring; setAdding(false); setMapInteraction(next); });
-    compactMap.addEventListener('change', () => setAdding(false));
-    $('map').addEventListener('keydown', event => { if (event.key === 'Escape') { setAdding(false); if (compactMap.matches) $('toggle-map').focus(); } });
+    function setAdding(value) { state.adding = value; $('toggle-pins').setAttribute('aria-pressed', String(value)); $('toggle-pins').textContent = value ? '✓ Finish adding pins' : '+ Add pins on map'; $('start-pin-mode').hidden = value; $('finish-pin-mode').hidden = !value; if (map) map.getContainer().style.cursor = value ? 'crosshair' : ''; setMapInteraction(true); }
+    function startAddingPins() { if (!map) return; setAdding(true); setDockExpanded(false); toast('Tap or click empty map space to add waypoints. Open the controls when you are finished.'); }
+    $('start-pin-mode').addEventListener('click', startAddingPins);
+    $('finish-pin-mode').addEventListener('click', () => { setAdding(false); setDockExpanded(true); });
+    $('toggle-pins').addEventListener('click', () => { if (!map) return; const next = !state.adding; setAdding(next); if (next) setDockExpanded(false); });
+    $('toggle-map').addEventListener('click', () => setMapInteraction(true));
+    $('map').addEventListener('keydown', event => { if (event.key === 'Escape') { setAdding(false); setDockExpanded(true); $('control-dock-toggle').focus(); } });
     $('fit-points').addEventListener('click', fitPoints);
     function clearExport() { if (exportUrl) URL.revokeObjectURL(exportUrl); exportUrl = null; exportFile = null; $('download-ready').hidden = true; $('download-link').removeAttribute('href'); $('share-file').hidden = true; }
     function download(blob, filename) {
@@ -1276,7 +1334,7 @@
     }
     $('share-file').addEventListener('click', async () => {
       if (!exportFile || !navigator.share) return;
-      try { await navigator.share({ files: [exportFile], title: 'Trailcraft — unverified planning file' }); }
+      try { await navigator.share({ files: [exportFile], title: 'trailplaner — unverified planning file' }); }
       catch (error) { if (error.name !== 'AbortError') toast('Sharing is unavailable. Use the filename link to download instead.'); }
     });
     function xmlText(text) { return String(text).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '').replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&apos;'}[c])); }
@@ -1295,14 +1353,18 @@
       const ele = p => Number.isFinite(p.ele) ? `<ele>${decimal(p.ele)}</ele>` : '';
       const waypoints = points.map(p => `  <wpt lat="${decimal(p.lat)}" lon="${decimal(p.lon)}">${ele(p)}<name>${xmlText(p.name || 'Unverified waypoint')}</name><desc>Unverified reference point. Its original name does not determine the current travel direction.</desc></wpt>`).join('\n');
       const track = segments.length ? `  <trk><name>${image ? 'Image reference trace' : 'Imported source track'} — UNVERIFIED</name><desc>${xmlText(warning)}</desc>\n${segments.map(seg => `    <trkseg>\n${seg.map(p => `      <trkpt lat="${decimal(p.lat)}" lon="${decimal(p.lon)}">${ele(p)}</trkpt>`).join('\n')}\n    </trkseg>`).join('\n')}\n  </trk>` : '';
-      return `<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="Trailcraft planning preview" xmlns="http://www.topografix.com/GPX/1/1">\n  <metadata><name>Trailcraft — unverified GPX draft</name><desc>${xmlText(warning)}</desc><time>${stamp}</time></metadata>\n${waypoints}\n${track}\n</gpx>\n`;
+      return `<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="trailplaner planning preview" xmlns="http://www.topografix.com/GPX/1/1">\n  <metadata><name>trailplaner — unverified GPX draft</name><desc>${xmlText(warning)}</desc><time>${stamp}</time></metadata>\n${waypoints}\n${track}\n</gpx>\n`;
     }
     $('save-gpx').addEventListener('click', () => {
-      if (routing.selected) { download(new Blob([plannedGPX(routing.selected)], { type: 'application/gpx+xml;charset=utf-8' }), 'trailcraft-route-PROVISIONAL.gpx'); track('gpx_exported'); return; }
+      if (routing.selected) { download(new Blob([plannedGPX(routing.selected)], { type: 'application/gpx+xml;charset=utf-8' }), 'trailplaner-route-PROVISIONAL.gpx'); track('gpx_exported'); return; }
       if ((!state.points.length && !state.segments.length) || (state.requiresTraceReview && !trace.reviewed)) return;
       const gpx = gpxDocument(state.points, state.segments, state.requiresTraceReview ? 'Image trace — unverified' : state.source);
-      download(new Blob([gpx], { type: 'application/gpx+xml;charset=utf-8' }), `trailcraft-draft-UNVERIFIED-${new Date().toISOString().slice(0, 10)}.gpx`); toast('GPX is ready in the current direction. Use the file link or Share file if it does not save automatically.');
+      download(new Blob([gpx], { type: 'application/gpx+xml;charset=utf-8' }), `trailplaner-draft-UNVERIFIED-${new Date().toISOString().slice(0, 10)}.gpx`); toast('GPX is ready in the current direction. Use the file link or Share file if it does not save automatically.');
       track('gpx_exported');
+    });
+    $('save-all-gpx').addEventListener('click', () => {
+      const routes = routing.result?.routes || []; if (!routes.length) return;
+      download(new Blob([allRoutesGPX(routes)], { type: 'application/gpx+xml;charset=utf-8' }), `trailplaner-all-${routes.length}-routes-PROVISIONAL.gpx`); toast(`GPX with ${routes.length} separate route tracks is ready.`); track('gpx_exported');
     });
     function roundedRect(ctx, x, y, w, h, r, color) { ctx.fillStyle = color; ctx.beginPath(); ctx.roundRect(x, y, w, h, r); ctx.fill(); }
     $('save-png').addEventListener('click', async () => {
@@ -1310,30 +1372,30 @@
       const button = $('save-png'), revision = draftRevision; button.disabled = true;
       try {
         map.stop();
-        const segments = routing.selected ? [routing.selected.coords] : state.segments;
+        const visibleRoutes = (routing.result?.routes || []).filter(route => routing.visible.has(route.id));
+        const segments = visibleRoutes.length ? visibleRoutes.map(route => route.coords) : state.segments;
         const bounds = map.getBounds(), allPoints = [...state.points, ...segments.flat()];
         if (allPoints.some(p => !bounds.contains([p.lat, p.lon]))) throw new Error('Use “Fit all points” before saving so your whole draft is visible.');
         if (tileLayer.isLoading()) throw new Error('Map tiles are still loading. Wait a moment, then save again.');
         const rect = map.getContainer().getBoundingClientRect(), width = Math.round(rect.width), height = Math.round(rect.height), header = 80, footer = 82;
         const canvas = document.createElement('canvas'), scale = Math.min(2, 4096 / (height + header + footer), 4096 / width); canvas.width = width * scale; canvas.height = (height + header + footer) * scale;
         const ctx = canvas.getContext('2d'); ctx.scale(scale, scale); ctx.fillStyle = '#f7f6f0'; ctx.fillRect(0, 0, width, height + header + footer);
-        ctx.fillStyle = '#263e35'; ctx.font = '28px Georgia'; ctx.fillText('trailcraft / planning draft', 22, 35, width - 44); ctx.font = '12px sans-serif'; ctx.fillText(`${state.points.length} waypoints · ${new Date().toISOString().slice(0, 10)} · NOT FOR NAVIGATION`, 22, 59, width - 44);
+        ctx.fillStyle = '#263e35'; ctx.font = '28px Georgia'; ctx.fillText('trailplaner / planning draft', 22, 35, width - 44); ctx.font = '12px sans-serif'; ctx.fillText(`${state.points.length} waypoints · ${new Date().toISOString().slice(0, 10)} · NOT FOR NAVIGATION`, 22, 59, width - 44);
         ctx.save(); ctx.beginPath(); ctx.rect(0, header, width, height); ctx.clip(); ctx.fillStyle = '#e3e9df'; ctx.fillRect(0, header, width, height);
         const tiles = Array.from(map.getContainer().querySelectorAll('.leaflet-tile'));
         const visible = tiles.filter(img => { const r = img.getBoundingClientRect(); return r.right > rect.left && r.left < rect.right && r.bottom > rect.top && r.top < rect.bottom; });
         if (!visible.length || visible.some(img => !img.complete || !img.naturalWidth)) throw new Error('Some map tiles are unavailable. Wait for the basemap to load before exporting.');
         visible.forEach(img => { const r = img.getBoundingClientRect(); ctx.drawImage(img, r.left - rect.left, r.top - rect.top + header, r.width, r.height); });
-        ctx.strokeStyle = routing.selected ? '#263e35' : '#bc4827'; ctx.lineWidth = routing.selected ? 5 : 3; ctx.setLineDash(routing.selected ? [] : [7, 7]);
-        segments.forEach(seg => { ctx.beginPath(); seg.forEach((p, i) => { const pos = map.latLngToContainerPoint([p.lat, p.lon]); if (i) ctx.lineTo(pos.x, pos.y + header); else ctx.moveTo(pos.x, pos.y + header); }); ctx.stroke(); }); ctx.setLineDash([]);
+        segments.forEach((seg, routeIndex) => { ctx.strokeStyle = visibleRoutes.length ? ROUTE_COLORS[routing.result.routes.indexOf(visibleRoutes[routeIndex])] : '#bc4827'; ctx.lineWidth = visibleRoutes.length ? 5 : 3; ctx.setLineDash(visibleRoutes.length ? [] : [7, 7]); ctx.beginPath(); seg.forEach((p, i) => { const pos = map.latLngToContainerPoint([p.lat, p.lon]); if (i) ctx.lineTo(pos.x, pos.y + header); else ctx.moveTo(pos.x, pos.y + header); }); ctx.stroke(); }); ctx.setLineDash([]);
         state.points.forEach((p, i) => { const pos = map.latLngToContainerPoint([p.lat, p.lon]); ctx.beginPath(); ctx.arc(pos.x, pos.y + header, 16, 0, Math.PI * 2); ctx.fillStyle = '#263e35'; ctx.fill(); ctx.strokeStyle = '#fffefa'; ctx.lineWidth = 3; ctx.stroke(); ctx.fillStyle = '#fffefa'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(String(i + 1), pos.x, pos.y + header); });
-        const ordered = segments.length ? segments.flat() : state.points;
+        const ordered = (routing.selected && routing.visible.has(routing.selected.id) ? routing.selected.coords : null) || visibleRoutes[0]?.coords || (segments.length ? segments.flat() : state.points);
         if (ordered.length > 1) [ordered[0], ordered.at(-1)].forEach((p, i) => { const pos = map.latLngToContainerPoint([p.lat, p.lon]), y = pos.y + header + (i ? 21 : -44); roundedRect(ctx, pos.x - 22, y, 44, 23, 4, '#bc4827'); ctx.fillStyle = 'white'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(i ? 'End' : 'Start', pos.x, y + 12); });
         ctx.restore(); ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
         roundedRect(ctx, 12, header + height - 29, Math.min(280, width - 24), 23, 3, '#fffefa'); ctx.fillStyle = '#263e35'; ctx.font = '10px sans-serif'; ctx.fillText('© OpenStreetMap contributors · openstreetmap.org/copyright', 20, header + height - 14, width - 40);
-        ctx.fillStyle = '#bc4827'; ctx.font = 'bold 12px sans-serif'; ctx.fillText('UNVERIFIED · NOT FOR NAVIGATION', 22, header + height + 26, width - 44); ctx.fillStyle = '#667267'; ctx.font = '11px sans-serif'; ctx.fillText(routing.selected ? 'Connected OSM walking route. Stop and waypoint offsets need checking.' : state.requiresTraceReview ? 'Image reference trace. Calibration and line selection may be wrong.' : 'Separate waypoints / source segments. No connections verified.', 22, header + height + 46, width - 44); ctx.fillText('Access, closures, terrain and public transport are unverified.', 22, header + height + 63, width - 44);
+        ctx.fillStyle = '#bc4827'; ctx.font = 'bold 12px sans-serif'; ctx.fillText('UNVERIFIED · NOT FOR NAVIGATION', 22, header + height + 26, width - 44); ctx.fillStyle = '#667267'; ctx.font = '11px sans-serif'; ctx.fillText(visibleRoutes.length ? `${visibleRoutes.length} connected OSM route option(s). Stop and waypoint offsets need checking.` : state.requiresTraceReview ? 'Image reference trace. Calibration and line selection may be wrong.' : 'Separate waypoints / source segments. No connections verified.', 22, header + height + 46, width - 44); ctx.fillText('Access, closures, terrain and public transport are unverified.', 22, header + height + 63, width - 44);
         const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png')); if (!blob) throw new Error('PNG export failed in this browser.');
         if (revision !== draftRevision) throw new Error('The draft changed during export. Save the preview again.');
-        download(blob, 'trailcraft-planning-draft-UNVERIFIED.png'); toast('PNG is ready with its planning warning. A file link is available below the map.');
+        download(blob, 'trailplaner-planning-draft-UNVERIFIED.png'); toast('PNG is ready with its planning warning. A file link is available in the controls.');
         track('png_exported');
       } catch (error) { toast(error.name === 'SecurityError' ? 'The map provider blocked image export. No incomplete PNG was saved.' : error.message); }
       finally { button.disabled = (!state.points.length && !state.segments.length) || !map; }
@@ -1341,24 +1403,17 @@
     $('discard').addEventListener('click', () => $('discard-dialog').showModal());
     $('keep-draft').addEventListener('click', () => $('discard-dialog').close());
     $('confirm-discard').addEventListener('click', () => { state.fileVersion++; clearPhoto(); state.points = []; state.segments = []; state.source = ''; state.requiresTraceReview = false; $('coordinates').value = ''; $('file-input').value = ''; $('input-message').hidden = true; setAdding(false); render(false); $('discard-dialog').close(); toast('Draft discarded. Your original files are unchanged.'); track('draft_discarded'); });
-    function removeManualMapPin(index) {
-      if (!state.points[index]?.manual) return;
-      state.points.splice(index, 1); map?.closePopup(); render(false); toast('Map pin removed.');
+    function removeMapPin(index) {
+      if (!state.points[index]) return;
+      mutateWaypoints(() => state.points.splice(index, 1), 'Waypoint deleted. Route options will update.'); map?.closePopup();
     }
     if (window.L) {
-      map = L.map('map', { scrollWheelZoom: false, worldCopyJump: true, minZoom: 2, maxZoom: 19 }).setView([22.36, 114.24], 10);
+      map = L.map('map', { scrollWheelZoom: true, touchZoom: true, dragging: true, tapHold: true, worldCopyJump: true, minZoom: 2, maxZoom: 19 }).setView([22.36, 114.24], 10);
       tileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, crossOrigin: 'anonymous', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }).addTo(map);
       markers = L.layerGroup().addTo(map); tracks = L.layerGroup().addTo(map);
-      map.on('click', event => { if (!state.adding) return; if (state.points.length >= MAX_WAYPOINTS) { toast(`Maximum ${MAX_WAYPOINTS} waypoints.`); return; } const p = event.latlng.wrap(); state.points.push({ ...point(p.lat, p.lng, `Map waypoint ${state.points.length + 1}`), manual: true }); state.source = 'Manual map pins'; render(false); track('map_pin_added'); });
-      let modifierWheel = 0, modifierWheelFrame = 0;
-      map.getContainer().addEventListener('wheel', event => {
-        if (!event.ctrlKey && !event.metaKey) return;
-        event.preventDefault(); modifierWheel += -event.deltaY;
-        if (modifierWheelFrame) return;
-        modifierWheelFrame = requestAnimationFrame(() => { const amount = modifierWheel; modifierWheel = 0; modifierWheelFrame = 0; if (Math.abs(amount) < 2) return; const next = Math.max(map.getMinZoom(), Math.min(map.getMaxZoom(), map.getZoom() + Math.sign(amount))); map.setZoomAround(map.mouseEventToLatLng(event), next); });
-      }, { passive: false });
+      map.on('click', event => { if (!state.adding) return; if (state.points.length >= MAX_WAYPOINTS) { toast(`Maximum ${MAX_WAYPOINTS} waypoints.`); return; } const p = event.latlng.wrap(), number = state.points.length + 1; mutateWaypoints(() => { state.points.push({ ...point(p.lat, p.lng, `Map waypoint ${number}`), manual: true }); state.source = 'Manual map pins'; }, `Waypoint ${number} added.`); track('map_pin_added'); });
       tileLayer.on('tileerror', () => { toast('Some basemap tiles could not load. Check your connection; do not infer paths from missing tiles.'); });
-      setMapInteraction(false);
+      setMapInteraction(true);
       let resizeFrame, previousWidth = 0, previousHeight = 0;
       new ResizeObserver(entries => {
         const { width, height } = entries[0].contentRect;
@@ -1367,6 +1422,7 @@
         resizeFrame = requestAnimationFrame(() => { map.invalidateSize({ pan: false, animate: false }); fitPoints(); });
       }).observe($('map'));
     } else { $('map').append(element('p', 'The map library could not load. Check your internet connection and reload. Coordinate import and waypoint GPX export still work.', 'map-unavailable')); $('toggle-pins').disabled = true; }
+    $('input-method').dispatchEvent(new Event('change'));
     render(false);
   })();
   </script>

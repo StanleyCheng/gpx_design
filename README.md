@@ -1,4 +1,4 @@
-# Trailcraft — GPX route planner
+# trailplaner — GPX route planner
 
 [AI-enabled Vercel app](https://gpxdesign.vercel.app/) · [GitHub Pages static app](https://stanleycheng.github.io/gpx_design/). A responsive single HTML frontend with embedded CSS and JavaScript. **Routes are provisional planning candidates, not certified safe navigation tracks.**
 
