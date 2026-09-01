@@ -1,6 +1,6 @@
 import http from 'node:http';
 import { timingSafeEqual } from 'node:crypto';
-import { readFile, writeFile, mkdir, rename } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
@@ -39,7 +39,7 @@ export async function kimiRecognize(input, key) {
 const PUBLIC = new Map([['/', ['index.html','text/html']],['/index.html',['index.html','text/html']],['/icon.svg',['icon.svg','image/svg+xml']],['/favicon-32.png',['favicon-32.png','image/png']],['/apple-touch-icon.png',['apple-touch-icon.png','image/png']],['/icon-192.png',['icon-192.png','image/png']],['/icon-512.png',['icon-512.png','image/png']],['/site.webmanifest',['site.webmanifest','application/manifest+json']]]);
 const secureEqual = (a, b) => { const x = Buffer.from(a || ''), y = Buffer.from(b || ''); return x.length === y.length && timingSafeEqual(x, y); };
 export function createApp(config = {}) {
-  const cfg = { host: '127.0.0.1', port: 8787, origin: 'https://stanleycheng.github.io', key: '', token: '', dailyLimit: 12, usagePath: path.join(ROOT, '.runtime/recognition-usage.json'), recognize: kimiRecognize, ...config };
+  const cfg = { host: '127.0.0.1', port: 8787, origin: 'https://stanleycheng.github.io', key: '', token: '', recognize: kimiRecognize, ...config };
   const local = ['127.0.0.1', 'localhost', '::1'].includes(cfg.host);
   if (!local && cfg.token.length < 32) throw new Error('Remote hosting requires a separate TRAILCRAFT_ACCESS_TOKEN of at least 32 characters. Never use the Kimi key as this token.');
   if (cfg.token && cfg.token === cfg.key) throw new Error('The app access token must differ from the Kimi API key.');
@@ -62,27 +62,22 @@ export function createApp(config = {}) {
       try {
         const chunks = []; let size = 0;
         for await (const chunk of req) { size += chunk.length; if (size > 3100000) { reply(413, { error: 'Image request too large.' }); req.destroy(); return; } chunks.push(chunk); }
-        const input = validateInput(JSON.parse(Buffer.concat(chunks).toString('utf8'))), date = new Date().toISOString().slice(0,10);
-        let usage; try { usage = JSON.parse(await readFile(cfg.usagePath, 'utf8')); } catch (e) { if (e.code !== 'ENOENT') throw new Error('The server usage ledger is unavailable. Recognition is paused.'); }
-        if (!usage || usage.date !== date) usage = { date, count: 0 };
-        if (!Number.isInteger(usage.count) || usage.count < 0) throw new Error('The server usage ledger is invalid.');
-        if (usage.count >= cfg.dailyLimit) return reply(429, { error: 'This server’s daily recognition budget has been reached. Try tomorrow.' });
-        usage.count++; await mkdir(path.dirname(cfg.usagePath), { recursive: true }); await writeFile(cfg.usagePath + '.tmp', JSON.stringify(usage), { mode: 0o600 }); await rename(cfg.usagePath + '.tmp', cfg.usagePath);
+        const input = validateInput(JSON.parse(Buffer.concat(chunks).toString('utf8')));
         const result = normalizeRecognition(await cfg.recognize(input, cfg.key)); reply(200, { result });
       } catch (e) { const safe = /^(Kimi returned HTTP|Kimi did not finish|The recognition response|The server usage|Image |Only embedded|Unexpected token|Expected property|JSON)/.test(e.message) ? e.message.slice(0,220) : 'Recognition failed or timed out. No coordinates were accepted. Please try a clearer image or manual calibration.'; reply(422, { error: safe }); }
       finally { active = false; }
       return;
     }
     if (req.method !== 'GET' || !PUBLIC.has(route)) return reply(404, { error: 'Not found' });
-    // Strict public-file allowlist: .env, source, tests and the usage ledger are never served.
+    // Strict public-file allowlist: .env, source and tests are never served.
     const [filename, type] = PUBLIC.get(route); try { const data = await readFile(path.join(ROOT, filename)); res.writeHead(200, { 'Content-Type': type, 'X-Content-Type-Options': 'nosniff', 'Cache-Control': 'no-cache' }); res.end(data); } catch { reply(404, { error: 'Not found' }); }
   });
   server.requestTimeout = 120000; server.headersTimeout = 10000;
   return server;
 }
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const port = Number(process.env.PORT || 8787), host = process.env.HOST || '127.0.0.1', dailyLimit = Math.max(1, Math.min(100, Number(process.env.KIMI_DAILY_REQUEST_LIMIT || 12)));
-  if (!Number.isInteger(dailyLimit) || !Number.isInteger(port)) throw new Error('Invalid server configuration.');
-  const server = createApp({ port, host, origin: process.env.ALLOWED_ORIGIN || 'https://stanleycheng.github.io', key: process.env.MOONSHOT_API_KEY || '', token: process.env.TRAILCRAFT_ACCESS_TOKEN || '', dailyLimit });
+  const port = Number(process.env.PORT || 8787), host = process.env.HOST || '127.0.0.1';
+  if (!Number.isInteger(port)) throw new Error('Invalid server configuration.');
+  const server = createApp({ port, host, origin: process.env.ALLOWED_ORIGIN || 'https://stanleycheng.github.io', key: process.env.MOONSHOT_API_KEY || '', token: process.env.TRAILCRAFT_ACCESS_TOKEN || '' });
   server.listen(port, host, () => console.log(`Trailcraft private server ready at http://${host}:${port}. Kimi keys and images are not logged.`));
 }

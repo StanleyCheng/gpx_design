@@ -11,7 +11,7 @@
 - Order optimisation retains all places. Large searches and waypoint counts are rejected, not truncated.
 - Existing image calibration, connected-pixel tracing, segment reversal and XML escaping tests still pass.
 - Recognition rejects absent consent, arbitrary image URLs, bad signatures and unsupported/invalid coordinates.
-- Private server rejects other origins and invalid app tokens, will not serve `.env` or source, and reserves a persisted daily quota before provider calls.
+- Private server rejects other origins and invalid app tokens, will not serve `.env` or source, and throttles bursts after three recognition attempts per minute per process.
 - No checkbox controls or removed confirmation gates remain. Route search and export use the existing action buttons, while AI candidates still require explicit selection and a valid coordinate.
 - Authored planner, recognition and guidance fragments exactly match the generated single-file page; all static DOM IDs remain unique and all inline scripts parse.
 - English and Traditional Chinese guidance cover all five input methods, every action state and each four-step route path. Language is presentation state and does not change the planning draft.
@@ -50,4 +50,4 @@ The earlier responsive UI was inspected at 440 × 956 (iPhone 16 Pro Max CSS vie
 - Government trail geometry outside Hong Kong is not integrated. OSM hiking membership alone does not prove official management.
 - Endpoints can be up to 80 m from the mapped passenger stop; that access gap is shown and never fabricated in GPX. Mandatory points must fall within the explicitly accepted path-node tolerance.
 - Search bounds, incomplete OSM tagging and conservative exclusions can reject a route that is actually walkable. Candidate ranking is heuristic; three routes and global optimality are not guaranteed.
-- Docker deployment recipe is supplied but has not been built or deployed on a remote host. Use a single instance with persistent quota storage as documented in AI_SETUP.md.
+- Docker deployment recipe is supplied but has not been built or deployed on a remote host. Private recognition has no daily request quota; monitor Kimi usage and billing as documented in AI_SETUP.md.

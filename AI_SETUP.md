@@ -19,8 +19,7 @@ To enable AI on the public page, deploy the server to a private HTTPS service wi
 
 - `HOST=0.0.0.0`, the hosting platform's `PORT`, `MOONSHOT_API_KEY`, and `ALLOWED_ORIGIN=https://stanleycheng.github.io`.
 - A separate random `TRAILCRAFT_ACCESS_TOKEN` of at least 32 characters. The server refuses remote startup without it and refuses using the Kimi key as this token. Origin checking is supplemental; the token provides authentication.
-- **One running process/instance**, persistent `.runtime/` storage, TLS termination and a small host-level request/body budget. Do not scale replicas against separate ledgers. For public multi-user service, replace the shared access code with account authentication and a shared transactional quota store.
-- `KIMI_DAILY_REQUEST_LIMIT` (default 12, maximum 100). Each attempted provider request reserves one count before sending; failures still count. It limits request count, not a guaranteed monetary spend. Each call also has a fixed token and image budget. The host's storage must survive restarts; failed/corrupt ledger reads pause recognition.
+- TLS termination and host-level request/body controls. Recognition is private to the owner through the separate access token. There is no daily request quota; monitor the Kimi account's usage and billing directly.
 
 Set the endpoint ending `/api/recognize-map` and app access code in the page's private connection controls. They stay in memory only. Do not put the access code into a public config file. No remote backend has been deployed by this change; hosting access is still required.
 
@@ -28,7 +27,7 @@ Set the endpoint ending `/api/recognize-map` and app access code in the page's p
 
 The server accepts only user-initiated requests marked with the consent protocol flag and base64 PNG/JPEG/WebP images up to 2 MB, checks the file signature, rejects arbitrary image URLs, forwards only to the fixed Kimi endpoint, caps context length, accepts at most 16 returned markers, validates coordinates and confidence/basis fields, rejects truncated model output, and redacts upstream errors. The browser sends that request only when Identify is selected and reserializes the image canvas before upload, stripping EXIF. Neither image bytes, clues, tokens nor model responses are written to server logs or storage.
 
-One recognition request runs at a time, with three attempts/minute and a persistent daily request ledger. Different origins are rejected. Public files are allowlisted; `.env`, the usage ledger and server source cannot be read via the server. Keys are never sent to the browser. The private server's operator and Kimi still receive the image; the app makes no promise about the provider's retention policy.
+One recognition request runs at a time per server process, with three attempts/minute. Different origins are rejected. Public files are allowlisted; `.env` and server source cannot be read via the server. Keys are never sent to the browser. The private server's operator and Kimi still receive the image; the app makes no promise about the provider's retention policy.
 
 AI sees image text as untrusted evidence. Place-name guesses and model confidence are not measured accuracy. If an image lacks a readable grid, labels or a unique landmark, the expected result is a request for more context. Camera GPS is not used to establish the depicted map's coordinates. Manual calibration remains available when recognition is unavailable or ambiguous.
 

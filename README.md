@@ -39,13 +39,13 @@ node --test tests/*.test.cjs tests/*.test.mjs
 node --env-file=.env server/recognition.mjs
 ```
 
-Open `http://127.0.0.1:8787/`. Copy `.env.example` to a private `.env` if one does not already exist; never overwrite a populated key file. The server serves an explicit public-file allowlist and will not serve `.env`, source files, tests or its usage ledger. No Kimi calls are possible without a configured key and the user selecting Identify.
+Open `http://127.0.0.1:8787/`. Copy `.env.example` to a private `.env` if one does not already exist; never overwrite a populated key file. The server serves an explicit public-file allowlist and will not serve `.env`, source files or tests. No Kimi calls are possible without a configured key and the user selecting Identify.
 
 The authored routing engine and UI fragments in `lib/` are embedded into `index.html` by the build script. The deployed frontend stays one HTML file plus icons. Leaflet 1.9.4, Exifr 7.1.3, fonts and map tiles load online. No offline navigation is claimed. Publish the repository's `main` branch root via GitHub Pages; no private server can run on Pages.
 
 ## Privacy and operations
 
-Drafts and files stay in browser memory except recognition images/clues sent when the user selects Identify. Recognition serializes a resized canvas, stripping camera metadata; the server forwards to Kimi and does not write images to disk. The server stores only a date and request count for its budget. Remote hosting requires a separate app access token, one process and persistent storage; see setup notes.
+Drafts and files stay in browser memory except recognition images/clues sent when the user selects Identify. Recognition serializes a resized canvas, stripping camera metadata; the server forwards to Kimi and does not write images to disk. Remote hosting requires a separate private app access token; see setup notes. There is no daily recognition quota, so monitor Kimi usage and billing directly.
 
 Routing sends a bounding box to the selected Overpass provider and (Hong Kong only) the AFCD service. Providers see the area and IP address. OSM tiles reveal the viewed area; PNG reuses displayed tiles. A ten-minute, one-area memory cache, bounded downloads, one request at a time and a pause after rate-limit responses reduce public-service load. High-traffic deployment needs a dedicated routing data service.
 
