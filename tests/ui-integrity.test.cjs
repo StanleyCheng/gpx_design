@@ -9,6 +9,7 @@ const html = read('index.html');
 const planner = read('lib/planner-ui.js').trim();
 const recognition = read('lib/recognition-ui.js').trim();
 const guidance = read('lib/guidance-ui.js').trim();
+const manifest = JSON.parse(read('site.webmanifest'));
 
 function inlineFragment(marker) {
   const start = html.indexOf(`// BEGIN ${marker}`);
@@ -21,6 +22,15 @@ test('visible product branding uses the requested TrailPlanner spelling', () => 
   assert.match(html, /<title>TrailPlanner — GPX route planner<\/title>/);
   assert.match(html, /<span class="brand-name">TrailPlanner<\/span>/);
   assert.doesNotMatch(html, /trailplaner/i);
+});
+
+test('Safari home-screen metadata consistently names the app TrailPlanner', () => {
+  assert.match(html, /name="apple-mobile-web-app-title" content="TrailPlanner"/);
+  assert.match(html, /name="apple-mobile-web-app-capable" content="yes"/);
+  assert.match(html, /rel="manifest" href="site\.webmanifest\?v=3"/);
+  assert.equal(manifest.name, 'TrailPlanner — GPX planner');
+  assert.equal(manifest.short_name, 'TrailPlanner');
+  assert.equal(manifest.display, 'standalone');
 });
 
 test('confirmation checkboxes and their removed gates are absent', () => {
@@ -69,10 +79,20 @@ test('method guidance and map gestures use the existing planning controls', () =
 });
 
 test('map-first route controls support colored combinations and individual or combined GPX', () => {
-  for (const id of ['control-dock', 'map-pins-panel', 'route-visibility', 'show-all-routes', 'hide-all-routes', 'save-all-gpx']) assert.match(html, new RegExp(`id=["']${id}["']`));
+  for (const id of ['control-dock', 'map-pins-panel', 'map-pin-action', 'map-route-action', 'map-route-toolbar', 'map-route-dots', 'map-export-action', 'route-visibility', 'show-all-routes', 'hide-all-routes', 'save-all-gpx']) assert.match(html, new RegExp(`id=["']${id}["']`));
   assert.match(planner, /ROUTE_COLORS/);
   assert.match(planner, /routing\.visible/);
   assert.match(planner, /function allRoutesGPX/);
+  assert.match(planner, /Route \$\{i \+ 1\} · \$\{km\(route\.metres\)\}/);
+  assert.match(planner, /className: 'route-endpoint-pin'/);
+  assert.match(planner, /const letter = endpoint \? 'F' : 'S'/);
+  assert.match(planner, /'map-route-dot'/);
+  assert.match(planner, /map-export-action.*routing\.visible/);
+  assert.match(planner, /shown-routes-PROVISIONAL\.gpx/);
+  assert.match(html, /map-pin-action.*Finish adding pins/);
+  assert.match(html, /map-route-action.*find-routes/);
+  assert.match(html, /--dock-visible-height/);
+  assert.match(planner, /toast\(text, true, 9000\)/);
 });
 
 test('route limits include the compact transport search and long-hike choices', () => {

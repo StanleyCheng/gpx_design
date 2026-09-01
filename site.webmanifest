@@ -1,6 +1,8 @@
 {
   "name": "TrailPlanner — GPX planner",
   "short_name": "TrailPlanner",
+  "id": "./",
+  "description": "Plan connected hiking routes through every waypoint with public transport at both ends.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
