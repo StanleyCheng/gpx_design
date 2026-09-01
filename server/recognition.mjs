@@ -64,7 +64,7 @@ export function createApp(config = {}) {
         for await (const chunk of req) { size += chunk.length; if (size > 3100000) { reply(413, { error: 'Image request too large.' }); req.destroy(); return; } chunks.push(chunk); }
         const input = validateInput(JSON.parse(Buffer.concat(chunks).toString('utf8')));
         const result = normalizeRecognition(await cfg.recognize(input, cfg.key)); reply(200, { result });
-      } catch (e) { const safe = /^(Kimi returned HTTP|Kimi did not finish|The recognition response|The server usage|Image |Only embedded|Unexpected token|Expected property|JSON)/.test(e.message) ? e.message.slice(0,220) : 'Recognition failed or timed out. No coordinates were accepted. Please try a clearer image or manual calibration.'; reply(422, { error: safe }); }
+      } catch (e) { const safe = /^(Kimi returned HTTP|Kimi did not finish|The recognition response|Image |Only embedded|Unexpected token|Expected property|JSON)/.test(e.message) ? e.message.slice(0,220) : 'Recognition failed or timed out. No coordinates were accepted. Please try a clearer image or manual calibration.'; reply(422, { error: safe }); }
       finally { active = false; }
       return;
     }

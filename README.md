@@ -23,7 +23,7 @@ Up to 16 mandatory places in entered order, or 8 with order optimisation. All li
 
 ## Image input
 
-[Kimi recognition](AI_SETUP.md) is the main route-map workflow: it identifies a suggested area and visible marked places only through a private server and a user-initiated Identify action. After review, the selected places feed the same three-option route planner. Kimi never supplies the routing graph. Each selected place still needs one valid coordinate; unsupported coordinates remain blank. Kimi recognition on the public site needs a separately deployed HTTPS backend; no endpoint or secret is shipped.
+[Kimi recognition](AI_SETUP.md) is the main route-map workflow: it identifies a suggested area and visible marked places only through the private Vercel-ready function and a user-initiated Identify action. After review, the selected places feed the same three-option route planner. Kimi never supplies the routing graph. Each selected place still needs one valid coordinate; unsupported coordinates remain blank. No endpoint secret or provider key is shipped to the browser.
 
 [Manual image conversion](IMAGE_CONVERSION.md) still works locally: calibrate three known locations, select a continuous route colour, trace and review. Image traces and imported tracks are unverified source references, not traversability evidence. GPX import preserves segments and numeric elevations; if no waypoints exist, only segment endpoints become mandatory places. Add any other must-visit locations explicitly.
 
@@ -31,17 +31,18 @@ The planning map stays clear when empty. On desktop, drag to pan and hold Ctrl o
 
 ## Run, test and publish
 
-Node 24, no package installation required:
+Node 22.12 or newer, with no third-party runtime packages required:
 
 ```sh
 node scripts/build-inline.mjs
-node --test tests/*.test.cjs tests/*.test.mjs
+npm test
+npm run build
 node --env-file=.env server/recognition.mjs
 ```
 
 Open `http://127.0.0.1:8787/`. Copy `.env.example` to a private `.env` if one does not already exist; never overwrite a populated key file. The server serves an explicit public-file allowlist and will not serve `.env`, source files or tests. No Kimi calls are possible without a configured key and the user selecting Identify.
 
-The authored routing engine and UI fragments in `lib/` are embedded into `index.html` by the build script. The deployed frontend stays one HTML file plus icons. Leaflet 1.9.4, Exifr 7.1.3, fonts and map tiles load online. No offline navigation is claimed. Publish the repository's `main` branch root via GitHub Pages; no private server can run on Pages.
+The authored routing engine and UI fragments in `lib/` are embedded into `index.html` by the build script. The deployed frontend stays one HTML file plus icons. Leaflet 1.9.4, Exifr 7.1.3, fonts and map tiles load online. No offline navigation is claimed. GitHub Pages can publish the static app; Vercel publishes the same allowlisted assets plus the private recognition function. See [AI_SETUP.md](AI_SETUP.md).
 
 ## Privacy and operations
 

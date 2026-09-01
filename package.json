@@ -1,0 +1,12 @@
+{
+  "name": "trailcraft-gpx-design",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.12.0 <25"
+  },
+  "scripts": {
+    "build": "node scripts/build-inline.mjs && node scripts/build-vercel.mjs",
+    "test": "node --test tests/*.test.cjs tests/*.test.mjs"
+  }
+}

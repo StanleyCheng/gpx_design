@@ -2,7 +2,7 @@
 
 ## Automated checks
 
-`node --test tests/*.test.cjs tests/*.test.mjs`: **31 passing tests**.
+`npm test`: **33 passing tests**.
 
 - Three distinct candidates visit every mandatory point and contain only existing source graph nodes/ways.
 - Missing geometry, disconnected paths, an off-network waypoint or a stop without a service fails closed.
@@ -12,6 +12,7 @@
 - Existing image calibration, connected-pixel tracing, segment reversal and XML escaping tests still pass.
 - Recognition rejects absent consent, arbitrary image URLs, bad signatures and unsupported/invalid coordinates.
 - Private server rejects other origins and invalid app tokens, will not serve `.env` or source, and throttles bursts after three recognition attempts per minute per process.
+- Vercel handler accepts its own origin plus the explicit GitHub Pages origin, supports safe endpoint discovery, rejects unauthorized calls, keeps the provider key server-side and resumes after the short burst window without a daily quota.
 - No checkbox controls or removed confirmation gates remain. Route search and export use the existing action buttons, while AI candidates still require explicit selection and a valid coordinate.
 - Authored planner, recognition and guidance fragments exactly match the generated single-file page; all static DOM IDs remain unique and all inline scripts parse.
 - English and Traditional Chinese guidance cover all five input methods, every action state and each four-step route path. Language is presentation state and does not change the planning draft.
@@ -45,9 +46,9 @@ The earlier responsive UI was inspected at 440 × 956 (iPhone 16 Pro Max CSS vie
 
 ## Remaining activation and product limits
 
-- Add the private Kimi key locally, deploy a separately authenticated HTTPS server, and test real labelled and ambiguous maps before claiming live recognition quality. GitHub Pages cannot run this server.
+- Import the repository into Vercel, add the two Production secrets and test real labelled and ambiguous maps before claiming live recognition quality. The Vercel adapter is tested locally but has not yet been deployed; GitHub Pages cannot run it.
 - Current timetables, last departures, closures, permits, weather and terrain conditions are not automatically verified.
 - Government trail geometry outside Hong Kong is not integrated. OSM hiking membership alone does not prove official management.
 - Endpoints can be up to 80 m from the mapped passenger stop; that access gap is shown and never fabricated in GPX. Mandatory points must fall within the explicitly accepted path-node tolerance.
 - Search bounds, incomplete OSM tagging and conservative exclusions can reject a route that is actually walkable. Candidate ranking is heuristic; three routes and global optimality are not guaranteed.
-- Docker deployment recipe is supplied but has not been built or deployed on a remote host. Private recognition has no daily request quota; monitor Kimi usage and billing as documented in AI_SETUP.md.
+- Docker and Vercel deployment recipes are supplied but have not been deployed on a remote host. Private recognition has no daily request quota; monitor Kimi usage and billing as documented in AI_SETUP.md.

@@ -39,6 +39,8 @@ test('AI place selection and server consent protocol remain fail-closed', () => 
   assert.match(recognition, /setAttribute\('aria-pressed', String\(p\.included\)\)/);
   assert.match(recognition, /consent: true/);
   assert.match(read('server/recognition.mjs'), /body\?\.consent !== true/);
+  assert.match(recognition, /X-Trailcraft-Recognition|x-trailcraft-recognition/);
+  assert.match(recognition, /new URL\('\/api\/recognize-map', location\.origin\)/);
 });
 
 test('single-file build embeds the authored UI fragments exactly', () => {

@@ -42,6 +42,7 @@ build/
 .next/
 .nuxt/
 .output/
+.vercel/
 .cache/
 .parcel-cache/
 .turbo/
@@ -77,3 +78,4 @@ Thumbs.db
 Thumbs.db:encryptable
 Desktop.ini
 $RECYCLE.BIN/
+.vercel
