@@ -69,6 +69,11 @@ test('map-first route controls support colored combinations and individual or co
   assert.match(planner, /function allRoutesGPX/);
 });
 
+test('route limits include the compact transport search and long-hike choices', () => {
+  assert.match(html, /<option value="1000">1 km per end<\/option>/);
+  assert.match(html, /<option value="80000">80 km<\/option>/);
+});
+
 test('static DOM ids remain unique', () => {
   const ids = [...html.matchAll(/\sid=["']([^"']+)["']/g)].map(match => match[1]);
   assert.equal(new Set(ids).size, ids.length);
