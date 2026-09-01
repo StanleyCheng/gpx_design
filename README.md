@@ -1,6 +1,6 @@
 # Trailcraft — GPX route planner
 
-[Live app](https://stanleycheng.github.io/gpx_design/). A responsive single HTML frontend with embedded CSS and JavaScript, published on GitHub Pages. **Routes are provisional planning candidates, not certified safe navigation tracks.**
+[AI-enabled Vercel app](https://gpxdesign.vercel.app/) · [GitHub Pages static app](https://stanleycheng.github.io/gpx_design/). A responsive single HTML frontend with embedded CSS and JavaScript. **Routes are provisional planning candidates, not certified safe navigation tracks.**
 
 ## Workflow
 
@@ -23,7 +23,7 @@ Up to 16 mandatory places in entered order, or 8 with order optimisation. All li
 
 ## Image input
 
-[Kimi recognition](AI_SETUP.md) is the main route-map workflow: it identifies a suggested area and visible marked places only through the private Vercel-ready function and a user-initiated Identify action. After review, the selected places feed the same three-option route planner. Kimi never supplies the routing graph. Each selected place still needs one valid coordinate; unsupported coordinates remain blank. No endpoint secret or provider key is shipped to the browser.
+[Kimi recognition](AI_SETUP.md) is the main route-map workflow: it identifies a suggested area and visible marked places only through the deployed private Vercel function and a user-initiated Identify action. After review, the selected places feed the same three-option route planner. Kimi never supplies the routing graph. Each selected place still needs one valid coordinate; unsupported coordinates remain blank. No endpoint secret or provider key is shipped to the browser.
 
 [Manual image conversion](IMAGE_CONVERSION.md) still works locally: calibrate three known locations, select a continuous route colour, trace and review. Image traces and imported tracks are unverified source references, not traversability evidence. GPX import preserves segments and numeric elevations; if no waypoints exist, only segment endpoints become mandatory places. Add any other must-visit locations explicitly.
 

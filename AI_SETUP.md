@@ -13,11 +13,15 @@ The repository's ignored `.env` now contains a configured key. A successful live
 
 ## Vercel setup
 
-GitHub Pages cannot keep a Kimi key or run the private server. This repository now includes a Vercel Node.js Function at `/api/recognize-map`, a 120-second function configuration and a static allowlist build. The Kimi key never enters `index.html` or the browser.
+GitHub Pages cannot keep a Kimi key or run the private server. The production Vercel project is `stanleychengs-projects/gpx_design`, available at [gpxdesign.vercel.app](https://gpxdesign.vercel.app). It serves a Node.js Function at `/api/recognize-map` with Fluid Compute and a 120-second function limit. The Kimi key never enters `index.html` or the browser.
+
+The GitHub repository is connected to the Vercel project, so pushes to `main` deploy to production. `MOONSHOT_API_KEY` and the separate `TRAILCRAFT_ACCESS_TOKEN` are configured as sensitive Production variables. The owner access code is also stored in the ignored local `.env`; copy that value into the page's **Private app access code** field. The page discovers its same-origin endpoint automatically.
+
+Use these steps if the project must be recreated or its secrets rotated:
 
 1. Sign in at [Vercel](https://vercel.com/) with the GitHub account that can access `StanleyCheng/gpx_design`.
 2. Choose **Add New → Project**, import `StanleyCheng/gpx_design`, keep the repository root as the Root Directory and choose the Hobby plan only for personal, non-commercial use. `vercel.json` selects the Other framework preset, build command and `dist` output.
-3. Deploy once. The page will work, while recognition will return a safe configuration error until secrets are added.
+3. Deploy once. The page will work, while recognition returns a safe configuration error until secrets are added.
 4. Open **Project → Settings → Environment Variables**. Add these for **Production**:
    - `MOONSHOT_API_KEY`: copy the value from the ignored local `.env`; enable **Sensitive**.
    - `TRAILCRAFT_ACCESS_TOKEN`: generate a different random owner code with `openssl rand -hex 32`; enable **Sensitive**. Save this code in a password manager. Never use the Kimi key as this code.
@@ -26,7 +30,7 @@ GitHub Pages cannot keep a Kimi key or run the private server. This repository n
 6. Redeploy the latest production deployment. Vercel environment-variable changes apply only to new deployments.
 7. Open the production `*.vercel.app` URL. The page discovers its same-origin recognition endpoint automatically. Expand **Private recognition connection**, enter the `TRAILCRAFT_ACCESS_TOKEN` owner code, upload a map and select **Identify map & waypoints**. Never enter the Kimi key in the page.
 
-To keep using GitHub Pages, enter `https://YOUR-VERCEL-DOMAIN/api/recognize-map` and the owner code in its private connection fields. Both stay only in browser memory for the current visit. The Vercel function accepts the Vercel page on the same origin and only the extra origins listed in `ALLOWED_ORIGIN`.
+To keep using GitHub Pages, enter `https://gpxdesign.vercel.app/api/recognize-map` and the owner code in its private connection fields. Both stay only in browser memory for the current visit. The Vercel function accepts the Vercel page on the same origin and only the extra origins listed in `ALLOWED_ORIGIN`.
 
 Do not add the Kimi key to GitHub Actions, `vercel.json`, source files or any variable prefixed with `NEXT_PUBLIC_`. Production-only sensitive variables also prevent untrusted preview deployments from using the live Kimi account. There is no daily recognition quota; monitor Kimi usage and billing directly. A short three-attempts-per-minute guard remains per warm function instance.
 
