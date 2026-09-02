@@ -60,6 +60,10 @@ test('route backend rotates providers and returns only compact planned routes', 
   assert.match(calls[2], /maps\.mail\.ru/);
   assert.ok(body.result.routes.every(route => route.coords.length > 1));
   assert.equal(response.headers.get('cache-control'), 'private, no-store');
+  const repeated = await handler(routeRequest());
+  assert.equal(repeated.status, 200);
+  assert.equal(calls.length, 3, 'reuse cached backup before contacting the unavailable primary providers');
+  assert.match((await repeated.json()).source, /server cache/);
 });
 
 test('route backend turns upstream abort-style failures into a useful retry message', async () => {
@@ -69,6 +73,38 @@ test('route backend turns upstream abort-style failures into a useful retry mess
   const body = await response.json();
   assert.match(body.error, /All map providers failed/);
   assert.match(body.error, /Please retry; your waypoints are unchanged/);
+  assert.doesNotMatch(body.error, /fetch is aborted/);
+});
+
+test('an aborted provider attempt can fall back without cancelling the route request', async () => {
+  let calls = 0;
+  const handler = createRoutePlanHandler({ fetcher: async () => {
+    if (++calls === 1) throw new DOMException('The operation was aborted.', 'AbortError');
+    return Response.json(fixture());
+  } });
+  const response = await handler(routeRequest([{ lat: 22.00001, lon: 114.001 }, { lat: 22, lon: 114.004 }]));
+  assert.equal(response.status, 200);
+  assert.equal(calls, 2);
+  assert.equal((await response.json()).result.routes.length, 3);
+});
+
+test('a cancelled request never starts or retries map downloads', async () => {
+  let calls = 0;
+  const handler = createRoutePlanHandler({ fetcher: async () => { calls++; return Response.json(fixture()); } });
+  const controller = new AbortController();
+  const request = new Request(routeRequest(), { signal: controller.signal });
+  controller.abort();
+  const response = await handler(request);
+  assert.equal(response.status, 503);
+  assert.equal(calls, 0);
+  assert.equal((await response.json()).result, undefined);
+});
+
+test('route backend does not turn missing coordinates into zero', async () => {
+  const handler = createRoutePlanHandler({ fetcher: async () => { throw new Error('must not fetch'); } });
+  const response = await handler(routeRequest([{ lat: null, lon: 114.001 }]));
+  assert.equal(response.status, 400);
+  assert.match((await response.json()).error, /Waypoint 1 is invalid/);
 });
 
 test('route backend stops immediately when the map area response is oversized', async () => {

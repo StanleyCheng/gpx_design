@@ -50,15 +50,14 @@ function validateChoice(value, allowed, label) {
 }
 
 function validateNumber(value, allowed, label) {
-  const number = Number(value);
-  if (!allowed.includes(number)) throw new RequestError(`Choose a valid ${label}.`);
-  return number;
+  if (typeof value !== 'number' || !allowed.includes(value)) throw new RequestError(`Choose a valid ${label}.`);
+  return value;
 }
 
 function validateInput(input) {
   if (!input || !Array.isArray(input.points) || !input.points.length || input.points.length > 16) throw new RequestError('Use 1–16 valid waypoints.');
   const points = input.points.map((point, index) => {
-    const lat = Number(point?.lat), lon = Number(point?.lon);
+    const lat = point?.lat, lon = point?.lon;
     if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) >= 75 || Math.abs(lon) > 180) throw new RequestError(`Waypoint ${index + 1} is invalid.`);
     return { lat, lon, name: String(point.name || `Waypoint ${index + 1}`).slice(0, 160) };
   });
@@ -86,17 +85,25 @@ async function readJSON(response, maxBytes = MAX_MAP_BYTES) {
     throw new UpstreamError(`HTTP ${status}`, [429, 502, 503, 504].includes(status) ? status : 503);
   }
   const declared = Number(response.headers.get('content-length') || 0);
-  if (declared > maxBytes) throw new UpstreamError('response too large', 413);
+  if (declared > maxBytes) {
+    await response.body?.cancel().catch(() => {});
+    throw new UpstreamError('response too large', 413);
+  }
   const reader = response.body?.getReader();
   if (!reader) return response.json();
   const chunks = []; let size = 0;
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    size += value.length;
-    if (size > maxBytes) { await reader.cancel(); throw new UpstreamError('response too large', 413); }
-    chunks.push(value);
-  }
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.length;
+      if (size > maxBytes) throw new UpstreamError('response too large', 413);
+      chunks.push(value);
+    }
+  } catch (error) {
+    await reader.cancel().catch(() => {});
+    throw error;
+  } finally { reader.releaseLock(); }
   const buffer = new Uint8Array(size); let offset = 0;
   for (const chunk of chunks) { buffer.set(chunk, offset); offset += chunk.length; }
   try { return JSON.parse(new TextDecoder().decode(buffer)); }
@@ -116,11 +123,15 @@ function cachePut(cache, key, value, now) {
 
 async function fetchMapData(box, selected, fetcher, signal, now) {
   const choices = selected === 'auto' ? PROVIDER_ORDER : [selected];
+  signal.throwIfAborted();
+  // A cached backup is immediately usable; do not wait for earlier providers again.
+  for (const choice of choices) {
+    const cached = cacheGet(mapCache, `${choice}/${box.join(',')}`, now());
+    if (cached) return { data: cached, provider: PROVIDERS[choice], cached: true };
+  }
   const failures = [];
   for (const choice of choices) {
     const provider = PROVIDERS[choice], key = `${choice}/${box.join(',')}`;
-    const cached = cacheGet(mapCache, key, now());
-    if (cached) return { data: cached, provider, cached: true };
     try {
       const response = await fetcher(provider.url, {
         method: 'POST',
@@ -135,7 +146,7 @@ async function fetchMapData(box, selected, fetcher, signal, now) {
     } catch (error) {
       if (signal.aborted) throw error;
       if (error?.status === 413) throw new UpstreamError('The requested map area is too large. Use closer waypoints or a smaller transport search distance.', 413);
-      const reason = error?.name === 'TimeoutError' ? 'timeout' : error?.message || 'network error';
+      const reason = ['TimeoutError', 'AbortError'].includes(error?.name) ? 'timeout' : error instanceof UpstreamError ? error.message : 'network unavailable';
       failures.push(`${provider.name}: ${String(reason).slice(0, 80)}`);
     }
   }
@@ -190,11 +201,13 @@ export function createRoutePlanHandler(options = {}) {
       const timeout = setTimeout(() => controller.abort(new DOMException('Route backend timed out', 'TimeoutError')), ROUTE_TIMEOUT_MS);
       const clientAbort = () => controller.abort(request.signal.reason);
       request.signal.addEventListener('abort', clientAbort, { once: true });
+      if (request.signal.aborted) clientAbort();
       try {
         const [map, official] = await Promise.all([
           fetchMapData(box, input.provider, fetcher, controller.signal, now),
           fetchOfficialTrails(box, input.region, fetcher, controller.signal, now)
         ]);
+        controller.signal.throwIfAborted();
         const result = TrailRouter.plan(map.data, input.points, input.settings, official.features);
         return json(200, { result, source: `${map.provider.name} / OpenStreetMap${map.cached ? ' · server cache' : ''}`, officialNote: official.note }, origin);
       } finally {

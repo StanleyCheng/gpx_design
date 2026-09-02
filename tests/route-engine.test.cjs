@@ -86,7 +86,11 @@ test('optimised order retains all mandatory waypoints', () => {
 test('query size and large waypoint counts are bounded', () => {
   assert.throws(() => R.boundingBox([{ lat: 22, lon: 114 }, { lat: 35, lon: 139 }], 4000), /250/);
   assert.throws(() => R.plan(fixture(), Array(17).fill(points[0])), /1–16/);
-  assert.ok(R.queryFor(R.boundingBox(points, 2000)).includes('out body'));
+  const query = R.queryFor(R.boundingBox(points, 2000));
+  assert.ok(query.includes('out body qt'));
+  assert.ok(query.includes('relation(bw.paths)'));
+  assert.ok(query.includes('relation(bn.stopmembers)'));
+  assert.doesNotMatch(query, /relation\["route"[^\n]+\]\(/, 'never download every route relation intersecting the whole bounding box');
 });
 test('passenger entrance names inherit their station and restricted services are excluded', () => {
   const data = fixture(), n = data.elements.find(e => e.id === 4); n.tags = { railway: 'subway_entrance', ref: '2' };
