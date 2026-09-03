@@ -63,6 +63,7 @@ function validateInput(input) {
   });
   const settings = input.settings || {};
   if (typeof settings.optimize !== 'boolean') throw new RequestError('Choose a valid waypoint order setting.');
+  if (settings.loop !== undefined && typeof settings.loop !== 'boolean') throw new RequestError('Choose a valid Loop setting: on or off.');
   const radius = validateNumber(settings.radius, [1000, 2000, 4000, 6000], 'transport search distance');
   return {
     points,
@@ -74,7 +75,8 @@ function validateInput(input) {
       maxDistance: validateNumber(settings.maxDistance, [10000, 20000, 30000, 50000, 80000], 'maximum hike distance'),
       maxRoad: validateNumber(settings.maxRoad, [0, 500, 1500, 3000], 'road connector limit'),
       tolerance: validateNumber(settings.tolerance, [15, 30, 60], 'waypoint tolerance'),
-      optimize: Boolean(settings.optimize)
+      optimize: Boolean(settings.optimize),
+      loop: settings.loop === true
     }
   };
 }

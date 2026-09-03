@@ -185,3 +185,80 @@ test('arrival and departure checks are independent when only the finish needs ex
   assert.equal(route.end.extendedApproach, true);
   assert.deepEqual(route.ids, [4, 3, 2, 1]);
 });
+
+test('Loop defaults off; enabling it closes every route using real directed graph edges', () => {
+  const data = fixture(), normal = R.plan(data, points);
+  assert.equal(normal.settings.loop, false);
+  assert.notEqual(normal.routes[0].start.id, normal.routes[0].end.id);
+  const result = R.plan(data, points, { loop: true, optimize: false });
+  const graph = R.buildGraph(data);
+  assert.ok(result.routes.length >= 1 && result.routes.length <= 3);
+  for (const route of result.routes) {
+    assert.equal(route.loop, true);
+    assert.equal(route.start.id, route.end.id);
+    assert.deepEqual(route.coords[0], route.coords.at(-1));
+    assert.deepEqual(route.order, [0, 1]);
+    assert.ok(route.ids.indexOf(3, route.ids.indexOf(2)) > route.ids.indexOf(2));
+    route.ids.slice(1).forEach((id, i) => assert.ok(graph.adj.get(route.ids[i]).some(e => e.to === id), 'including the last edge back to the start'));
+    assert.ok(route.metres >= result.routes[0].metres - .01);
+  }
+  const tree = R.search(graph, 2, 'distance', new Map());
+  const expected = 2 * (tree.length.get(1) + tree.length.get(3));
+  assert.ok(Math.abs(result.routes[0].metres - expected) < .01, 'the first loop uses the shortest in-order walk, including return');
+});
+
+test('loops require a shared stop with both passenger roles and a mapped return', () => {
+  const data = fixture();
+  data.elements.find(e => e.id === 501).members[0].role = 'platform_exit_only';
+  data.elements.find(e => e.id === 502).members[0].role = 'platform_entry_only';
+  assert.ok(R.plan(data, points).routes.length);
+  assert.throws(() => R.plan(data, points, { ...extended, loop: true }), error => error.code === 'NO_TRANSPORT' && /shared start\/finish/.test(error.message));
+  const directed = fixture();
+  directed.elements.filter(e => e.type === 'way').forEach(e => { e.tags['oneway:foot'] = 'yes'; });
+  assert.ok(R.plan(directed, points).routes.length);
+  assert.throws(() => R.plan(directed, points, { ...extended, loop: true }), /one-way path without a mapped return/);
+});
+
+test('a shared loop stop is matched before nearby-stop pruning and the 12-stop shortlist', () => {
+  const { data, points } = transportNetwork({ nearStart: true });
+  // Nearby arrival-only / departure-only stops cannot form a loop. Only the
+  // farther stop at node 1 has both roles, so it needs the existing expansion.
+  data.elements.find(e => e.id === 501).members[0].role = 'platform';
+  for (let i = 0; i < 15; i++) {
+    data.elements.push({ type: 'node', id: 1000 + i, ...points[0], tags: { highway: 'bus_stop' } });
+    data.elements.push({ type: 'relation', id: 2000 + i, tags: { route: 'bus' }, members: [{ type: 'node', ref: 1000 + i, role: 'platform_exit_only' }] });
+  }
+  assert.throws(() => R.plan(data, points, { loop: true }), error => error.code === 'NO_TRANSPORT' && error.endpointIndices.join(',') === '0,1');
+  const route = R.plan(data, points, { ...extended, loop: true }).routes[0];
+  assert.equal(route.start.id, 1); assert.equal(route.end.id, 1);
+  assert.ok(route.start.extendedApproach && route.end.extendedApproach);
+  assert.deepEqual(route.ids, [1, 5, 2, 3, 2, 5, 1]);
+});
+
+test('loop returns count toward distance and road limits; no partial open route is substituted', () => {
+  const normal = R.plan(fixture(), points, { optimize: false }).routes[0];
+  assert.throws(() => R.plan(fixture(), points, { loop: true, maxDistance: normal.metres + 10 }), error => error.code === 'ROUTE_LIMITS' && /loop returning/.test(error.message));
+  const data = fixture();
+  data.elements.filter(e => e.type === 'way').forEach(e => { e.tags.highway = 'residential'; });
+  assert.throws(() => R.plan(data, points, { loop: true, maxRoad: normal.metres + 10 }), /road limit/);
+});
+
+test('reordered loop alternatives retain the common stop and every mandatory pin', () => {
+  const { data } = transportNetwork({ nearStart: true });
+  data.elements.filter(e => e.type === 'relation').forEach(e => { e.members[0].role = 'platform'; });
+  const input = [.006, .002, .01, .004].map(lon => ({ lat: 22.05, lon: 114 + lon }));
+  const result = R.plan(data, input, { ...extended, loop: true, optimize: true });
+  assert.deepEqual(result.routes[0].order, [0, 1, 2, 3]);
+  assert.ok(result.routes.some(r => !r.preservesOrder && r.metres < result.routes[0].metres));
+  for (const route of result.routes) {
+    assert.equal(route.start.id, route.end.id);
+    assert.deepEqual(route.coords[0], route.coords.at(-1));
+    assert.deepEqual([...route.order].sort(), [0, 1, 2, 3]);
+  }
+});
+
+test('a single mandatory pin can make an out-and-back loop without dropping that pin', () => {
+  const route = R.plan(fixture(), [points[0]], { loop: true }).routes[0];
+  assert.deepEqual(route.ids, [1, 2, 1]);
+  assert.deepEqual(route.order, [0]);
+});

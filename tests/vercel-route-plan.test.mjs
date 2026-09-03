@@ -19,7 +19,7 @@ function fixture() {
   return { elements: [...nodes, ...ways, ...relations], osm3s: { timestamp_osm_base: '2026-08-31T00:00:00Z' } };
 }
 
-function routeRequest(points = [{ lat: 22, lon: 114.001 }, { lat: 22, lon: 114.004 }], origin = 'https://gpxdesign.vercel.app') {
+function routeRequest(points = [{ lat: 22, lon: 114.001 }, { lat: 22, lon: 114.004 }], origin = 'https://gpxdesign.vercel.app', settings = {}) {
   return new Request('https://gpxdesign.vercel.app/api/plan-routes', {
     method: 'POST',
     headers: { Origin: origin, 'Content-Type': 'application/json' },
@@ -27,7 +27,7 @@ function routeRequest(points = [{ lat: 22, lon: 114.001 }, { lat: 22, lon: 114.0
       points,
       provider: 'auto',
       region: 'world',
-      settings: { radius: 1000, maxDistance: 30000, maxRoad: 1500, tolerance: 30, optimize: false }
+      settings: { radius: 1000, maxDistance: 30000, maxRoad: 1500, tolerance: 30, optimize: false, ...settings }
     })
   });
 }
@@ -53,6 +53,7 @@ test('route backend rotates providers and returns only compact planned routes', 
   assert.equal(response.status, 200);
   const body = await response.json();
   assert.equal(body.result.routes.length, 3);
+  assert.equal(body.result.settings.loop, false, 'older clients retain normal routing when Loop is omitted');
   assert.match(body.source, /VK Maps \/ OpenStreetMap/);
   assert.equal(calls.length, 3);
   assert.match(calls[0], /overpass-api\.de/);
@@ -161,4 +162,35 @@ test('backend stops at 10 km and reports the missing start, not a generic server
   assert.match(body.error, /start before waypoint 1/);
   assert.match(body.error, /10 km maximum was reached/);
   assert.equal(calls, 2);
+});
+
+test('backend carries Loop through transport expansion and returns only closed tracks', async () => {
+  const { data, points } = transportNetwork({ lat: 22.25, nearStart: true });
+  data.elements.find(e => e.id === 501).members[0].role = 'platform';
+  const queries = [];
+  const handler = createRoutePlanHandler({ fetcher: async (url, options) => {
+    queries.push(options.body.get('data'));
+    return Response.json(data);
+  } });
+  const response = await handler(routeRequest(points, undefined, { loop: true }));
+  assert.equal(response.status, 200);
+  const { result } = await response.json();
+  assert.equal(result.settings.loop, true);
+  assert.equal(result.transportExpanded, true);
+  assert.equal(queries.length, 2);
+  assert.match(queries[1], /around:10000,22.250000,114.000000/);
+  assert.match(queries[1], /around:10000,22.250000,114.010000/);
+  for (const route of result.routes) {
+    assert.equal(route.start.id, 1); assert.equal(route.end.id, 1);
+    assert.deepEqual(route.coords[0], route.coords.at(-1));
+  }
+});
+
+test('backend rejects ambiguous Loop values before fetching any map data', async () => {
+  const handler = createRoutePlanHandler({ fetcher: async () => { throw new Error('must not fetch'); } });
+  for (const loop of ['false', 1, null]) {
+    const response = await handler(routeRequest(undefined, undefined, { loop }));
+    assert.equal(response.status, 400);
+    assert.match((await response.json()).error, /valid Loop setting/);
+  }
 });
