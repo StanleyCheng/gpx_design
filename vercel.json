@@ -8,7 +8,7 @@
       "maxDuration": 120
     },
     "api/plan-routes.mjs": {
-      "maxDuration": 120
+      "maxDuration": 240
     }
   }
 }

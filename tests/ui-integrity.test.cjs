@@ -94,11 +94,11 @@ test('map-first route controls support colored combinations and individual or co
   assert.doesNotMatch(html, /map-pin-action/);
   assert.match(html, /map-route-action.*find-routes/);
   assert.match(html, /--dock-visible-height/);
-  assert.match(planner, /toast\(text, true, 9000\)/);
+  assert.match(planner, /toast\(text, true, 0\)/);
 });
 
 test('route limits include the compact transport search and long-hike choices', () => {
-  assert.match(html, /<option value="1000" selected>1 km per end<\/option>/);
+  assert.match(html, /<option value="1000" selected>1 km first · up to 10 km if needed<\/option>/);
   assert.match(html, /<option value="80000">80 km<\/option>/);
 });
 

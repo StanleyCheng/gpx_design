@@ -7,7 +7,7 @@ const MAX_REQUEST_BYTES = 20_000;
 const MAX_MAP_BYTES = 64 * 1024 * 1024;
 const CACHE_TTL_MS = 10 * 60 * 1000;
 const PROVIDER_TIMEOUT_MS = 30_000;
-const ROUTE_TIMEOUT_MS = 110_000;
+const ROUTE_TIMEOUT_MS = 220_000;
 const PROVIDERS = {
   coffee: { name: 'Private.coffee', url: 'https://overpass.private.coffee/api/interpreter' },
   vk: { name: 'VK Maps', url: 'https://maps.mail.ru/osm/tools/overpass/api/interpreter' },
@@ -70,7 +70,7 @@ function validateInput(input) {
     region: validateChoice(input.region || 'world', ['hk', 'tw', 'jp', 'kr', 'world'], 'region'),
     settings: {
       radius,
-      maxApproach: radius,
+      maxApproach: 1000,
       maxDistance: validateNumber(settings.maxDistance, [10000, 20000, 30000, 50000, 80000], 'maximum hike distance'),
       maxRoad: validateNumber(settings.maxRoad, [0, 500, 1500, 3000], 'road connector limit'),
       tolerance: validateNumber(settings.tolerance, [15, 30, 60], 'waypoint tolerance'),
@@ -121,21 +121,22 @@ function cachePut(cache, key, value, now) {
   while (cache.size > 8) cache.delete(cache.keys().next().value);
 }
 
-async function fetchMapData(box, selected, fetcher, signal, now) {
+async function fetchMapData(box, selected, fetcher, signal, now, areas = []) {
   const choices = selected === 'auto' ? PROVIDER_ORDER : [selected];
+  const query = TrailRouter.queryFor(box, areas);
   signal.throwIfAborted();
   // A cached backup is immediately usable; do not wait for earlier providers again.
   for (const choice of choices) {
-    const cached = cacheGet(mapCache, `${choice}/${box.join(',')}`, now());
+    const cached = cacheGet(mapCache, `${choice}/${query}`, now());
     if (cached) return { data: cached, provider: PROVIDERS[choice], cached: true };
   }
   const failures = [];
   for (const choice of choices) {
-    const provider = PROVIDERS[choice], key = `${choice}/${box.join(',')}`;
+    const provider = PROVIDERS[choice], key = `${choice}/${query}`;
     try {
       const response = await fetcher(provider.url, {
         method: 'POST',
-        body: new URLSearchParams({ data: TrailRouter.queryFor(box) }),
+        body: new URLSearchParams({ data: query }),
         headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', 'User-Agent': 'TrailPlanner/1.0 (+https://gpxdesign.vercel.app/)', Referer: 'https://gpxdesign.vercel.app/' },
         signal: AbortSignal.any([signal, AbortSignal.timeout(PROVIDER_TIMEOUT_MS)])
       });
@@ -145,7 +146,7 @@ async function fetchMapData(box, selected, fetcher, signal, now) {
       return { data, provider, cached: false };
     } catch (error) {
       if (signal.aborted) throw error;
-      if (error?.status === 413) throw new UpstreamError('The requested map area is too large. Use closer waypoints or a smaller transport search distance.', 413);
+      if (error?.status === 413) throw new UpstreamError(areas.length ? 'The 10 km transport extension exceeded the map download size limit. Try a waypoint closer to a serviced trailhead; no partial route was used.' : 'The requested map area is too large. Use closer waypoints or a smaller transport search distance.', 413);
       const reason = ['TimeoutError', 'AbortError'].includes(error?.name) ? 'timeout' : error instanceof UpstreamError ? error.message : 'network unavailable';
       failures.push(`${provider.name}: ${String(reason).slice(0, 80)}`);
     }
@@ -203,12 +204,24 @@ export function createRoutePlanHandler(options = {}) {
       request.signal.addEventListener('abort', clientAbort, { once: true });
       if (request.signal.aborted) clientAbort();
       try {
-        const [map, official] = await Promise.all([
+        let [map, official] = await Promise.all([
           fetchMapData(box, input.provider, fetcher, controller.signal, now),
           fetchOfficialTrails(box, input.region, fetcher, controller.signal, now)
         ]);
         controller.signal.throwIfAborted();
-        const result = TrailRouter.plan(map.data, input.points, input.settings, official.features);
+        let result;
+        try { result = TrailRouter.plan(map.data, input.points, input.settings, official.features); }
+        catch (error) {
+          const areas = TrailRouter.transportExpansion(input.points, error);
+          if (!areas.length) throw error;
+          [map, official] = await Promise.all([
+            fetchMapData(box, input.provider, fetcher, controller.signal, now, areas),
+            fetchOfficialTrails(TrailRouter.coverageBox(box, areas), input.region, fetcher, controller.signal, now)
+          ]);
+          controller.signal.throwIfAborted();
+          result = TrailRouter.plan(map.data, input.points, { ...input.settings, radius: 10000, maxApproach: 10000 }, official.features);
+          result.transportExpanded = true;
+        }
         return json(200, { result, source: `${map.provider.name} / OpenStreetMap${map.cached ? ' · server cache' : ''}`, officialNote: official.note }, origin);
       } finally {
         clearTimeout(timeout);
@@ -223,8 +236,8 @@ export function createRoutePlanHandler(options = {}) {
         const message = status === 413 ? `${error.message} Your waypoints are unchanged.` : timedOut ? 'The route backend timed out while waiting for map data. Please retry; your waypoints are unchanged.' : `${error.message} Please retry; your waypoints are unchanged.`;
         return json(status, { error: message }, origin);
       }
-      const message = String(error?.message || 'No safe connected route met the selected limits.').slice(0, 600);
-      return json(422, { error: message }, origin);
+      const message = String(error?.message || 'No connected route met the selected limits.').slice(0, 1200);
+      return json(422, { error: message, code: error?.code }, origin);
     }
   };
 }

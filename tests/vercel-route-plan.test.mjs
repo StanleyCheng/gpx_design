@@ -118,3 +118,47 @@ test('route backend stops immediately when the map area response is oversized', 
   assert.equal(calls, 1);
   assert.match((await response.json()).error, /closer waypoints or a smaller transport search distance/);
 });
+
+const { default: transportNetwork } = await import('./fixtures/transport-network.cjs');
+test('backend retries only a missing transport end, with a separate expanded cache entry', async () => {
+  const { data, points } = transportNetwork({ lat: 22.15 });
+  const queries = [];
+  const handler = createRoutePlanHandler({ fetcher: async (url, options) => {
+    const query = options.body.get('data'); queries.push(query);
+    return Response.json(data);
+  } });
+  const response = await handler(routeRequest(points));
+  assert.equal(response.status, 200);
+  const body = await response.json();
+  assert.equal(queries.length, 2);
+  assert.doesNotMatch(queries[0], /around:/);
+  assert.match(queries[1], /around:10000,22.150000,114.000000/);
+  assert.doesNotMatch(queries[1], /around:10000,22.150000,114.010000/);
+  assert.equal(body.result.transportExpanded, true);
+  assert.equal(body.result.routes[0].start.extendedApproach, true);
+  assert.equal(body.result.routes[0].end.extendedApproach, false);
+  assert.equal((await handler(routeRequest(points))).status, 200);
+  assert.equal(queries.length, 2, 'both initial and expanded queries are cached independently');
+});
+test('backend returns a specific off-path pin reason without a pointless transport expansion', async () => {
+  let calls = 0;
+  const handler = createRoutePlanHandler({ fetcher: async () => { calls++; return Response.json(fixture()); } });
+  const response = await handler(routeRequest([{ lat: 22.001, lon: 114.007 }]));
+  assert.equal(response.status, 422);
+  const body = await response.json();
+  assert.equal(body.code, 'WAYPOINT_OFF_PATH');
+  assert.match(body.error, /Waypoint 1 has no eligible path within 30 m/);
+  assert.equal(calls, 1);
+});
+test('backend stops at 10 km and reports the missing start, not a generic server error', async () => {
+  const { data, points } = transportNetwork({ lat: 22.2, detour: true });
+  let calls = 0;
+  const handler = createRoutePlanHandler({ fetcher: async () => { calls++; return Response.json(data); } });
+  const response = await handler(routeRequest(points));
+  assert.equal(response.status, 422);
+  const body = await response.json();
+  assert.equal(body.code, 'NO_TRANSPORT');
+  assert.match(body.error, /start before waypoint 1/);
+  assert.match(body.error, /10 km maximum was reached/);
+  assert.equal(calls, 2);
+});

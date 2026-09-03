@@ -1,4 +1,18 @@
-# Routing and recognition validation — 2026-09-01
+# Routing and interface validation — 2026-09-03
+
+`npm test`: **62 passing tests**. The new cases exercise independent 1 km / 10 km arrival and departure checks, long walking detours despite geographically nearby stops, separate extension cache keys, strict and optional pin order, genuinely shorter reordered visits, source geometry and specific failure causes. The first distance search now uses metres without hidden road or step weights; other profiles prefer mapped trails. Known unclear/impassable tags are excluded from every profile.
+
+A fresh Hong Kong backend integration run downloaded 49,593 OSM elements (5.96 MB) after a missing-transport extension, and returned three routes in 47 seconds including provider fallback and AFCD lookup. The previously failing sample (22.3893078, 114.3664416 → 22.3913284, 114.3663188) now has a 2.669 km first candidate in pin order, starting and finishing near Sai Wan Pavilion, with 1.214 km arrival and 1.051 km exit walks. Alternatives were 7.122 km and 7.612 km. All 2,394 generated segments across the three routes were checked against their actual downloaded OSM way segments. The downloaded OSM snapshot reports 2026-05-31; this is a software validation sample, not a hiking recommendation or proof of current conditions or transit service.
+
+Browser checks used WebKit’s iPhone 16 Pro Max profile (440 CSS px wide) and desktop Chrome at 1280 × 800, alongside the earlier 1440 × 900, 615 × 773 and 320 px layout checks. Method-stage switching, scrolling, map pin deletion, ordering, coloured route toggles, Details and GPX download passed without horizontal page overflow. The live-backend response was replayed for repeatable visual/export checks; provider fallback was separately exercised in-browser with a deterministic network fixture and two actual worker calculations (initial 1 km, extended 10 km). The exported first-route GPX parsed correctly with 357 track points, visit order and approach/gap warnings. A mocked 422 failure preserved both input pins, hid stale route controls, and kept its specific reason visible above the collapsed dock. A physical iPhone has not been tested.
+
+The control panel now uses five stage tabs, no visible text when minimized, input-specific tools and an external Details dialog. Informational panels are hidden inside the dock; necessary file actions and route/waypoint data remain. Loop start and finish markers are separated so neither letter hides the other.
+
+Map matching follows downloaded geometry, with no invented joins. Missing access, terrain, permit, closure, timetable and real-world accuracy checks remain unresolved. A route’s provisional status and data timestamp are retained in the app and GPX. The core area is limited to 250 km² with at most two additional 10 km transport circles; downloads and graph size remain bounded. The shortest-found label refers to searched candidates, not a proof of the globally shortest constrained itinerary. Reordering is bounded to 8 pins; larger drafts retain pin order.
+
+---
+
+## Earlier validation record (2026-09-01)
 
 ## Automated checks
 

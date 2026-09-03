@@ -59,7 +59,7 @@ test('a stop without a transport service never qualifies', () => {
 });
 test('disconnected paths and missing source geometry fail closed', () => {
   const data = fixture(); data.elements = data.elements.filter(e => ![102, 103, 104].includes(e.id));
-  assert.throws(() => R.plan(data, points), /cannot all be connected/);
+  assert.throws(() => R.plan(data, points), /Waypoint 1 → waypoint 2 cannot be connected/);
   const missing = fixture(); missing.elements = missing.elements.filter(e => e.id !== 5);
   assert.throws(() => R.plan(missing, points), /geometry is missing/);
   assert.throws(() => R.plan({ ...fixture(), remark: 'runtime timeout' }, points), /incomplete data/);
@@ -76,7 +76,7 @@ test('distance and road limits are not silently relaxed', () => {
 test('foot one-way affects connectivity and reversal', () => {
   const data = fixture(); data.elements.filter(e => e.type === 'way').forEach(e => { e.tags['oneway:foot'] = 'yes'; });
   const result = R.plan(data, points); assert.equal(result.routes[0].reversible, false);
-  assert.throws(() => R.plan(data, [...points].reverse()), /cannot all be connected/);
+  assert.throws(() => R.plan(data, [...points].reverse(), { optimize: false }), /Waypoint 1 → waypoint 2 cannot be connected/);
 });
 test('optimised order retains all mandatory waypoints', () => {
   const input = [points[1], points[0], { lat: 22.001, lon: 114.002 }];
@@ -101,4 +101,87 @@ test('passenger entrance names inherit their station and restricted services are
   assert.equal(R.transportStops(R.buildGraph(data), points, 4000).stops.some(s=>s.id===1), false);
   assert.equal(R.passableNode({tags:{highway:'ford'}}), false);
   assert.equal(R.walkable({highway:'path',disused:'yes'}), false);
+});
+
+const transportNetwork = require('./fixtures/transport-network.cjs');
+const extended = { radius: 10000, maxApproach: 10000, optimize: false };
+test('missing arrival transport widens only the start and preserves a nearby finish', () => {
+  const { data, points } = transportNetwork();
+  let failure;
+  assert.throws(() => R.plan(data, points, { optimize: false }), error => { failure = error; return error.code === 'NO_TRANSPORT' && /start before waypoint 1/.test(error.message) && !/finish after/.test(error.message); });
+  assert.deepEqual(failure.endpointIndices, [0]);
+  const areas = R.transportExpansion(points, failure);
+  assert.deepEqual(areas, [{ ...points[0], radius: 10000 }]);
+  const result = R.plan(data, points, extended), route = result.routes[0];
+  assert.equal(route.start.id, 1); assert.equal(route.end.id, 4);
+  assert.equal(route.start.extendedApproach, true); assert.equal(route.end.extendedApproach, false);
+  assert.ok(route.start.approach > 2000 && route.start.approach < 2200);
+  assert.ok(route.end.approach < 400);
+  assert.deepEqual(route.ids, [1, 2, 3, 4]);
+  assert.ok(Math.abs(route.metres - (route.start.approach + R.distance(points[0], points[1]) + route.end.approach)) < .01);
+  assert.throws(() => R.plan(data, points, { ...extended, maxDistance: 2000 }), error => error.code === 'ROUTE_LIMITS' && /including both approaches/.test(error.message));
+});
+test('reachable transport within 1 km takes priority over farther services after expansion', () => {
+  const { data, points } = transportNetwork({ nearStart: true });
+  const result = R.plan(data, points, extended);
+  assert.ok(result.routes.every(r => r.start.id === 5 && !r.start.extendedApproach));
+});
+test('10 km is walking distance, not a straight-line circle; no detour is bridged', () => {
+  const { data, points } = transportNetwork({ detour: true });
+  assert.ok(R.distance(points[0], data.elements[0]) < 1000);
+  assert.throws(() => R.plan(data, points, extended), error => error.code === 'NO_TRANSPORT' && /10 km maximum was reached/.test(error.message));
+});
+test('first route minimizes metres in pin order, without hidden road penalties', () => {
+  const data = fixture();
+  data.elements.push({ type: 'way', id: 106, nodes: [2, 3], tags: { highway: 'residential', foot: 'yes' } });
+  const result = R.plan(data, points, { optimize: true });
+  assert.deepEqual(result.routes[0].order, [0, 1]);
+  assert.deepEqual(result.routes[0].ids, [1, 2, 3, 4]);
+  assert.ok(result.routes[0].edges.some(e => e.way === 106));
+  assert.ok(result.routes.some(r => r.roadMetres === 0), 'a trail option remains available');
+  assert.ok(result.routes.every(r => r.metres >= result.routes[0].metres - .01));
+});
+test('a shorter reordered alternative follows, never replaces, the valid pin-order route', () => {
+  const { data } = transportNetwork({ nearStart: true });
+  const input = [{ lat: 22.05, lon: 114.006 }, { lat: 22.05, lon: 114.002 }, { lat: 22.05, lon: 114.01 }];
+  const result = R.plan(data, input, { ...extended, optimize: true });
+  assert.deepEqual(result.routes[0].order, [0, 1, 2]);
+  const reordered = result.routes.find(r => !r.preservesOrder);
+  assert.ok(reordered, 'a different visit order is useful even if it shares path edges');
+  assert.ok(reordered.metres < result.routes[0].metres);
+  assert.deepEqual([...reordered.order].sort(), [0, 1, 2]);
+  assert.match(reordered.reason, /shorter/);
+  assert.ok(R.plan(data, input, extended).routes.every(r => r.preservesOrder));
+});
+test('one-way ordered failure is explained when reordering produces a qualifying route', () => {
+  const data = fixture(); data.elements.filter(e => e.type === 'way').forEach(e => { e.tags['oneway:foot'] = 'yes'; });
+  const result = R.plan(data, [...points].reverse(), { optimize: true });
+  assert.deepEqual(result.routes[0].order, [1, 0]);
+  assert.match(result.notices[0], /Waypoint 1 → waypoint 2 cannot be connected/);
+  assert.equal(result.routes[0].reversible, false);
+});
+test('unclear or impassable tagged paths never enter any variant', () => {
+  for (const tags of [{ trail_visibility: 'intermediate' }, { smoothness: 'impassable' }, { via_ferrata_scale: '2' }]) {
+    const data = fixture(); data.elements.filter(e => e.type === 'way').forEach(e => Object.assign(e.tags, tags));
+    assert.throws(() => R.plan(data, points), /No eligible walking network/);
+  }
+});
+test('transport query expands only missing ends and rejects unbounded areas', () => {
+  const box = R.boundingBox(points, 1000);
+  const query = R.queryFor(box, [{ ...points[0], radius: 10000 }]);
+  assert.match(query, /around:10000,22.000000,114.001000/);
+  assert.doesNotMatch(query, /around:10000,22.000000,114.004000/);
+  assert.ok(query.includes(box.join(',')), 'the complete core waypoint area is retained');
+  assert.deepEqual(R.transportExpansion(points, { code: 'WAYPOINT_OFF_PATH' }), []);
+  assert.throws(() => R.queryFor(box, [{ ...points[0], radius: 50000 }]), /at most two/);
+});
+test('arrival and departure checks are independent when only the finish needs extension', () => {
+  const { data, points } = transportNetwork();
+  data.elements.filter(e => e.type === 'relation').forEach(r => { r.members[0].role = r.members[0].ref === 4 ? 'platform_exit_only' : 'platform_entry_only'; });
+  const reversed = [...points].reverse();
+  assert.throws(() => R.plan(data, reversed, { optimize: false }), error => error.code === 'NO_TRANSPORT' && error.endpointIndices.join(',') === '1' && /finish after waypoint 2/.test(error.message));
+  const route = R.plan(data, reversed, extended).routes[0];
+  assert.equal(route.start.extendedApproach, false);
+  assert.equal(route.end.extendedApproach, true);
+  assert.deepEqual(route.ids, [4, 3, 2, 1]);
 });
