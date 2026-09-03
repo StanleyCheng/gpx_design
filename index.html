@@ -1180,7 +1180,13 @@
     const today = new Date(); $('plan-date').value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     function reversePlannedRoute() {
       const r = routing.selected; if (!r || !r.reversible) return;
-      [r.start, r.end] = [r.end, r.start]; r.coords.reverse(); r.ids.reverse(); r.edges.reverse(); r.order.reverse(); showRoutes(); routeDetails(); render(); toast('Route reversed. Review arrival, departure and trail access again before saving.');
+      r.originalTitle ??= r.title; r.originalReason ??= r.reason;
+      r.reversed = !r.reversed;
+      [r.start, r.end] = [r.end, r.start]; r.coords.reverse(); r.ids.reverse(); r.edges.reverse(); r.order.reverse();
+      r.preservesOrder = r.order.every((index, visit) => index === visit);
+      r.title = r.reversed ? `${r.originalTitle} · reversed` : r.originalTitle;
+      r.reason = r.reversed ? 'Reversed by you. Check the new visit order, arrival and departure below.' : r.originalReason;
+      showRoutes(); routeDetails(); render(); toast('Route reversed. Review arrival, departure and trail access again before saving.');
     }
     function plannedGPX(r) {
       const warning = `PROVISIONAL ROUTE — independently check before navigation. Connected OSM walking ways only; no artificial connectors. Start near ${r.start.name} (${km(r.start.approach)} approach, ${Math.ceil(r.start.accessGap)} m unrouted stop gap); end near ${r.end.name} (${km(r.end.approach)} exit, ${Math.ceil(r.end.accessGap)} m gap). Transport approaches prefer 1 km, extending up to 10 km only when needed. Visit order: ${r.order.map(i => i + 1).join(" → ")}. All ${state.points.length} mandatory waypoints visited within the explicitly accepted ${$('plan-tolerance').value} m tolerance. OSM snapshot ${r.osmTimestamp || 'unknown'}. Hiking date ${$('plan-date').value}. Timetables, closures, permits, terrain and management are not automatically verified. OpenStreetMap contributors, ODbL: https://www.openstreetmap.org/copyright. AFCD corridor matches, where available, are approximate. No elevation invented.`;
