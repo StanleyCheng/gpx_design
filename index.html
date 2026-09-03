@@ -1886,7 +1886,9 @@
     }
     if (window.L) {
       map = L.map('map', { zoomControl: false, scrollWheelZoom: true, touchZoom: true, dragging: true, tapHold: true, worldCopyJump: true, minZoom: 2, maxZoom: 19 }).setView([22.36, 114.24], 10);
-      tileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, crossOrigin: 'anonymous', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }).addTo(map);
+      // Keep the required map credit visible, without optional library branding.
+      map.attributionControl.setPrefix(false);
+      tileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, crossOrigin: 'anonymous', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" aria-label="OpenStreetMap contributors and licence">OpenStreetMap</a>' }).addTo(map);
       markers = L.layerGroup().addTo(map); tracks = L.layerGroup().addTo(map);
       map.on('click', event => { if (!state.adding) return; if (state.points.length >= MAX_WAYPOINTS) { toast(`Maximum ${MAX_WAYPOINTS} waypoints.`); return; } const p = event.latlng.wrap(), number = state.points.length + 1; mutateWaypoints(() => { state.points.push({ ...point(p.lat, p.lng, `Map waypoint ${number}`), manual: true }); state.source = 'Manual map pins'; }, `Waypoint ${number} added.`); track('map_pin_added'); });
       tileLayer.on('tileerror', () => { toast('Some basemap tiles could not load. Check your connection; do not infer paths from missing tiles.'); });
