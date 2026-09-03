@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRoutePlanHandler } from '../api/plan-routes.mjs';
+import fiftyWaypoints from './fixtures/fifty-waypoints.cjs';
 
 function fixture() {
   const nodes = [
@@ -39,6 +40,25 @@ test('route backend rejects foreign origins and supports local-file preflight', 
   assert.equal(preflight.status, 204);
   assert.equal(preflight.headers.get('access-control-allow-origin'), 'null');
   assert.equal(preflight.headers.get('x-trailplanner-route-backend'), '1');
+});
+test('backend accepts 50 named waypoints and rejects 51 before fetching', async () => {
+  const { data, points } = fiftyWaypoints();
+  const named = points.map(p => ({ ...p, name: '山'.repeat(160) }));
+  let fetches = 0;
+  const handler = createRoutePlanHandler({ fetcher: async () => {
+    fetches++;
+    return Response.json(data);
+  } });
+  const response = await handler(routeRequest(named));
+  assert.equal(response.status, 200);
+  const body = await response.json();
+  assert.ok(body.result.routes.length);
+  assert.ok(body.result.routes.every(route => route.snaps.length === 50 && route.order.length === 50));
+  assert.equal(fetches, 1);
+  const rejected = await handler(routeRequest([...named, named[0]]));
+  assert.equal(rejected.status, 400);
+  assert.match((await rejected.json()).error, /1–50/);
+  assert.equal(fetches, 1, 'an oversized waypoint list must not trigger a map request');
 });
 
 test('route backend rotates providers and returns only compact planned routes', async () => {

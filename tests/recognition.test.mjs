@@ -6,7 +6,15 @@ const image = 'data:image/png;base64,' + Buffer.from([137,80,78,71,13,10,26,10,0
 test('uncertain/invalid coordinates cannot silently become usable pins', () => {
   const r = normalizeRecognition({ ...result, waypoints: [{ ...result.waypoints[0], basis: 'unknown' }, { ...result.waypoints[0], lat: null }, { ...result.waypoints[0], lat: '25' }] });
   assert.ok(r.waypoints.every(p => p.lat === null && p.lon === null));
-  assert.throws(() => normalizeRecognition({ ...result, waypoints: Array(17).fill(result.waypoints[0]) }));
+  assert.throws(() => normalizeRecognition({ ...result, waypoints: Array(51).fill(result.waypoints[0]) }));
+});
+test('recognition retains all 50 candidate pins without inventing uncertain locations', () => {
+  const waypoints = Array.from({ length: 50 }, (_, i) => ({ ...result.waypoints[0], label: `Pin ${i + 1}`, basis: i === 49 ? 'unknown' : 'printed_coordinates' }));
+  const normalized = normalizeRecognition({ ...result, waypoints });
+  assert.equal(normalized.waypoints.length, 50);
+  assert.equal(normalized.waypoints[48].lat, 25);
+  assert.equal(normalized.waypoints[49].label, 'Pin 50');
+  assert.equal(normalized.waypoints[49].lat, null);
 });
 test('image URL fetching and absent consent are rejected', () => {
   assert.throws(() => validateInput({ image, consent: false }));

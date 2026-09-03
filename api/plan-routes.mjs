@@ -3,7 +3,7 @@ import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const TrailRouter = require('../lib/route-engine.js');
 
-const MAX_REQUEST_BYTES = 20_000;
+const MAX_REQUEST_BYTES = 64_000;
 const MAX_MAP_BYTES = 64 * 1024 * 1024;
 const CACHE_TTL_MS = 10 * 60 * 1000;
 const PROVIDER_TIMEOUT_MS = 30_000;
@@ -55,7 +55,7 @@ function validateNumber(value, allowed, label) {
 }
 
 function validateInput(input) {
-  if (!input || !Array.isArray(input.points) || !input.points.length || input.points.length > 16) throw new RequestError('Use 1–16 valid waypoints.');
+  if (!input || !Array.isArray(input.points) || !input.points.length || input.points.length > TrailRouter.MAX_WAYPOINTS) throw new RequestError(`Use 1–${TrailRouter.MAX_WAYPOINTS} valid waypoints.`);
   const points = input.points.map((point, index) => {
     const lat = point?.lat, lon = point?.lon;
     if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) >= 75 || Math.abs(lon) > 180) throw new RequestError(`Waypoint ${index + 1} is invalid.`);

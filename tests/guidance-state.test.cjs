@@ -7,7 +7,7 @@ const vm = require('node:vm');
 const source = readFileSync(join(__dirname, '..', 'lib', 'guidance-ui.js'), 'utf8');
 const stateStart = source.indexOf('// BEGIN GUIDANCE STATE');
 const stateEnd = source.indexOf('// END GUIDANCE STATE') + '// END GUIDANCE STATE'.length;
-const stateContext = {};
+const stateContext = { MAX_WAYPOINTS: require('../lib/route-engine.js').MAX_WAYPOINTS };
 vm.runInNewContext(source.slice(stateStart, stateEnd), stateContext);
 const guideStateFor = stateContext.guideStateFor;
 const state = model => JSON.parse(JSON.stringify(guideStateFor(model)));
@@ -34,7 +34,8 @@ test('coordinate and image work move through clear review states', () => {
 
 test('shared planning states override the chosen input method', () => {
   assert.deepEqual(state({ ...base('gpx'), pointCount: 2 }), { step: 3, action: 'route-settings' });
-  assert.deepEqual(state({ ...base('text'), pointCount: 17 }), { step: 3, action: 'review-remove' });
+  assert.deepEqual(state({ ...base('text'), pointCount: 50 }), { step: 3, action: 'route-settings' });
+  assert.deepEqual(state({ ...base('text'), pointCount: 51 }), { step: 3, action: 'review-remove' });
   assert.deepEqual(state({ ...base('coordinates'), pointCount: 2, routingBusy: true }), { step: 3, action: 'waiting-routes' });
   assert.deepEqual(state({ ...base('map-image'), hasRoutes: true }), { step: 4, action: 'compare-routes' });
   assert.deepEqual(state({ ...base('image'), hasRoutes: true, hasSelectedRoute: true }), { step: 4, action: 'review-save' });

@@ -85,12 +85,34 @@ test('optimised order retains all mandatory waypoints', () => {
 });
 test('query size and large waypoint counts are bounded', () => {
   assert.throws(() => R.boundingBox([{ lat: 22, lon: 114 }, { lat: 35, lon: 139 }], 4000), /250/);
-  assert.throws(() => R.plan(fixture(), Array(17).fill(points[0])), /1–16/);
+  assert.throws(() => R.plan(fixture(), Array(51).fill(points[0])), /1–50/);
   const query = R.queryFor(R.boundingBox(points, 2000));
   assert.ok(query.includes('out body qt'));
   assert.ok(query.includes('relation(bw.paths)'));
   assert.ok(query.includes('relation(bn.stopmembers)'));
   assert.doesNotMatch(query, /relation\["route"[^\n]+\]\(/, 'never download every route relation intersecting the whole bounding box');
+});
+test('50 required waypoints stay on mapped geometry and in order, including loops', () => {
+  const { data, points } = require('./fixtures/fifty-waypoints.cjs')();
+  for (const loop of [false, true]) {
+    const result = R.plan(data, points, { optimize: true, loop });
+    assert.ok(result.routes.length);
+    for (const route of result.routes) {
+      assert.deepEqual(route.order, points.map((_, i) => i));
+      assert.equal(route.snaps.length, 50);
+      let position = -1;
+      for (const snap of route.snaps) {
+        position = route.ids.indexOf(snap.id, position + 1);
+        assert.ok(position >= 0, `route visits waypoint ${snap.index + 1} in sequence`);
+        assert.ok(snap.metres < .1);
+      }
+      assert.ok(route.edges.every(edge => edge.way === 10));
+      assert.ok(route.coords.every(p => Math.abs(p.lat - 22.05) < 1e-9));
+      if (loop) assert.deepEqual(route.coords[0], route.coords.at(-1));
+    }
+    assert.match(result.notices.join(' '), /keep your pin order/);
+  }
+  assert.throws(() => R.plan(data, [...points.slice(0, 49), { lat: 22.1, lon: 114 }]), /Waypoint 50 has no eligible path/);
 });
 test('passenger entrance names inherit their station and restricted services are excluded', () => {
   const data = fixture(), n = data.elements.find(e => e.id === 4); n.tags = { railway: 'subway_entrance', ref: '2' };

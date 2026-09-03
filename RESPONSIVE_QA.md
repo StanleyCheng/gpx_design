@@ -1,5 +1,13 @@
 # Responsive and workflow verification
 
+## 2026-09-03: Route swiping and 50-pin input
+
+- Chrome and desktop WebKit at 1280 × 800: horizontal wheel/trackpad events browse the route cards in both directions; vertical wheel events scroll the dock. Browsing changes neither route selection nor visibility. Left/Right and Home/End keys browse the focused row; the third card still exports its own GPX.
+- iPhone 16 Pro Max WebKit emulation at 440 × 956: the route row scrolls horizontally without document overflow; tapping the third card selects it and minimizes the dock. The minimized dock remains 22 px tall. Native scrolling is retained, but physical iPhone swipes and Safari browser chrome were not tested.
+- Browser GPX and coordinate imports retained 50 pins. A 51-pin text input preserved the existing draft and displayed an error. Clicking the map at the 50-pin limit displayed “Maximum 50 waypoints.” without adding a pin or disabling Find.
+- Routing through all 50 pins on a synthetic walking network produced a GPX with 50 required waypoints plus start/finish, and 52 mapped trackpoints. Deleting pin 50 triggered a new route through all 49 remaining pins. Map tiles were stubbed; route comparisons used a recorded backend response, and the 50-pin workflow used the actual engine with synthetic map data. No new live map or AI requests were needed.
+- All 73 automated tests pass, including 50-pin open/loop geometry, rejection of 51 pins, a 50-pin API request with long Unicode names, and uncertainty preservation for 50 recognition candidates.
+
 Checked 2026-08-31 using the Codex in-app browser on macOS. Viewports emulate screen dimensions, **not physical devices or Safari/WebKit**.
 
 | Viewport | Result |
