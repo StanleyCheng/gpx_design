@@ -91,8 +91,8 @@
     <section class="map-section" aria-labelledby="map-title"><h1 id="map-title" class="skip">Planning map</h1>
       <div id="map-capture" class="map-container"><div id="map" aria-label="Interactive map for reviewing and editing waypoint locations" aria-describedby="map-gesture-note"></div><div class="map-status-panel"><div class="map-quick-actions" aria-label="Map planning shortcuts"><button id="map-route-action" type="button" disabled>Find routes</button></div><aside id="map-route-toolbar" class="map-route-toolbar" aria-label="Routes shown on map" hidden><strong>Routes</strong><div id="map-route-dots" class="map-route-dots"></div><button id="map-export-action" class="map-export-action" type="button" disabled>Export GPX</button></aside></div></div>
     </section>
-    <section id="control-dock" class="control-dock" aria-label="Route planning controls">
-      <button id="control-dock-toggle" class="dock-toggle" type="button" aria-expanded="true" aria-controls="control-dock-content" aria-label="Minimize planning controls"><span class="dock-grip" aria-hidden="true"></span><span class="dock-heading"><strong id="dock-title">Add your waypoints</strong><span id="dock-summary">Choose how you want to add places</span></span><span class="dock-chevron" aria-hidden="true">⌄</span></button>
+    <section id="control-dock" class="control-dock collapsed" aria-label="Route planning controls">
+      <button id="control-dock-toggle" class="dock-toggle" type="button" aria-expanded="false" aria-controls="control-dock-content" aria-label="Open planning controls"><span class="dock-grip" aria-hidden="true"></span><span class="dock-heading"><strong id="dock-title">Add your waypoints</strong><span id="dock-summary">Choose how you want to add places</span></span><span class="dock-chevron" aria-hidden="true">⌄</span></button>
       <div id="control-dock-content" class="dock-content">
         <div class="stage-tabs" role="tablist" aria-label="Route planning stages">
           <button id="stage-tab-method" type="button" role="tab" data-stage="method" aria-controls="stage-method" aria-selected="true" tabindex="0"><span class="stage-number" aria-hidden="true">1</span><span>Adding Pins</span></button>
@@ -106,7 +106,7 @@
           <h2>How will you add your places?</h2>
           <p class="stage-intro">Choose a way below. We’ll show you just the tools you need next.</p>
         <label class="field" for="input-method">How would you like to add them?</label>
-        <select id="input-method"><option value="" selected disabled>Choose how to add points…</option><option value="map-pins">Put pins on the map</option><option value="coordinates">Paste coordinates</option><option value="text">Upload TXT or CSV</option><option value="gpx">Upload GPX</option><option value="map-image">Paste or upload a route map</option><option value="image">Review a map image or photo</option></select>
+        <select id="input-method"><option value="" disabled>Choose how to add points…</option><option value="map-pins" selected>Put pins on the map</option><option value="coordinates">Paste coordinates</option><option value="text">Upload TXT or CSV</option><option value="gpx">Upload GPX</option><option value="map-image">Paste or upload a route map</option><option value="image">Review a map image or photo</option></select>
           <p class="help">Your points stay on the map when you switch tabs. An imported file replaces the draft only after it is read successfully.</p>
         </section>
         <section id="stage-input" class="stage-panel" role="tabpanel" aria-labelledby="stage-tab-input" tabindex="0" hidden>
@@ -1822,6 +1822,7 @@
     } else { $('map').append(element('p', 'The map library could not load. Check your internet connection and reload. Coordinate import and waypoint GPX export still work.', 'map-unavailable')); $('toggle-pins').disabled = true; }
     $('input-method').dispatchEvent(new Event('change'));
     render(false);
+    setDockExpanded(false);
   })();
   </script>
 </body>
