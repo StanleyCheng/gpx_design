@@ -9,6 +9,7 @@ const html = read('index.html');
 const planner = read('lib/planner-ui.js').trim();
 const recognition = read('lib/recognition-ui.js').trim();
 const guidance = read('lib/guidance-ui.js').trim();
+const stages = read('lib/stage-ui.js').trim();
 const manifest = JSON.parse(read('site.webmanifest'));
 
 function inlineFragment(marker) {
@@ -63,6 +64,7 @@ test('single-file build embeds the authored UI fragments exactly', () => {
   assert.equal(inlineFragment('PLANNER UI'), planner);
   assert.equal(inlineFragment('RECOGNITION UI'), recognition);
   assert.equal(inlineFragment('GUIDANCE UI'), guidance);
+  assert.equal(inlineFragment('STAGE UI'), stages);
 });
 
 test('method guidance and map gestures use the existing planning controls', () => {
@@ -79,7 +81,7 @@ test('method guidance and map gestures use the existing planning controls', () =
 });
 
 test('map-first route controls support colored combinations and individual or combined GPX', () => {
-  for (const id of ['control-dock', 'map-pins-panel', 'map-pin-action', 'map-route-action', 'map-route-toolbar', 'map-route-dots', 'map-export-action', 'route-visibility', 'show-all-routes', 'hide-all-routes', 'save-all-gpx']) assert.match(html, new RegExp(`id=["']${id}["']`));
+  for (const id of ['control-dock', 'map-pins-panel', 'map-route-action', 'map-route-toolbar', 'map-route-dots', 'map-export-action', 'route-visibility', 'show-all-routes', 'hide-all-routes', 'save-all-gpx']) assert.match(html, new RegExp(`id=["']${id}["']`));
   assert.match(planner, /ROUTE_COLORS/);
   assert.match(planner, /routing\.visible/);
   assert.match(planner, /function allRoutesGPX/);
@@ -89,7 +91,7 @@ test('map-first route controls support colored combinations and individual or co
   assert.match(planner, /'map-route-dot'/);
   assert.match(planner, /map-export-action.*routing\.visible/);
   assert.match(planner, /shown-routes-PROVISIONAL\.gpx/);
-  assert.match(html, /map-pin-action.*Finish adding pins/);
+  assert.doesNotMatch(html, /map-pin-action/);
   assert.match(html, /map-route-action.*find-routes/);
   assert.match(html, /--dock-visible-height/);
   assert.match(planner, /toast\(text, true, 9000\)/);

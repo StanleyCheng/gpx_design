@@ -64,27 +64,57 @@
     #ai-review,#image-converter,#route-builder,#route-results,.dock-map-controls{margin:14px 0 0}.control-dock .panel{box-shadow:none}.control-dock .panel-heading{padding:16px 18px 10px}.control-dock .panel-body{padding:0 18px 18px}.control-dock #route-builder[hidden],.control-dock #route-results[hidden],.control-dock .dock-map-controls[hidden]{display:none!important}.route-builder .plan-fields{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:12px}.route-options{grid-template-columns:repeat(3,minmax(220px,1fr));overflow-x:auto;padding-bottom:6px;scroll-snap-type:x proximity}.route-choice{scroll-snap-align:start}.route-visibility-controls{margin:14px 0;padding:14px;border:1px solid var(--line);border-radius:9px;background:var(--soft)}.route-visibility-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.route-visibility-head strong{font-size:13px}.route-visibility{display:flex;flex-wrap:wrap;gap:8px}.route-toggle{--route-color:var(--ink);border-color:var(--route-color);background:var(--white)}.route-toggle::before{content:'';width:11px;height:11px;border-radius:50%;background:var(--route-color)}.route-toggle[aria-pressed=true]{background:var(--route-color);color:#fff}.route-toggle[aria-pressed=true]::before{background:#fff}.route-visibility-actions{display:flex;gap:6px}.route-visibility-actions button{padding:6px 9px;min-height:36px;font-size:11px}.dock-map-controls{border-top:1px solid var(--line);padding-top:14px}.dock-map-controls .map-actions,.dock-map-controls .map-tools,.dock-map-controls .export-actions{display:flex;flex-wrap:wrap;gap:8px}.dock-map-controls .map-bottom{display:block;padding:12px 0;border:0}.dock-map-controls .map-tools{margin-top:10px}.dock-map-controls .map-footer{padding-top:10px}.dock-map-controls .export-actions{width:100%}.dock-map-controls .export-actions button{flex:1}.dock-map-controls .export-note{max-width:none}.dock-map-controls .download-ready{margin-top:12px}.direction-summary{margin-top:6px}.routes-empty{padding:18px}.selected-route-detail{padding:16px}.analytics-consent-open .control-dock{visibility:hidden}.consent{z-index:2000}
     @media(max-width:720px){.topbar{height:58px}.topbar-inner{height:58px}.topbar .shell{padding-inline:max(12px,env(safe-area-inset-left,0px)) max(12px,env(safe-area-inset-right,0px))}.brand-mark{width:34px;height:34px}.brand-name{font-size:27px}main.shell{inset:58px 0 0}.map-label{top:12px;right:10px;max-width:calc(100% - 74px);font-size:11px}.leaflet-control-zoom{margin-top:12px!important;margin-left:10px!important}.leaflet-bottom{bottom:var(--dock-visible-height,calc(46px + env(safe-area-inset-bottom,0px)))}.control-dock{width:100%;max-height:min(70dvh,680px);border-inline:0}.control-dock.collapsed{max-height:calc(46px + env(safe-area-inset-bottom,0px))}.dock-toggle{min-height:46px;padding:4px 10px}.dock-body{padding-inline:14px}.map-pin-panel .pin-instructions{grid-template-columns:1fr}.route-builder .plan-fields{grid-template-columns:1fr}.route-options{grid-template-columns:repeat(3,minmax(82vw,1fr))}.control-dock .panel-heading{padding-inline:14px}.control-dock .panel-body{padding-inline:14px}.dock-map-controls .export-actions{display:grid;grid-template-columns:1fr 1fr}.dock-map-controls .export-actions button{min-width:0}.dock-map-controls .export-actions #discard{grid-column:1/-1}.route-visibility-head{align-items:flex-start;flex-direction:column}.map-actions button,.map-tools button{flex:1}.toast{bottom:calc(58px + env(safe-area-inset-bottom,0px));z-index:1800}}
     @media(max-width:380px){.brand-name{font-size:25px}.dock-heading strong{font-size:11px}.dock-body{padding-inline:10px}.control-dock .panel-body{padding-inline:10px}.route-options{grid-template-columns:repeat(3,minmax(88vw,1fr))}}
-    .map-status-panel{position:absolute;z-index:500;top:16px;right:16px;display:flex;max-width:calc(100% - 88px);flex-direction:column;align-items:flex-end;gap:7px}.map-status-panel .map-label{position:static;width:max-content;max-width:100%;border-radius:12px;padding:8px 11px;background:color-mix(in srgb,#fff3cf 80%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}.map-status-panel .map-label span{display:block;margin-left:0}.map-quick-actions{display:flex;flex-direction:column;align-items:flex-end;gap:7px}.map-quick-actions button{width:max-content;min-height:44px;padding:7px 11px;border-color:#b8c1b7;box-shadow:var(--shadow);font-size:12px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}#map-pin-action{background:color-mix(in srgb,#d9efe4 80%,transparent)}#map-route-action{background:color-mix(in srgb,#f7dfca 80%,transparent)}.map-quick-actions button[aria-pressed=true]{background:color-mix(in srgb,#f1c9b8 80%,transparent);border-color:var(--accent);color:var(--ink)}.map-route-toolbar{display:flex;flex-direction:column;align-items:center;gap:5px;width:max-content;padding:5px;border:1px solid var(--line);border-radius:10px;background:color-mix(in srgb,#e9e2f4 80%,transparent);box-shadow:var(--shadow);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}.map-route-toolbar strong{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.map-route-dots{display:grid;gap:5px}.map-route-dot{width:36px;height:36px;min-height:36px;padding:0;border:2px solid color-mix(in srgb,#fff 80%,transparent);border-radius:50%;background:color-mix(in srgb,var(--route-color) 72%,white);color:#fff;box-shadow:0 0 0 1px var(--route-color),var(--shadow);font-size:12px}.map-route-dot[aria-pressed=false]{background:color-mix(in srgb,#fff 80%,transparent);color:var(--route-color);opacity:.8}.map-export-action{width:max-content;padding:6px;min-height:38px;background:color-mix(in srgb,#dceaf4 80%,transparent);font-size:10px;line-height:1.15}.route-endpoint-pin{background:transparent;border:0}.route-endpoint-pin span{display:grid;width:24px;height:24px;place-items:center;border:3px solid var(--white);border-radius:50%;color:var(--white);font:700 11px var(--font);box-shadow:0 2px 8px #263e3566}.toast{bottom:calc(var(--dock-visible-height,48px) + 12px);width:min(520px,calc(100% - 32px));text-align:center}.toast.error{background:var(--danger);border-color:#fff}
-    @media(max-width:720px){.map-status-panel{top:12px;right:10px;max-width:calc(100% - 74px);gap:6px}.map-status-panel .map-label{padding:7px 9px;font-size:11px}.map-quick-actions{gap:6px}.map-quick-actions button{min-height:44px;padding:6px 9px;font-size:11px}.map-route-toolbar{gap:4px;padding:4px}.map-route-dots{gap:4px}.map-route-dot{width:34px;height:34px;min-height:34px}.map-export-action{min-height:36px;padding:5px}.toast{bottom:calc(var(--dock-visible-height,46px) + 10px)}}
+    .map-status-panel{position:absolute;z-index:500;top:16px;right:16px;display:flex;max-width:calc(100% - 88px);flex-direction:column;align-items:flex-end;gap:7px}.header-map-status{position:static;width:max-content;max-width:100%;border-radius:12px;padding:8px 11px;background:color-mix(in srgb,#fff3cf 80%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}.header-map-status span{display:block;margin-left:0}.map-quick-actions{display:flex;flex-direction:column;align-items:flex-end;gap:7px}.map-quick-actions button{width:max-content;min-height:44px;padding:7px 11px;border-color:#b8c1b7;box-shadow:var(--shadow);font-size:12px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}#map-route-action{background:color-mix(in srgb,#f7dfca 80%,transparent)}.map-quick-actions button[aria-pressed=true]{background:color-mix(in srgb,#f1c9b8 80%,transparent);border-color:var(--accent);color:var(--ink)}.map-route-toolbar{display:flex;flex-direction:column;align-items:center;gap:5px;width:max-content;padding:5px;border:1px solid var(--line);border-radius:10px;background:color-mix(in srgb,#e9e2f4 80%,transparent);box-shadow:var(--shadow);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}.map-route-toolbar strong{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.map-route-dots{display:grid;gap:5px}.map-route-dot{width:36px;height:36px;min-height:36px;padding:0;border:2px solid color-mix(in srgb,#fff 80%,transparent);border-radius:50%;background:color-mix(in srgb,var(--route-color) 72%,white);color:#fff;box-shadow:0 0 0 1px var(--route-color),var(--shadow);font-size:12px}.map-route-dot[aria-pressed=false]{background:color-mix(in srgb,#fff 80%,transparent);color:var(--route-color);opacity:.8}.map-export-action{width:max-content;padding:6px;min-height:38px;background:color-mix(in srgb,#dceaf4 80%,transparent);font-size:10px;line-height:1.15}.route-endpoint-pin{background:transparent;border:0}.route-endpoint-pin span{display:grid;width:24px;height:24px;place-items:center;border:3px solid var(--white);border-radius:50%;color:var(--white);font:700 11px var(--font);box-shadow:0 2px 8px #263e3566}.toast{bottom:calc(var(--dock-visible-height,48px) + 12px);width:min(520px,calc(100% - 32px));text-align:center}.toast.error{background:var(--danger);border-color:#fff}
+    @media(max-width:720px){.map-status-panel{top:12px;right:10px;max-width:calc(100% - 74px);gap:6px}.header-map-status{padding:7px 9px;font-size:11px}.map-quick-actions{gap:6px}.map-quick-actions button{min-height:44px;padding:6px 9px;font-size:11px}.map-route-toolbar{gap:4px;padding:4px}.map-route-dots{gap:4px}.map-route-dot{width:34px;height:34px;min-height:34px}.map-export-action{min-height:36px;padding:5px}.toast{bottom:calc(var(--dock-visible-height,46px) + 10px)}}
+
+    .map-section>#map-title{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+    /* Compact stage controls: content stays mounted when changing tabs. */
+    :root{--stage-mint:color-mix(in srgb,#d9efe4 80%,transparent);--stage-sand:color-mix(in srgb,#f7f1dd 80%,transparent);--stage-selected:var(--ink)}
+    .topbar-inner{gap:12px;justify-content:space-between}.brand{flex-shrink:0}.header-map-status{flex:0 1 auto;min-width:0;max-width:46%;font-size:11px;line-height:1.4;text-align:right;padding:6px 10px;border:1px solid var(--line)}.header-map-status strong,.header-map-status span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.map-status-panel{top:10px}
+    .control-dock{width:min(760px,calc(100% - 24px))}.dock-content{display:flex;flex-direction:column;min-height:0}.dock-body{padding:12px 18px 6px;min-height:0;scrollbar-gutter:auto}.dock-toggle{display:flex;justify-content:center;position:relative;min-height:44px;padding:5px 12px}.dock-heading{display:none}.dock-grip{width:34px;height:4px;background:var(--muted);opacity:.45}.dock-chevron{position:absolute;right:14px}.control-dock.collapsed{width:92px;max-height:calc(44px + env(safe-area-inset-bottom,0px));border-radius:14px 14px 0 0}.control-dock.collapsed .dock-content,.control-dock.collapsed .dock-chevron{display:none}.control-dock.collapsed .dock-toggle{min-height:44px}
+    .stage-tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;flex:none;padding:0 12px 9px;border-bottom:1px solid var(--line)}.stage-tabs button{display:flex;flex-direction:column;gap:4px;min-width:0;min-height:52px;padding:6px 2px;border:0;border-radius:8px;background:transparent;font-size:11px;line-height:1.25}.stage-tabs button[aria-selected=true]{background:var(--stage-mint);color:var(--stage-selected)}.stage-tabs button:disabled{opacity:.45}.stage-number{display:grid;place-items:center;width:18px;height:18px;border:1px solid var(--line);border-radius:50%;font-size:10px}.stage-tabs button[aria-selected=true] .stage-number{background:var(--ink);border-color:var(--ink);color:var(--white)}.stage-panel{min-width:0}.stage-panel>h2{display:none}.stage-footer{display:flex;justify-content:space-between;gap:10px;padding:10px 18px calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);flex:none}.stage-footer button{font-size:12px}.stage-footer #stage-next{margin-left:auto}
+    .control-dock .help,.control-dock .stage-intro,.control-dock .pin-help,.control-dock .pin-instructions,.control-dock .review-notice,.control-dock .converter-intro,.control-dock .map-guidance,.control-dock .export-note,.control-dock .direction-summary,.control-dock .routes-empty,.control-dock .message,#next-action,.map-pin-panel>p,#photo-status,#trace-message,#ai-upload-notice{display:none!important}.control-dock .panel-heading,.control-dock #route-results>.section-title,.control-dock .dock-section-title>h2{display:none}.control-dock #file-panel>p,.control-dock #image-review>p,.control-dock #paste-controls>p,.control-dock #download-ready p,.control-dock #trace-review>p{display:none}.control-dock #ai-questions{display:none!important}.control-dock #upload-help{display:none}.control-dock .map-pin-panel{padding:4px 0}.control-dock #coordinates-panel .field-top{margin-top:4px}.control-dock .panel-body{padding:8px 0}.control-dock #route-builder{border:0;background:transparent;margin:0}.control-dock .plan-fields{margin-top:0;gap:12px}.control-dock .build-actions{margin-top:12px}.control-dock .upload-area{min-height:0;margin-top:0;padding:12px}.control-dock .upload-area>svg{display:none}.control-dock .upload-area>strong{margin-bottom:8px}.control-dock .paste-controls{margin-top:8px}.control-dock #ai-review{background:transparent;border:0;border-top:1px solid var(--line);border-radius:0;margin-top:12px}.control-dock #manual-trace-tools{margin-top:12px}.control-dock #manual-trace-tools>summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-size:12px;font-weight:600}.control-dock #image-converter{margin:0}.control-dock #route-results{margin:0}.control-dock .route-visibility-controls{margin:0 0 12px;padding:10px}.control-dock .dock-map-controls{border:0;padding:0;margin:0}.control-dock .dock-section-title{margin:0 0 8px}.control-dock .map-footer{border:0;padding-top:8px}.control-dock #privacy-settings{display:block;margin-top:8px;min-height:36px}.control-dock .pin-actions{margin:0}.control-dock .pin-actions button{width:100%}
+    #route-details-dialog{max-width:760px}.route-details-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}.route-details-heading h2{font-size:25px}#route-details-dialog .selected-route-detail{padding:0;border:0}#route-details-dialog .route-export-review{margin-top:16px}
+    @media(max-width:720px){.control-dock{width:100%}.header-map-status{max-width:48%;font-size:10px;padding:5px 7px}.topbar-inner{gap:8px}.map-status-panel{top:10px}.dock-body{padding-inline:14px}.stage-footer{padding-inline:14px}.stage-tabs{padding-inline:10px;gap:2px}.stage-tabs button{font-size:10px}.control-dock input,.control-dock select,.control-dock textarea{font-size:16px}.control-dock input[type=date]{min-width:0}.control-dock .map-tools{margin-top:0}.control-dock .map-bottom{padding:0}}
+    @media(max-width:380px){.brand-name{font-size:23px}.brand-mark{width:29px;height:29px}.brand{gap:6px}.header-map-status{font-size:9px}.stage-tabs{padding-inline:5px}.stage-tabs button{font-size:9px}.dock-body{padding-inline:12px}}
+    @media(prefers-reduced-motion:reduce){.control-dock,.dock-chevron{transition:none}}
   </style>
 </head>
 <body class="map-first">
-  <a class="skip" href="#planner">Skip to route planner</a>
+  <a class="skip" href="#control-dock-toggle">Skip to route planner</a>
   <header class="topbar"><div class="shell topbar-inner">
     <a href="#" class="brand" aria-label="TrailPlanner home"><svg class="brand-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="m2 26 12-21 7 12 4-7 7 16Z" stroke="currentColor" stroke-width="2.3" stroke-linejoin="round"/><path d="m9 14 5 2 4-3" stroke="currentColor" stroke-width="1.7"/></svg><span class="brand-name">TrailPlanner</span></a>
+    <div class="map-label header-map-status" role="status"><strong id="map-caption">Your planning canvas</strong><span id="map-count">No waypoints added</span></div>
   </div></header>
   <noscript><p class="noscript">JavaScript is required to import files and use the map. Route planning requires JavaScript. No route is certified safe.</p></noscript>
   <main class="shell">
     <section class="map-section" aria-labelledby="map-title"><h1 id="map-title" class="skip">Planning map</h1>
-      <div id="map-capture" class="map-container"><div id="map" aria-label="Interactive map for reviewing and editing waypoint locations" aria-describedby="map-gesture-note"></div><div class="map-status-panel"><div class="map-label"><strong id="map-caption">Your planning canvas</strong><span id="map-count">No waypoints added</span></div><div class="map-quick-actions" aria-label="Map planning shortcuts"><button id="map-pin-action" type="button" aria-pressed="false">Start adding pins</button><button id="map-route-action" type="button" disabled>Find routes</button></div><aside id="map-route-toolbar" class="map-route-toolbar" aria-label="Routes shown on map" hidden><strong>Routes</strong><div id="map-route-dots" class="map-route-dots"></div><button id="map-export-action" class="map-export-action" type="button" disabled>Export GPX</button></aside></div></div>
+      <div id="map-capture" class="map-container"><div id="map" aria-label="Interactive map for reviewing and editing waypoint locations" aria-describedby="map-gesture-note"></div><div class="map-status-panel"><div class="map-quick-actions" aria-label="Map planning shortcuts"><button id="map-route-action" type="button" disabled>Find routes</button></div><aside id="map-route-toolbar" class="map-route-toolbar" aria-label="Routes shown on map" hidden><strong>Routes</strong><div id="map-route-dots" class="map-route-dots"></div><button id="map-export-action" class="map-export-action" type="button" disabled>Export GPX</button></aside></div></div>
     </section>
     <section id="control-dock" class="control-dock" aria-label="Route planning controls">
-      <button id="control-dock-toggle" class="dock-toggle" type="button" aria-expanded="true" aria-controls="control-dock-body"><span class="dock-grip" aria-hidden="true"></span><span class="dock-heading"><strong id="dock-title">Add your waypoints</strong><span id="dock-summary">Choose how you want to add places</span></span><span class="dock-chevron" aria-hidden="true">⌄</span></button>
+      <button id="control-dock-toggle" class="dock-toggle" type="button" aria-expanded="true" aria-controls="control-dock-content" aria-label="Minimize planning controls"><span class="dock-grip" aria-hidden="true"></span><span class="dock-heading"><strong id="dock-title">Add your waypoints</strong><span id="dock-summary">Choose how you want to add places</span></span><span class="dock-chevron" aria-hidden="true">⌄</span></button>
+      <div id="control-dock-content" class="dock-content">
+        <div class="stage-tabs" role="tablist" aria-label="Route planning stages">
+          <button id="stage-tab-method" type="button" role="tab" data-stage="method" aria-controls="stage-method" aria-selected="true" tabindex="0"><span class="stage-number" aria-hidden="true">1</span><span>Adding Pins</span></button>
+          <button id="stage-tab-input" type="button" role="tab" data-stage="input" aria-controls="stage-input" aria-selected="false" tabindex="-1" disabled><span class="stage-number" aria-hidden="true">2</span><span>Add Points</span></button>
+          <button id="stage-tab-requirements" type="button" role="tab" data-stage="requirements" aria-controls="stage-requirements" aria-selected="false" tabindex="-1" disabled><span class="stage-number" aria-hidden="true">3</span><span>Requirements</span></button>
+          <button id="stage-tab-routes" type="button" role="tab" data-stage="routes" aria-controls="stage-routes" aria-selected="false" tabindex="-1" disabled><span class="stage-number" aria-hidden="true">4</span><span>Routes</span></button>
+          <button id="stage-tab-export" type="button" role="tab" data-stage="export" aria-controls="stage-export" aria-selected="false" tabindex="-1" disabled><span class="stage-number" aria-hidden="true">5</span><span>Export</span></button>
+        </div>
       <div id="control-dock-body" class="dock-body">
+        <section id="stage-method" class="stage-panel" role="tabpanel" aria-labelledby="stage-tab-method" tabindex="0">
+          <h2>How will you add your places?</h2>
+          <p class="stage-intro">Choose a way below. We’ll show you just the tools you need next.</p>
+        <label class="field" for="input-method">How would you like to add them?</label>
+        <select id="input-method"><option value="" selected disabled>Choose how to add points…</option><option value="map-pins">Put pins on the map</option><option value="coordinates">Paste coordinates</option><option value="text">Upload TXT or CSV</option><option value="gpx">Upload GPX</option><option value="map-image">Paste or upload a route map</option><option value="image">Review a map image or photo</option></select>
+          <p class="help">Your points stay on the map when you switch tabs. An imported file replaces the draft only after it is read successfully.</p>
+        </section>
+        <section id="stage-input" class="stage-panel" role="tabpanel" aria-labelledby="stage-tab-input" tabindex="0" hidden>
+          <h2 id="input-stage-title">Add your points</h2>
+          <p id="input-stage-help" class="stage-intro">Add each place your hike must visit, then review the points on the map.</p>
     <section id="planner" class="workspace" aria-label="Plan your hike">
       <div class="panel"><div class="panel-heading"><span class="step">01</span><h2>Add your must-visit places</h2></div><div class="panel-body">
-        <label class="field" for="input-method">How would you like to add them?</label>
-        <select id="input-method"><option value="map-pins">Put pins on the map</option><option value="coordinates">Paste coordinates</option><option value="text">Upload TXT or CSV</option><option value="gpx">Upload GPX</option><option value="map-image">Paste or upload a route map</option><option value="image">Review a map image or photo</option></select>
+
         <div id="map-pins-panel" class="map-pin-panel"><p>Place every spot your hike must visit. You can adjust them before and after route planning.</p><ol class="pin-instructions"><li>Move and zoom the map.</li><li>Tap or click to add each pin.</li><li>Drag to move; tap or right-click to delete.</li></ol><div class="pin-actions"><button id="start-pin-mode" class="primary" type="button">Start adding pins</button><button id="finish-pin-mode" type="button" hidden>Finish adding pins</button></div><p class="pin-help">iPhone: pinch to zoom, drag the map with one finger, drag a pin to move it, or tap a pin for Delete. Computer: wheel or trackpad to zoom, drag to pan, drag a pin to move it, or right-click a pin to delete it.</p></div>
         <div id="coordinates-panel" hidden><div class="field-top"><label class="field" for="coordinates">Coordinates</label><span>WGS84 · LATITUDE, LONGITUDE</span></div><textarea id="coordinates" spellcheck="false" aria-describedby="coordinate-help" placeholder="22.3893078, 114.3664416&#10;22.3913284, 114.3663188"></textarea><p class="help" id="coordinate-help">Decimal degrees. One latitude/longitude pair per line, or comma-separated pairs. No trail connections are assumed.</p><div class="input-actions"><button id="preview-points" class="primary">Preview waypoints <span aria-hidden="true">↗</span></button><button id="load-example" class="text-button">Try example pins</button></div></div>
         <div id="file-panel" hidden><div class="upload-area"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 16V3m-4 4 4-4 4 4M4 14v6h16v-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><strong id="upload-title">Choose your coordinate file</strong><p id="upload-help" class="small">TXT or CSV · maximum 10 MB</p><label class="field" for="file-input">Select a file</label><input id="file-input" type="file" accept=".txt,.csv,text/plain,text/csv" aria-describedby="upload-help"></div><p class="help">Import replaces the current draft. Review your file before using any points.</p><div id="image-review" class="image-preview" hidden><img id="photo" alt="Your uploaded map image for manual location review"><p id="photo-status" role="status"></p><p id="photo-gps-warning" class="review-notice" hidden>Check this GPS position on an independent map before adding it. It may be the camera location, not the map location.</p><button id="add-photo-gps" hidden disabled>Add photo position</button><p class="help">To copy a coloured line exactly, select “Paste or upload a route map”, then open the secondary image-tracing tool. It requires three known map locations; photo GPS cannot identify the area shown.</p></div></div>
@@ -107,12 +137,13 @@
         <details id="ai-connection"><summary>Private recognition connection</summary><p class="help">GitHub Pages cannot hold a secret API key. Connect the private TrailPlanner recognition server, or run the private server on your computer. Never enter your Kimi API key here.</p><label class="field" for="ai-endpoint">Recognition endpoint<input id="ai-endpoint" type="text" spellcheck="false" autocomplete="off" placeholder="https://your-private-server/api/recognize-map"></label><label class="field" for="ai-access">Private app access code (not your Kimi key)<input id="ai-access" type="password" autocomplete="off"></label><p class="help">The connection and access code stay in memory for this visit. The code is sent only to the endpoint you enter.</p></details>
         <label class="field" for="ai-context">Optional clue: country, town, trail name or printed map title<input id="ai-context" type="text" maxlength="500" placeholder="For example: a trail near Taipei, Taiwan"></label>
         <p id="ai-upload-notice" class="review-notice">Selecting “Identify map &amp; waypoints” sends this map image and your clue to the configured server and Kimi. Images are not sent to Google Analytics.</p>
-        <div class="build-actions"><button id="recognize-map" class="primary" aria-describedby="ai-upload-notice" disabled>Identify map &amp; waypoints →</button><button id="cancel-recognition" hidden>Cancel recognition</button><a href="#image-converter" class="text-button">Use manual calibration instead ↓</a></div>
+        <div class="build-actions"><button id="recognize-map" class="primary" aria-describedby="ai-upload-notice" disabled>Identify with Kimi · sends image →</button><button id="cancel-recognition" hidden>Cancel recognition</button><a href="#image-converter" class="text-button">Use manual calibration instead ↓</a></div>
         <p id="ai-status" class="message" role="status">Automatic recognition needs a private server connection. Manual image calibration below works without AI.</p>
         <div id="ai-results" hidden><h3 id="ai-area"></h3><p id="ai-evidence" class="help"></p><p id="ai-questions" class="message"></p><canvas id="ai-overlay" aria-label="Uploaded map with numbered AI candidate markers"></canvas><div id="ai-candidates"></div><p class="review-notice">Before using these places, check every included marker on an independent map and correct any coordinate. These are not certified trail positions.</p><button id="use-ai-waypoints" class="primary" disabled>Use selected places → Find routes</button></div>
       </div>
     </section>
 
+    <details id="manual-trace-tools" hidden><summary>Trace a coloured route manually</summary>
     <section id="image-converter" class="image-converter panel" aria-labelledby="converter-title" hidden>
       <div class="panel-heading"><span class="step">↗</span><h2 id="converter-title">From map image to GPX</h2><span class="pill">On-device conversion</span></div>
       <p class="converter-intro">Locate three known places, pick the route colour, then mark the start, any via points, and the end. We follow connected coloured pixels; we never fill a gap. The result is an <strong>unverified image trace</strong>, not a verified hiking route.</p>
@@ -142,6 +173,11 @@
         </div>
       </div>
     </section>
+    </details>
+        </section>
+        <section id="stage-requirements" class="stage-panel" role="tabpanel" aria-labelledby="stage-tab-requirements" tabindex="0" hidden>
+          <h2>Check your waypoints &amp; limits</h2>
+          <p class="stage-intro">Keep every place you want to visit. Set how far you want to walk and how close transport must be.</p>
     <section id="route-builder" class="route-builder panel" aria-labelledby="build-title">
       <div class="panel-heading"><span class="step">02</span><h2 id="build-title">Review your places. Find your connections.</h2></div>
       <div class="panel-body">
@@ -158,32 +194,51 @@
           <label>OpenStreetMap data provider<select id="plan-provider"><option value="auto" selected>Automatic fallback · recommended</option><option value="coffee">Private.coffee Overpass</option><option value="vk">VK Maps Overpass</option><option value="fossgis">FOSSGIS Overpass</option></select></label>
         </div>
         <p class="help">Check the suggested region, especially near borders or islands. Searches favour mapped hiking trails and, where available, government trail data. Restricted access, fords, demanding OSM terrain tags and unsuitable roads are excluded. Missing terrain tags are still unknown. Every waypoint must match a real path within your chosen tolerance; there are no invented links.</p>
-        <div class="build-actions"><button id="find-routes" class="primary" disabled>Find up to 3 routes ↗</button><button id="cancel-routing" hidden>Cancel search</button><button id="view-inputs" class="text-button" disabled>Review input pins on map ↓</button></div>
+        <div class="build-actions"><button id="find-routes" class="primary" disabled>Find up to 3 routes ↗</button><button id="view-inputs" class="text-button" disabled>Review input pins on map ↓</button></div>
         <p class="help">Route search sends only your waypoint coordinates and selected limits to TrailPlanner’s Vercel backend. The backend tries another public Overpass provider when one times out or has a temporary server error, then returns only the planned route options. It does not retry oversized or invalid searches. Hong Kong searches also check AFCD’s public trail dataset. Your uploaded file and image are not sent. Successful graph routing does not verify timetables, closures or safe access.</p>
-        <div id="routing-status" class="message" role="status" aria-live="polite" hidden></div>
+
       </div>
     </section>
+        </section>
+        <section id="stage-routes" class="stage-panel" role="tabpanel" aria-labelledby="stage-tab-routes" tabindex="0" hidden>
+          <h2>Compare your routes</h2>
+          <p class="stage-intro">Use the coloured buttons to show or hide routes. Select one to see its details, or export all the options.</p>
+          <button id="cancel-routing" type="button" hidden>Cancel search</button>
+        <div id="routing-status" class="message" role="status" aria-live="polite" hidden></div>
     <section id="route-results" class="route-section" aria-labelledby="routes-title">
       <div class="section-title"><h2 id="routes-title"><span>03</span>Compare your route options</h2><p id="route-result-count">Add your places to get started</p></div>
       <div id="route-visibility-controls" class="route-visibility-controls" hidden><div class="route-visibility-head"><strong>Routes shown on the map</strong><div class="route-visibility-actions"><button id="show-all-routes" type="button">Show all</button><button id="hide-all-routes" type="button">Hide all</button></div></div><div id="route-visibility" class="route-visibility" aria-label="Choose routes to show"></div></div>
       <div id="route-options" class="route-options"><div class="routes-empty"><strong>Your route options will appear here.</strong><p>Each option must visit every listed waypoint and connect to mapped public transport at both ends. We show fewer than three when fewer distinct routes meet your settings.</p></div></div>
-      <p id="routing-evidence-note" class="help">No placeholder routes, assumed trail connections, or guaranteed service claims.</p>
-      <div id="selected-route-detail" class="selected-route-detail" hidden></div>
-      <div id="route-export-review" class="route-export-review" hidden><h3>Before exporting this route</h3><p>These are provisional routes built from map data. Review the linked sources and the complete map before using an export.</p><ul class="route-review-list"><li>Check actual arrival and return services for the hike date, including the last departure and walking access to both stops.</li><li>Check official trail access, closures, permits, conditions and suitability. Government status shown as unknown remains unverified.</li><li>Check every waypoint offset and the complete route on the map. No required place is silently skipped.</li></ul><p id="route-export-status" role="status">The provisional route can be saved in the direction shown. These review reminders are not a safety certification.</p></div>
+
+
+
     </section>
+        </section>
+        <section id="stage-export" class="stage-panel" role="tabpanel" aria-labelledby="stage-tab-export" tabindex="0" hidden>
+          <h2>Save your hike</h2>
+          <p id="export-stage-help" class="stage-intro">Save one route, all routes, or a picture of the map. Review the route and transport details before you go.</p>
+
     <section id="dock-map-controls" class="dock-map-controls" aria-label="Map and export controls" hidden>
-      <div class="dock-section-title"><h2>Map &amp; files</h2><div class="map-actions"><button id="reverse-route" disabled>Reverse route ⇄</button><button id="fit-points" disabled>Fit all points <span aria-hidden="true">⤢</span></button></div></div>
+      <div class="dock-section-title"><h2>Map &amp; files</h2><div class="map-actions"><button id="route-details-button" type="button" hidden>Details</button><button id="reverse-route" disabled>Reverse route ⇄</button><button id="fit-points" disabled>Fit all points <span aria-hidden="true">⤢</span></button></div></div>
       <div class="map-bottom"><div class="map-guidance"><p class="legend"><span><span class="legend-dot"></span>Numbered mandatory places</span><span id="track-legend" hidden><span class="legend-dash"></span>Unverified source track</span></p><p id="map-gesture-note" class="map-gesture-note">Wheel or pinch to zoom. Drag to pan. Drag a pin to move it; tap or right-click a pin to delete it.</p></div><div class="map-tools"><a id="map-next-step" class="text-button" href="#route-builder" hidden>Route settings</a><button id="toggle-map" aria-pressed="true" aria-controls="map" hidden>Map active</button><button id="toggle-pins" aria-pressed="false" aria-controls="map">+ Add pins on map</button></div></div>
       <div id="direction-summary" class="direction-summary" aria-live="polite" hidden></div>
       <div class="map-footer"><p class="export-note" id="export-note">GPX saves the current direction, waypoints and any source track segments. It never creates connections between waypoints or across segment gaps. All exports are unverified; check access and transport independently.</p><div class="export-actions"><button id="save-png" disabled>Save preview as PNG <span aria-hidden="true">↓</span></button><button id="save-gpx" class="primary" disabled>Save selected route as GPX <span aria-hidden="true">↓</span></button><button id="save-all-gpx" disabled>Save all routes as GPX <span aria-hidden="true">↓</span></button><button id="discard" disabled>Discard</button></div></div>
       <div id="download-ready" class="download-ready" role="status" hidden><div><strong>Your planning file is ready.</strong><p>If the download did not start, tap the filename below. On supported phones, Share file opens options such as Save to Files.</p><a id="download-link" download></a></div><button id="share-file" hidden>Share file</button></div>
     </section>
+        </section>
     <button id="privacy-settings" class="privacy-button" type="button">Privacy settings</button>
+      </div>
+        <div class="stage-footer"><button id="stage-back" type="button" hidden>← Back</button><button id="stage-next" type="button" class="primary" disabled>Continue →</button></div>
       </div>
     </section>
   </main>
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
   <aside id="analytics-consent" class="consent" aria-labelledby="consent-title" hidden><h2 id="consent-title">Help improve the next hike?</h2><p>Optional Google Analytics measures visits and basic app actions. Your coordinates, files, and photos are excluded. The planner works the same either way.</p><div class="consent-actions"><button id="analytics-decline">No thanks</button><button id="analytics-accept">Allow analytics</button></div><button id="consent-close" class="text-button consent-dismiss" hidden>Keep current choice</button><span class="small" id="consent-status"></span></aside>
+  <dialog id="route-details-dialog" aria-labelledby="route-details-title"><div class="route-details-heading"><h2 id="route-details-title">Route details</h2><button id="close-route-details" type="button">Close</button></div>
+      <p id="routing-evidence-note" class="help">No placeholder routes, assumed trail connections, or guaranteed service claims.</p>
+      <div id="selected-route-detail" class="selected-route-detail" hidden></div>
+      <div id="route-export-review" class="route-export-review" hidden><h3>Before exporting this route</h3><p>These are provisional routes built from map data. Review the linked sources and the complete map before using an export.</p><ul class="route-review-list"><li>Check actual arrival and return services for the hike date, including the last departure and walking access to both stops.</li><li>Check official trail access, closures, permits, conditions and suitability. Government status shown as unknown remains unverified.</li><li>Check every waypoint offset and the complete route on the map. No required place is silently skipped.</li></ul><p id="route-export-status" role="status">The provisional route can be saved in the direction shown. These review reminders are not a safety certification.</p></div>
+  </dialog>
   <dialog id="discard-dialog" aria-labelledby="discard-title"><h2 id="discard-title">Discard this draft?</h2><p>This removes the current waypoints, imported tracks, and image from this page. Your original files are never changed.</p><div class="dialog-actions"><button id="keep-draft">Keep draft</button><button id="confirm-discard" class="primary">Discard draft</button></div></dialog>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/lite.umd.js" crossorigin="anonymous"></script>
@@ -545,25 +600,113 @@
       if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) throw new Error('Coordinates must be valid WGS84 decimal degrees: latitude −90 to 90, longitude −180 to 180.');
       return { lat, lon, name: String(name || 'Waypoint').slice(0, 180) };
     };
-    function message(text, error = false) { $('input-message').textContent = text; $('input-message').classList.toggle('error', error); $('input-message').hidden = false; if (error) toast(text, true, 9000); }
+    function message(text, error = false) { $('input-message').textContent = text; $('input-message').classList.toggle('error', error); $('input-message').hidden = false; toast(text, error, error ? 9000 : 5500); }
     function toast(text, error = false, duration = 5500) { clearTimeout(toastTimer); $('toast').textContent = text; $('toast').classList.toggle('error', error); $('toast').setAttribute('aria-live', error ? 'assertive' : 'polite'); $('toast').hidden = false; if (duration > 0) toastTimer = setTimeout(() => { $('toast').hidden = true; }, duration); }
-    function setDockExpanded(expanded, focus = false) {
-      $('control-dock').classList.toggle('collapsed', !expanded); $('control-dock-toggle').setAttribute('aria-expanded', String(expanded));
-      if (map) requestAnimationFrame(() => map.invalidateSize({ pan: false, animate: false }));
-      if (focus && expanded) setTimeout(() => $('input-method').focus({ preventScroll: true }), 220);
+    // BEGIN STAGE UI
+    // BEGIN STAGE MODEL
+    function stageAvailability(model) {
+      return {
+        method: true,
+        input: !!model.method,
+        requirements: model.pointCount > 0,
+        routes: !!(model.routingBusy || model.routingSearched || model.routeCount),
+        export: !!(model.pointCount || model.segmentCount || model.hasImage)
+      };
     }
+    // END STAGE MODEL
+    const stageOrder = ['method', 'input', 'requirements', 'routes', 'export'];
+    const stageNames = { method: 'Adding Pins', input: 'Add Points', requirements: 'Requirements', routes: 'Routes', export: 'Export' };
+    const inputNames = { 'map-pins': 'Map pins', coordinates: 'Coordinates', text: 'TXT / CSV', gpx: 'GPX file', 'map-image': 'Route image', image: 'Map photo' };
+    let currentStage = 'method';
+    function availableStages() {
+      return stageAvailability({ method: $('input-method').value, pointCount: state.points.length, segmentCount: state.segments.length, hasImage: !!state.imageUrl, routingBusy: routing.busy, routingSearched: routing.searched, routeCount: routing.result?.routes.length || 0 });
+    }
+    function setDockExpanded(expanded, focus = false) {
+      $('control-dock').classList.toggle('collapsed', !expanded);
+      $('control-dock-toggle').setAttribute('aria-expanded', String(expanded));
+      $('control-dock-toggle').setAttribute('aria-label', `${expanded ? 'Minimize' : 'Open'} planning controls — ${stageNames[currentStage]}`);
+      if (map) requestAnimationFrame(() => map.invalidateSize({ pan: false, animate: false }));
+      if (focus && expanded) $('stage-tab-' + currentStage).focus({ preventScroll: true });
+    }
+    function setStage(stage, { expand = true, focus = false } = {}) {
+      if (!availableStages()[stage]) return;
+      if (stage !== 'input' && state.adding) setAdding(false);
+      currentStage = stage;
+      updateDockState();
+      $('control-dock-body').scrollTop = 0;
+      if (expand) setDockExpanded(true);
+      if (focus) $('stage-tab-' + stage).focus({ preventScroll: true });
+    }
+    function updateDockState() {
+      const available = availableStages();
+      if (!available[currentStage]) currentStage = available.input ? 'input' : 'method';
+      for (const stage of stageOrder) {
+        const tab = $('stage-tab-' + stage), selected = currentStage === stage;
+        tab.disabled = !available[stage];
+        tab.setAttribute('aria-selected', String(selected));
+        tab.tabIndex = selected ? 0 : -1;
+        $('stage-' + stage).hidden = !selected;
+      }
+      const method = $('input-method').value;
+      $('stage-tab-input').lastElementChild.textContent = inputNames[method] || stageNames.input;
+      $('input-stage-title').textContent = inputNames[method] || 'Add your points';
+      $('manual-trace-tools').hidden = !['map-image', 'image'].includes(method) || !trace.bitmap;
+      $('route-builder').hidden = !available.requirements;
+      $('route-results').hidden = !available.routes;
+      $('dock-map-controls').hidden = !available.export;
+      $('dock-title').textContent = stageNames[currentStage];
+      $('dock-summary').textContent = '';
+      const expanded = !$('control-dock').classList.contains('collapsed');
+      $('control-dock-toggle').setAttribute('aria-label', `${expanded ? 'Minimize' : 'Open'} planning controls — ${stageNames[currentStage]}`);
+      const back = $('stage-back'), next = $('stage-next');
+      back.hidden = currentStage === 'method';
+      next.hidden = ['requirements', 'export'].includes(currentStage);
+      next.textContent = currentStage === 'method' ? 'Continue →' : currentStage === 'input' ? 'Review waypoints →' : 'Export →';
+      next.disabled = currentStage === 'method' ? !available.input : currentStage === 'input' ? !available.requirements : !routing.result?.routes.length;
+      document.querySelector('.stage-footer').hidden = currentStage === 'method' && !available.input;
+      $('route-details-button').hidden = !routing.selected;
+    }
+    for (const stage of stageOrder) $('stage-tab-' + stage).addEventListener('click', () => setStage(stage));
+    document.querySelector('.stage-tabs').addEventListener('keydown', event => {
+      if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+      const available = availableStages(), enabled = stageOrder.filter(stage => available[stage]);
+      const index = enabled.indexOf(currentStage);
+      const next = event.key === 'Home' ? 0 : event.key === 'End' ? enabled.length - 1 : (index + (event.key === 'ArrowRight' ? 1 : -1) + enabled.length) % enabled.length;
+      event.preventDefault(); setStage(enabled[next], { focus: true });
+    });
+    $('stage-back').addEventListener('click', () => {
+      const available = availableStages(), prior = stageOrder.slice(0, stageOrder.indexOf(currentStage)).filter(stage => available[stage]).at(-1);
+      if (prior) setStage(prior);
+    });
+    $('stage-next').addEventListener('click', () => {
+      if ($('stage-next').disabled) return;
+      setStage(currentStage === 'method' ? 'input' : currentStage === 'input' ? 'requirements' : 'export');
+    });
     $('control-dock-toggle').addEventListener('click', () => setDockExpanded($('control-dock').classList.contains('collapsed'), true));
     const syncDockHeight = () => document.documentElement.style.setProperty('--dock-visible-height', `${Math.ceil($('control-dock').getBoundingClientRect().height)}px`);
     new ResizeObserver(syncDockHeight).observe($('control-dock')); requestAnimationFrame(syncDockHeight);
-    function updateDockState() {
-      const n = state.points.length, routes = routing.result?.routes?.length || 0;
-      $('route-builder').hidden = !n; $('route-results').hidden = !routing.busy && !routing.searched && !routes; $('dock-map-controls').hidden = !n && !state.segments.length && !state.imageUrl;
-      if (routing.busy) { $('dock-title').textContent = 'Finding safe route options'; $('dock-summary').textContent = 'Checking paths and public transport at both ends'; }
-      else if (routing.selected) { $('dock-title').textContent = `Selected: ${routing.selected.title}`; $('dock-summary').textContent = `${n} mandatory waypoint${n === 1 ? '' : 's'} · edit pins or export GPX`; }
-      else if (routes) { $('dock-title').textContent = `Compare ${routes} route option${routes === 1 ? '' : 's'}`; $('dock-summary').textContent = 'Show any combination, select one, or export all'; }
-      else if (n) { $('dock-title').textContent = `${n} waypoint${n === 1 ? '' : 's'} ready`; $('dock-summary').textContent = 'Check their order and create up to 3 routes'; }
-      else { $('dock-title').textContent = 'Add your waypoints'; $('dock-summary').textContent = $('input-method').selectedOptions[0]?.textContent || 'Choose how to add places'; }
+    function revealControl(id) {
+      const target = $(id), stage = target?.closest('.stage-panel');
+      if (stage) setStage(stage.id.replace('stage-', ''));
+      const details = target?.closest('details'); if (details) details.open = true;
+      if (target?.closest('#route-details-dialog') && !$('route-details-dialog').open) $('route-details-dialog').showModal();
     }
+    $('control-dock').addEventListener('click', event => {
+      const link = event.target.closest('a[href^="#"]');
+      if (!link) return;
+      const target = $(link.getAttribute('href').slice(1));
+      if (target) { event.preventDefault(); revealControl(target.id); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    });
+    $('route-details-button').addEventListener('click', () => $('route-details-dialog').showModal());
+    $('close-route-details').addEventListener('click', () => $('route-details-dialog').close());
+    // Keep processing feedback above the dock, without restoring information cards inside it.
+    for (const id of ['ai-status', 'photo-status', 'trace-message']) {
+      new MutationObserver(() => {
+        const node = $(id);
+        if (node.textContent.trim() && currentStage === 'input' && !$('stage-input').hidden) toast(node.textContent, node.classList.contains('error'), 7000);
+      }).observe($(id), { childList: true, characterData: true, subtree: true });
+    }
+    // END STAGE UI
     function parseCoordinates(text) {
       text = text.trim().replace(/^\uFEFF/, '').replace(/^lat(?:itude)?\s*[,;\t]\s*(?:lon(?:gitude)?|lng)\s*(?:\r?\n|\r)/i, '');
       if (!text) throw new Error('Add at least one latitude/longitude pair first.');
@@ -758,7 +901,7 @@
       showRouteVisibility();
     }
     function selectRoute(route) {
-      routing.selected = route; routing.visible.add(route.id); showRoutes(); routeDetails(); render(); setDockExpanded(false);
+      routing.selected = route; routing.visible.add(route.id); showRoutes(); routeDetails(); render(); setStage('export', { expand: false }); setDockExpanded(false);
     }
     function routeDetails() {
       const r = routing.selected; if (!r) return;
@@ -887,8 +1030,9 @@
       if (Date.now() < routing.blockedUntil) { toast('The map provider asked us to pause. Wait 30 seconds before retrying.'); return; }
       stopRouting(); const serial = routing.serial, controller = new AbortController(); routing.controller = controller; routing.busy = true; routing.searched = true; routing.selected = null; routing.result = null; routing.visible.clear(); $('selected-route-detail').hidden = true; $('route-export-review').hidden = true; $('route-visibility-controls').hidden = true; clearExport();
       $('cancel-routing').hidden = false; $('routing-status').hidden = false; $('routing-status').textContent = 'Downloading walking paths and mapped passenger services…';
+      $('map-route-toolbar').hidden = true; $('map-route-dots').replaceChildren(); $('map-export-action').disabled = true;
       toast('Finding routes through every waypoint…', false, 0);
-      $('route-options').replaceChildren(element('div', 'Checking real paths and transport connections. The search may take up to two minutes; you can cancel.', 'routes-empty')); render(false);
+      $('route-options').replaceChildren(element('div', 'Checking real paths and transport connections. The search may take up to two minutes; you can cancel.', 'routes-empty')); render(false); setStage('routes', { expand: false });
       const timeout = setTimeout(() => controller.abort(), 125000);
       try {
         const radius = +$('plan-radius').value, box = TrailRouter.boundingBox(state.points, radius);
@@ -1074,11 +1218,11 @@
     try { const saved = localStorage.getItem(GUIDE_LANGUAGE_KEY); if (saved === 'zh-Hant') guideLanguage = saved; } catch {}
     let guideAction = 'focus-coordinates';
     const guideMethodOptions = Array.from($('input-method').options);
-    const guideScroll = (id, focusId = id) => { $(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); setTimeout(() => $(focusId)?.focus({ preventScroll: true }), 350); };
+    const guideScroll = (id, focusId = id) => { revealControl(id); $(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); setTimeout(() => $(focusId)?.focus({ preventScroll: true }), 350); };
     function guideEndpointReady() { try { return !!recognitionEndpoint(); } catch { return false; } }
     function guideModel() {
       return {
-        method: $('input-method').value, hasCoordinatesText: !!$('coordinates').value.trim(), hasImage: !!ai.image,
+        method: $('input-method').value || 'map-pins', hasCoordinatesText: !!$('coordinates').value.trim(), hasImage: !!ai.image,
         hasRecognitionEndpoint: guideEndpointReady(), recognitionBusy: !!ai.controller, hasRecognitionResult: !!ai.result,
         hasPhotoGPS: !!state.photoGPS, pointCount: state.points.length, routingBusy: routing.busy,
         hasRoutes: !!routing.result, hasSelectedRoute: !!routing.selected
@@ -1103,7 +1247,7 @@
       else if (['image', 'map-image'].includes(model.method) && status.action === 'setup-recognition') { secondary.textContent = copy.coordinatesInstead; secondary.dataset.action = 'coordinates'; }
       else { secondary.hidden = true; secondary.textContent = ''; secondary.dataset.action = ''; }
       $('guide-safety-title').textContent = copy.safetyTitle; $('guide-official-title').textContent = copy.officialTitle; $('guide-official-copy').textContent = copy.officialCopy; $('guide-transit-title').textContent = copy.transitTitle; $('guide-transit-copy').textContent = copy.transitCopy; $('guide-connections-title').textContent = copy.connectionsTitle; $('guide-connections-copy').textContent = copy.connectionsCopy; $('guide-privacy').textContent = copy.privacy;
-      guideMethodOptions.forEach(option => { option.textContent = copy.methods[option.value].label; });
+      guideMethodOptions.forEach(option => { if (option.value) option.textContent = copy.methods[option.value].label; });
       const nextKey = routing.selected ? 'selected' : routing.result ? 'routes' : routing.busy ? 'busy' : state.points.length > 16 ? 'tooMany' : state.points.length ? 'ready' : 'empty';
       const details = `${copy.regions[activeRegion()]} · ${copy.mandatory(state.points.length)}. ${state.segments.length ? copy.trackReference : copy.order}`;
       const nextStrong = element('strong', copy.next[nextKey]), nextDetails = element('p', details);
@@ -1186,7 +1330,7 @@
       $('export-note').textContent = 'Input GPX saves only your waypoints and original segments; it does not create a walking route. Use “Find up to 3 routes” above for connected walking geometry.';
       paintPlannedRoute(); updateGuidance(); updateDockState(); if (fit && (routing.selected || routing.result)) fitPoints();
     }
-    function replaceDraft(points, segments, source) { state.points = points; state.segments = segments; state.source = source; state.requiresTraceReview = source === 'Image trace — unverified'; render(); }
+    function replaceDraft(points, segments, source) { state.points = points; state.segments = segments; state.source = source; state.requiresTraceReview = source === 'Image trace — unverified'; render(); if (points.length) setStage('requirements'); else if (segments.length) setStage('export'); }
     function clearPhoto() {
       resetRecognition();
       if (trace.bitmap) { resetTrace(); trace.bitmap = null; trace.pixels = null; $('image-converter').hidden = true; $('trace-canvas').width = 1; $('trace-canvas').height = 1; }
@@ -1195,13 +1339,13 @@
     }
     $('input-method').addEventListener('change', () => {
       const method = $('input-method').value; state.fileVersion++;
-      setAdding(false); $('map-pins-panel').hidden = method !== 'map-pins'; $('coordinates-panel').hidden = method !== 'coordinates'; $('file-panel').hidden = ['coordinates', 'map-pins'].includes(method); $('input-message').hidden = true; $('file-input').value = '';
+      setAdding(false); $('map-pins-panel').hidden = method !== 'map-pins'; $('coordinates-panel').hidden = method !== 'coordinates'; $('file-panel').hidden = ['', 'coordinates', 'map-pins'].includes(method); $('input-message').hidden = true; $('file-input').value = '';
       $('paste-controls').hidden = method !== 'map-image';
       const config = { text: ['Choose your coordinate file', 'TXT or CSV · maximum 10 MB', '.txt,.csv,text/plain,text/csv'], gpx: ['Choose your GPX file', 'GPX · maximum 10 MB · unverified source data', '.gpx,application/gpx+xml,application/xml,text/xml'], image: ['Choose your map image or photo', 'JPEG, PNG or WebP · maximum 10 MB · local processing', 'image/jpeg,image/png,image/webp'], 'map-image': ['Choose a route screenshot, or paste one below', 'JPEG, PNG or WebP · maximum 10 MB · local processing', 'image/jpeg,image/png,image/webp'] }[method];
       if (config) { $('upload-title').textContent = config[0]; $('upload-help').textContent = config[1]; $('file-input').accept = config[2]; }
       $('image-review').hidden = !['image', 'map-image'].includes(method) || !state.imageUrl;
       $('image-converter').hidden = !['map-image', 'image'].includes(method) || !trace.bitmap; $('ai-review').hidden = !['map-image', 'image'].includes(method) || !ai.image;
-      updateInputGuide(); updateDockState();
+      updateInputGuide(); updateDockState(); if (method) setStage('input');
     });
     $('preview-points').addEventListener('click', () => {
       try { const points = parseCoordinates($('coordinates').value); state.fileVersion++; clearPhoto(); replaceDraft(points, [], 'Entered coordinates'); message(`${points.length} waypoints added. Check every pin. Government trail status and transport are not verified.`); track('waypoints_previewed'); }
@@ -1219,7 +1363,7 @@
           try { await probe.decode(); if (probe.naturalWidth * probe.naturalHeight > 40000000) throw new Error('Please resize the image below 40 megapixels.'); } catch (error) { URL.revokeObjectURL(imageUrl); throw new Error(error.message.includes('megapixels') ? error.message : 'This image could not be decoded. Try another JPEG or PNG.'); }
           if (version !== state.fileVersion) { URL.revokeObjectURL(imageUrl); return; }
           clearPhoto(); state.imageUrl = imageUrl; $('photo').src = imageUrl; $('image-review').hidden = false; $('photo-status').textContent = 'Checking for photo GPS metadata…'; render(false);
-          openConverter(probe); openRecognition(probe);
+          openConverter(probe); openRecognition(probe); updateDockState();
           message(method === 'map-image' ? 'Image opened locally. Try “Identify the map” below with Kimi, or use manual calibration to trace the route.' : `Opened ${file.name} locally. No location has been inferred from the image.`);
           track('photo_reviewed');
           if (method === 'map-image') { $('photo-status').textContent = 'Map image ready for recognition or manual calibration. Camera GPS is not used to locate the area shown.'; return; }
@@ -1245,7 +1389,7 @@
     $('add-photo-gps').addEventListener('click', () => {
       if ($('add-photo-gps').disabled || !state.photoGPS) return;
       if (state.points.length >= MAX_WAYPOINTS) { message(`Maximum ${MAX_WAYPOINTS} waypoints.`, true); return; }
-      state.points.push({ ...state.photoGPS }); state.source = 'Photo GPS metadata'; $('add-photo-gps').disabled = true; render(); toast('Photo position added. Trail access is still unverified.');
+      state.points.push({ ...state.photoGPS }); state.source = 'Photo GPS metadata'; $('add-photo-gps').disabled = true; render(); setStage('requirements'); toast('Photo position added. Trail access is still unverified.');
       track('photo_gps_confirmed');
     });
     // BEGIN IMAGE CONVERSION MATH — pure functions, also exercised by tests.
@@ -1456,11 +1600,10 @@
       $('map-gesture-note').hidden = false;
       $('map-gesture-note').textContent = state.adding ? 'Tap empty map space to add a pin. Pinch or use the wheel to zoom; drag the map to pan. Drag a pin to move it, or tap/right-click it to delete.' : 'Pinch or use the wheel/trackpad to zoom. Drag to pan. Drag a pin to move it; tap or right-click it to delete.';
     }
-    function setAdding(value) { state.adding = value; $('toggle-pins').setAttribute('aria-pressed', String(value)); $('toggle-pins').textContent = value ? '✓ Finish adding pins' : '+ Add pins on map'; $('map-pin-action').setAttribute('aria-pressed', String(value)); $('map-pin-action').textContent = value ? 'Finish adding pins' : 'Start adding pins'; $('start-pin-mode').hidden = value; $('finish-pin-mode').hidden = !value; if (map) map.getContainer().style.cursor = value ? 'crosshair' : ''; setMapInteraction(true); }
+    function setAdding(value) { state.adding = value; $('toggle-pins').setAttribute('aria-pressed', String(value)); $('toggle-pins').textContent = value ? '✓ Finish adding pins' : '+ Add pins on map'; $('start-pin-mode').hidden = value; $('finish-pin-mode').hidden = !value; if (map) map.getContainer().style.cursor = value ? 'crosshair' : ''; setMapInteraction(true); }
     function startAddingPins() { if (!map) return; setAdding(true); setDockExpanded(false); toast('Tap or click empty map space to add waypoints. Open the controls when you are finished.'); }
     $('start-pin-mode').addEventListener('click', startAddingPins);
-    $('finish-pin-mode').addEventListener('click', () => { setAdding(false); setDockExpanded(true); });
-    $('map-pin-action').addEventListener('click', () => { const adding = !state.adding; setAdding(adding); setDockExpanded(false); toast(adding ? 'Tap or click empty map space to add waypoints.' : `${state.points.length} waypoint${state.points.length === 1 ? '' : 's'} ready. You can now find routes.`); });
+    $('finish-pin-mode').addEventListener('click', () => { setAdding(false); setStage(state.points.length ? 'requirements' : 'input'); });
     $('map-route-action').addEventListener('click', () => { if ($('map-route-action').disabled) return; setAdding(false); setDockExpanded(false); $('find-routes').click(); });
     $('toggle-pins').addEventListener('click', () => { if (!map) return; const next = !state.adding; setAdding(next); if (next) setDockExpanded(false); });
     $('toggle-map').addEventListener('click', () => setMapInteraction(true));
@@ -1469,7 +1612,7 @@
     function clearExport() { if (exportUrl) URL.revokeObjectURL(exportUrl); exportUrl = null; exportFile = null; $('download-ready').hidden = true; $('download-link').removeAttribute('href'); $('share-file').hidden = true; }
     function download(blob, filename) {
       clearExport(); exportUrl = URL.createObjectURL(blob); exportFile = new File([blob], filename, { type: blob.type });
-      const link = $('download-link'); link.href = exportUrl; link.download = filename; link.textContent = filename; $('download-ready').hidden = false;
+      const link = $('download-link'); link.href = exportUrl; link.download = filename; link.textContent = filename; $('download-ready').hidden = false; setStage('export', { expand: false });
       try { $('share-file').hidden = !navigator.canShare?.({ files: [exportFile] }); } catch { $('share-file').hidden = true; }
       link.click();
     }
@@ -1543,7 +1686,7 @@
     });
     $('discard').addEventListener('click', () => $('discard-dialog').showModal());
     $('keep-draft').addEventListener('click', () => $('discard-dialog').close());
-    $('confirm-discard').addEventListener('click', () => { state.fileVersion++; clearPhoto(); state.points = []; state.segments = []; state.source = ''; state.requiresTraceReview = false; $('coordinates').value = ''; $('file-input').value = ''; $('input-message').hidden = true; setAdding(false); render(false); $('discard-dialog').close(); toast('Draft discarded. Your original files are unchanged.'); track('draft_discarded'); });
+    $('confirm-discard').addEventListener('click', () => { state.fileVersion++; clearPhoto(); state.points = []; state.segments = []; state.source = ''; state.requiresTraceReview = false; $('coordinates').value = ''; $('file-input').value = ''; $('input-message').hidden = true; setAdding(false); render(false); $('discard-dialog').close(); setStage('method'); toast('Draft discarded. Your original files are unchanged.'); track('draft_discarded'); });
     function removeMapPin(index) {
       if (!state.points[index]) return;
       mutateWaypoints(() => state.points.splice(index, 1), 'Waypoint deleted. Route options will update.'); map?.closePopup();
