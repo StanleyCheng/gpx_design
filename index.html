@@ -84,13 +84,16 @@
     }
     #map-markers-action[aria-pressed=true]{background:color-mix(in srgb,#dcefdc 80%,transparent);color:var(--ink)}#map-markers-action[aria-pressed=false]{background:var(--soft);color:var(--muted);border-style:dashed}
     .map-status-panel,.map-quick-actions{align-items:center}
-    #map-route-action{width:46px;height:46px;min-width:46px;min-height:46px;padding:0;border:1px solid #1b211e;border-radius:50%;background:#bfe3bd;color:#17231e;animation:find-rgb-cycle 9s ease-in-out infinite}
+    #map-route-action{width:46px;height:46px;min-width:46px;min-height:46px;padding:0;border:1px solid #1b211e;border-radius:50%;background:#bfe3bd;color:#17231e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0}
+    #map-route-action[aria-busy=true]{animation:find-rgb-cycle 9s ease-in-out infinite}
+    .finding-dots{display:none;height:7px;align-items:center;justify-content:center;gap:2px}.finding-dots span{width:3px;height:3px;border-radius:50%;background:currentColor;opacity:.35}.finding-dots span:nth-child(2){animation-delay:.16s}.finding-dots span:nth-child(3){animation-delay:.32s}#map-route-action[aria-busy=true] .find-label{line-height:1}#map-route-action[aria-busy=true] .finding-dots{display:flex}#map-route-action[aria-busy=true] .finding-dots span{animation:find-dot 1.15s ease-in-out infinite}
     @keyframes find-rgb-cycle{0%,100%{background:#f1aaa2}33.333%{background:#bfe3bd}66.666%{background:#b9d8ef}}
+    @keyframes find-dot{0%,60%,100%{transform:translateY(1px);opacity:.35}30%{transform:translateY(-2px);opacity:1}}
     .route-line-label span{min-width:70px;min-height:38px;flex-direction:column;gap:2px;padding:4px 7px;line-height:1.05;text-align:center;white-space:normal}.route-line-label strong,.route-line-label small{display:block;font:inherit}.route-line-label small{font-size:10px}
     .dock-grip{display:grid;place-items:center;width:20px;height:20px;background:none!important;opacity:1!important;color:var(--ink);font:700 13px/1 var(--font)}.dock-grip::before{content:'↓'}.control-dock.collapsed .dock-grip::before{content:'↑'}.dock-chevron{display:none!important}
     .plan-loop-field{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:47px;padding:0 10px;border:1px solid var(--line);border-radius:7px;background:var(--soft);font-size:12px;font-weight:600;align-self:end}
     .plan-switch{display:flex;align-items:center;gap:8px;min-height:44px;padding:4px 0;border:0;background:transparent;font-size:12px;box-shadow:none}.switch-track{position:relative;width:36px;height:22px;border-radius:12px;background:var(--muted)}.switch-track::after{content:'';position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:var(--white)}.plan-switch[aria-checked=true] .switch-track{background:var(--ink)}.plan-switch[aria-checked=true] .switch-track::after{transform:translateX(14px)}.switch-state{min-width:22px}
-    @media(prefers-reduced-motion:reduce){.control-dock,.dock-chevron{transition:none}#map-route-action{animation:none;background:#bfe3bd}}
+    @media(prefers-reduced-motion:reduce){.control-dock,.dock-chevron{transition:none}#map-route-action[aria-busy=true],#map-route-action[aria-busy=true] .finding-dots span{animation:none;background:#bfe3bd;transform:none;opacity:1}}
   </style>
 </head>
 <body class="map-first">
@@ -102,7 +105,7 @@
   <noscript><p class="noscript">JavaScript is required to import files and use the map. Route planning requires JavaScript. No route is certified safe.</p></noscript>
   <main class="shell">
     <section class="map-section" aria-labelledby="map-title"><h1 id="map-title" class="skip">Planning map</h1>
-      <div id="map-capture" class="map-container"><div id="map" aria-label="Interactive map for reviewing and editing waypoint locations" aria-describedby="map-gesture-note"></div><div class="map-status-panel"><div class="map-quick-actions" aria-label="Map planning shortcuts"><button id="map-route-action" type="button" aria-label="Find routes" aria-busy="false" disabled>Find</button></div><aside id="map-route-toolbar" class="map-route-toolbar" aria-label="Routes shown on map" hidden><strong>Routes</strong><div id="map-route-dots" class="map-route-dots"></div><button id="map-markers-action" class="map-export-action" type="button" aria-pressed="true" aria-label="Hide waypoint pins and start/finish markers" title="Hide pins and start/finish points">Pins</button><button id="map-export-action" class="map-export-action" type="button" aria-label="Export shown routes as GPX" disabled>Export</button></aside></div></div>
+      <div id="map-capture" class="map-container"><div id="map" aria-label="Interactive map for reviewing and editing waypoint locations" aria-describedby="map-gesture-note"></div><div class="map-status-panel"><div class="map-quick-actions" aria-label="Map planning shortcuts"><button id="map-route-action" type="button" aria-label="Find routes" aria-busy="false" disabled><span class="find-label">Find</span><span class="finding-dots" aria-hidden="true"><span></span><span></span><span></span></span></button></div><aside id="map-route-toolbar" class="map-route-toolbar" aria-label="Routes shown on map" hidden><strong>Routes</strong><div id="map-route-dots" class="map-route-dots"></div><button id="map-markers-action" class="map-export-action" type="button" aria-pressed="true" aria-label="Hide waypoint pins and start/finish markers" title="Hide pins and start/finish points">Pins</button><button id="map-export-action" class="map-export-action" type="button" aria-label="Export shown routes as GPX" disabled>Export</button></aside></div></div>
     </section>
     <section id="control-dock" class="control-dock collapsed" aria-label="Route planning controls">
       <button id="control-dock-toggle" class="dock-toggle" type="button" aria-expanded="false" aria-controls="control-dock-content" aria-label="Open planning controls"><span class="dock-grip" aria-hidden="true"></span><span class="dock-heading"><strong id="dock-title">Add your waypoints</strong><span id="dock-summary">Choose how you want to add places</span></span><span class="dock-chevron" aria-hidden="true">⌄</span></button>
@@ -1030,7 +1033,6 @@
       $('find-routes').disabled = !valid || routing.busy;
       $('find-routes').textContent = routing.busy ? 'Finding walking connections…' : 'Find up to 3 routes →';
       $('map-route-action').disabled = !valid || routing.busy;
-      $('map-route-action').textContent = 'Find';
       $('map-route-action').setAttribute('aria-busy', String(routing.busy));
       $('map-route-action').setAttribute('aria-label', routing.busy ? 'Finding routes' : 'Find routes');
       $('map-route-action').title = routing.busy ? 'Finding routes…' : 'Find up to 3 routes';
