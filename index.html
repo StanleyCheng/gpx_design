@@ -1311,9 +1311,10 @@
         const error = new Error(`Map service returned ${response.status}. ${paused ? 'Wait at least 30 seconds before retrying.' : transient ? 'The provider is temporarily unavailable.' : 'Try again later or choose another map data provider.'}`);
         error.status = response.status; error.transient = transient; throw error;
       }
-      if (Number(response.headers.get('Content-Length')) > maxBytes) throw new Error('Map response is too large. Reduce the search radius.');
+      const oversizedMessage = 'The walking map is too large for safe browser processing. This plan needs the route server; tap Find to retry when the connection is available.';
+      if (Number(response.headers.get('Content-Length')) > maxBytes) throw new Error(oversizedMessage);
       const reader = response.body.getReader(), chunks = []; let size = 0;
-      try { while (true) { const { done, value } = await reader.read(); if (done) break; size += value.length; if (size > maxBytes) throw new Error('Map response is too large. Reduce the search radius.'); chunks.push(value); } } catch (e) { await reader.cancel().catch(() => {}); throw e; }
+      try { while (true) { const { done, value } = await reader.read(); if (done) break; size += value.length; if (size > maxBytes) throw new Error(oversizedMessage); chunks.push(value); } } catch (e) { await reader.cancel().catch(() => {}); throw e; }
       const buffer = new Uint8Array(size); let offset = 0; for (const chunk of chunks) { buffer.set(chunk, offset); offset += chunk.length; }
       return JSON.parse(new TextDecoder().decode(buffer));
     }
@@ -1361,14 +1362,27 @@
       catch (e) { if (signal.aborted) throw e; return { features: [], note: 'AFCD trail data was unavailable. Government-managed coverage cannot be established.' }; }
     }
     async function getBackendPlan(points, settings, provider, region, signal) {
+      const body = JSON.stringify({ points, settings, provider, region });
       let response;
-      try {
-        response = await fetch(ROUTE_BACKEND_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ points, settings, provider, region }), signal: AbortSignal.any([signal, AbortSignal.timeout(235000)]) });
-      } catch (error) {
-        if (signal.aborted) throw error;
-        const timedOut = ['TimeoutError', 'AbortError'].includes(error?.name);
-        const failure = new Error(timedOut ? 'The route backend took too long to respond. Your waypoints are unchanged; please retry.' : 'The route backend could not be reached.');
-        failure.directFallback = !timedOut; throw failure;
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          response = await fetch(ROUTE_BACKEND_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, signal: AbortSignal.any([signal, AbortSignal.timeout(235000)]) });
+          break;
+        } catch (error) {
+          if (signal.aborted) throw error;
+          const timedOut = ['TimeoutError', 'AbortError'].includes(error?.name);
+          if (timedOut) {
+            const failure = new Error('The route backend took too long to respond. Your waypoints are unchanged; please retry.');
+            failure.directFallback = false; throw failure;
+          }
+          if (attempt < 3) {
+            const retryText = `The route server connection was interrupted. Retrying (${attempt + 1} of 3)…`;
+            $('routing-status').textContent = retryText; toast(retryText, false, 0);
+            continue;
+          }
+          const failure = new Error('The route server connection failed three times. Your waypoints are unchanged; tap Find to retry.');
+          failure.directFallback = false; throw failure;
+        }
       }
       let payload = {};
       try { payload = await response.json(); } catch { /* A missing/old backend may return an HTML error page. */ }
