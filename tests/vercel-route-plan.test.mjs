@@ -59,6 +59,10 @@ test('backend accepts 50 named waypoints and rejects 51 before fetching', async 
   assert.equal(rejected.status, 400);
   assert.match((await rejected.json()).error, /1–50/);
   assert.equal(fetches, 1, 'an oversized waypoint list must not trigger a map request');
+  const invalidFordSetting = await handler(routeRequest(named, undefined, { allowOfficialFords: 'yes' }));
+  assert.equal(invalidFordSetting.status, 400);
+  assert.match((await invalidFordSetting.json()).error, /stream-crossing setting/);
+  assert.equal(fetches, 1, 'an invalid ford setting must not trigger a map request');
 });
 
 test('route backend rotates providers and returns only compact planned routes', async () => {
@@ -69,11 +73,12 @@ test('route backend rotates providers and returns only compact planned routes', 
     if (calls.length === 2) throw new TypeError('network unavailable');
     return new Response(JSON.stringify(fixture()), { status: 200, headers: { 'Content-Type': 'application/json' } });
   } });
-  const response = await handler(routeRequest());
+  const response = await handler(routeRequest(undefined, undefined, { allowOfficialFords: true }));
   assert.equal(response.status, 200);
   const body = await response.json();
   assert.equal(body.result.routes.length, 3);
   assert.equal(body.result.settings.loop, false, 'older clients retain normal routing when Loop is omitted');
+  assert.equal(body.result.settings.allowOfficialFords, true);
   assert.match(body.source, /VK Maps \/ OpenStreetMap/);
   assert.equal(calls.length, 3);
   assert.match(calls[0], /overpass-api\.de/);

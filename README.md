@@ -5,7 +5,7 @@
 ## Workflow
 
 1. Add mandatory places using decimal coordinates, TXT/CSV, GPX, image recognition, or map pins.
-2. Review each place and its order. Select regional guidance, hike date, distance, transport approach, waypoint tolerance and road-connector limits.
+2. Review each place and its order. Select regional guidance, hike date, distance, transport approach, waypoint tolerance and road-connector limits. In Hong Kong, **Official trail stream crossings** can explicitly admit a mapped ford on matching AFCD trail geometry; it is off by default.
 3. Find up to three distinct routes. Every route must include every place within the accepted tolerance, follow real connected OSM walking ways, and start/end near passenger stops linked to mapped transit services.
 4. Choose a route, inspect the full map and evidence, independently check access and transport, then save GPX. After reversing, review arrival and departure services for the new direction; reversal is disabled when mapped foot direction or boarding rules prohibit it. PNG remains a clearly labelled planning preview.
 
@@ -21,7 +21,7 @@ The engine returns fewer options or an actionable failure instead of inventing r
 - **Taiwan, Japan, South Korea:** the same OSM walking and transport-service graph, plus relevant official authority links. Government trail geometry, current closures and timetables are **not integrated** for these regions yet.
 - **Elsewhere:** experimental, subject to OSM coverage. Limited to local searches between 75°S and 75°N, a core waypoint area at most 250 km², not crossing the date line; at most two 20 km endpoint circles can be added for transport. Download and graph-size limits still apply.
 
-Up to 50 mandatory places across map pins, coordinate/GPX imports, and recognized waypoints; reordering alternatives are considered for up to 8. With more pins, alternatives retain the entered order. All limits are enforced. A bus-stop symbol without a mapped service does not qualify. Stops must be within 80 m of a route-network node, with that unrouted gap explicitly shown. The hike date is for manual timetable checks, not an automatic schedule filter. No ascent, duration, safety score or elevation is invented. Known restrictions, conditional access, fords, demanding `sac_scale` tags, unclear trail-visibility tags, impassable surfaces, via ferrata and unsuitable roads are excluded; untagged conditions remain unknown.
+Up to 50 mandatory places across map pins, coordinate/GPX imports, and recognized waypoints; reordering alternatives are considered for up to 8. With more pins, alternatives retain the entered order. All limits are enforced. A bus-stop symbol without a mapped service does not qualify. Stops must be within 80 m of a route-network node, with that unrouted gap explicitly shown. The hike date is for manual timetable checks, not an automatic schedule filter. No ascent, duration, safety score or elevation is invented. Known restrictions, conditional access, demanding `sac_scale` tags, unclear trail-visibility tags, impassable surfaces, via ferrata and unsuitable roads are excluded; untagged conditions remain unknown. Fords are excluded by default. The optional Hong Kong setting admits only ford segments matching AFCD geometry and never overrides `foot=no`, private or conditional access, locks, barriers, or one-way rules. Route review and GPX descriptions disclose every admitted ford.
 
 ## Image input
 

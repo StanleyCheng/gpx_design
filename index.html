@@ -203,6 +203,7 @@
           <label>Regional guidance<select id="plan-region"><option value="auto">Suggest from coordinates</option><option value="hk">Hong Kong</option><option value="tw">Taiwan</option><option value="jp">Japan</option><option value="kr">South Korea</option><option value="world">Elsewhere · experimental</option></select></label>
           <label>Visit order<select id="plan-order"><option value="optimize" selected>Pin order first · allow alternatives</option><option value="keep">Keep pin order for every route</option></select></label>
           <div class="plan-loop-field"><span id="plan-loop-label">Loop</span><button id="plan-loop" class="plan-switch" type="button" role="switch" aria-checked="false" aria-labelledby="plan-loop-label" title="Return to the same start and finish"><span class="switch-track" aria-hidden="true"></span><span class="switch-state" aria-hidden="true">Off</span></button></div>
+          <div class="plan-loop-field"><span id="plan-official-fords-label">Official trail stream crossings</span><button id="plan-official-fords" class="plan-switch" type="button" role="switch" aria-checked="false" aria-labelledby="plan-official-fords-label" title="Allow mapped fords only where the path matches Hong Kong AFCD trail geometry"><span class="switch-track" aria-hidden="true"></span><span class="switch-state" aria-hidden="true">Off</span></button></div>
           <label>Hike date<input id="plan-date" type="date"></label>
           <label>Maximum hike distance<select id="plan-distance"><option value="10000">10 km</option><option value="20000">20 km</option><option value="30000" selected>30 km</option><option value="50000">50 km</option><option value="80000">80 km</option></select></label>
           <label>Transport at each end<select id="plan-radius"><option value="1000" selected>1 km first · up to 20 km if needed</option></select></label>
@@ -210,7 +211,7 @@
           <label>Maximum mapped road connectors<select id="plan-roads"><option value="0">None · paths only</option><option value="500">500 m total</option><option value="1500" selected>1.5 km total</option><option value="3000">3 km total</option></select></label>
           <label>OpenStreetMap data provider<select id="plan-provider"><option value="auto" selected>Automatic fallback · recommended</option><option value="coffee">Private.coffee Overpass</option><option value="vk">VK Maps Overpass</option><option value="fossgis">FOSSGIS Overpass</option></select></label>
         </div>
-        <p class="help">Check the suggested region, especially near borders or islands. Searches favour mapped hiking trails and, where available, government trail data. Restricted access, fords, demanding OSM terrain tags and unsuitable roads are excluded. Missing terrain tags are still unknown. Every waypoint must match a real path within your chosen tolerance; there are no invented links.</p>
+        <p class="help">Check the suggested region, especially near borders or islands. Searches favour mapped hiking trails and, where available, government trail data. Restricted access, demanding OSM terrain tags and unsuitable roads are excluded. Fords remain excluded unless you explicitly allow one on matching Hong Kong AFCD trail geometry; current water conditions still require your review. Missing terrain tags are unknown. Every waypoint must match a real path within your chosen tolerance; there are no invented links.</p>
         <div class="build-actions"><button id="find-routes" class="primary" disabled>Find up to 3 routes ↗</button><button id="view-inputs" class="text-button" disabled>Review input pins on map ↓</button></div>
         <p class="help">Route search sends only your waypoint coordinates and selected limits to TrailPlanner’s Vercel backend. The backend tries another public Overpass provider when one times out or has a temporary server error, then returns only the planned route options. It does not retry oversized or invalid searches. Hong Kong searches also check AFCD’s public trail dataset. Your uploaded file and image are not sent. Successful graph routing does not verify timetables, closures or safe access.</p>
 
@@ -282,11 +283,12 @@
   const validPoint = p => p && Number.isFinite(p.lat) && Number.isFinite(p.lon) && Math.abs(p.lat) < 75 && Math.abs(p.lon) <= 180;
   const nameOf = e => String(e.tags?.['name:en'] || e.tags?.name || e.tags?.ref || `OSM ${e.type} ${e.id}`).slice(0, 160);
   const edgeKey = (a, b) => a < b ? `${a}/${b}` : `${b}/${a}`;
-  function walkable(tags = {}) {
+  const isFord = (tags = {}) => tags.highway === 'ford' || Boolean(tags.ford && tags.ford !== 'no');
+  function walkableWithFords(tags = {}, allowFord = false) {
     if (!WALK.has(tags.highway) || tags.area === 'yes' || ['disused', 'abandoned', 'construction', 'proposed'].some(k => tags[k] && tags[k] !== 'no')) return false;
     if (NO.has(tags.foot) || (NO.has(tags.access) && !YES.has(tags.foot))) return false;
     if (tags['access:conditional'] || tags['foot:conditional'] || tags.seasonal === 'yes' || tags.locked === 'yes') return false;
-    if (tags.ford && tags.ford !== 'no') return false;
+    if (!allowFord && isFord(tags)) return false;
     if (tags.sac_scale && tags.sac_scale !== 'hiking') return false;
     if (['intermediate', 'bad', 'horrible', 'no'].includes(tags.trail_visibility) || ['grade4', 'grade5'].includes(tags.tracktype)) return false;
     if (['horrible', 'very_horrible', 'impassable'].includes(tags.smoothness) || (tags.via_ferrata_scale && tags.via_ferrata_scale !== '0')) return false;
@@ -297,10 +299,19 @@
     if (tags.highway === 'service' && ['driveway', 'parking_aisle', 'drive-through'].includes(tags.service)) return false;
     return true;
   }
+  const walkable = (tags = {}) => walkableWithFords(tags, false);
   function passableNode(node) {
     const t = node.tags || {};
     if (NO.has(t.foot) || (NO.has(t.access) && !YES.has(t.foot))) return false;
-    if (t.highway === 'ford' || t.locked === 'yes' || t['foot:conditional'] || t['access:conditional'] || (t.ford && t.ford !== 'no')) return false;
+    if (isFord(t) || t.locked === 'yes' || t['foot:conditional'] || t['access:conditional']) return false;
+    return !['wall', 'fence', 'retaining_wall', 'city_wall', 'hedge'].includes(t.barrier);
+  }
+  function passableOnOfficialSegment(node, official, allowOfficialFords) {
+    if (passableNode(node)) return true;
+    const t = node.tags || {};
+    if (!allowOfficialFords || official < 0 || !isFord(t)) return false;
+    if (NO.has(t.foot) || (NO.has(t.access) && !YES.has(t.foot))) return false;
+    if (t.locked === 'yes' || t['foot:conditional'] || t['access:conditional']) return false;
     return !['wall', 'fence', 'retaining_wall', 'city_wall', 'hedge'].includes(t.barrier);
   }
   class Heap {
@@ -338,7 +349,7 @@
       return -1;
     };
   }
-  function buildGraph(data, features = []) {
+  function buildGraph(data, features = [], options = {}) {
     if (!data || data.remark || !Array.isArray(data.elements)) throw routeError('INCOMPLETE_MAP', 'The map server returned incomplete data. Please retry later; no partial route was used.');
     if (data.elements.length > 200000) throw routeError('MAP_TOO_LARGE', 'The downloaded map exceeds the 200,000-element processing limit. Move the first or last waypoint closer to a serviced trailhead, or plan a smaller area. No partial graph was used.');
     const unique = new Map();
@@ -347,17 +358,24 @@
     const relations = elements.filter(e => e.type === 'relation'), hiking = new Map();
     for (const r of relations) if (['hiking', 'foot'].includes(r.tags?.route)) for (const m of r.members || []) if (m.type === 'way') { if (!hiking.has(m.ref)) hiking.set(m.ref, []); hiking.get(m.ref).push({ id: r.id, name: nameOf(r) }); }
     const adj = new Map(), reverse = new Map(), eligible = new Map(), segments = [], corridor = officialIndex(features);
+    const allowOfficialFords = options.allowOfficialFords === true, excludedOfficialFords = new Set();
     let excludedWays = 0, missingNodes = 0;
     for (const way of elements.filter(e => e.type === 'way' && e.tags?.highway)) {
-      if (!walkable(way.tags)) { excludedWays++; continue; }
-      const tags = way.tags, direction = tags['oneway:foot'];
+      const tags = way.tags, fordWay = isFord(tags);
+      if (!walkableWithFords(tags, allowOfficialFords && fordWay)) { excludedWays++; continue; }
+      const direction = tags['oneway:foot'];
       for (let i = 1; i < (way.nodes || []).length; i++) {
         const a = nodes.get(way.nodes[i - 1]), b = nodes.get(way.nodes[i]);
         if (!a || !b) { missingNodes++; continue; }
-        if (!passableNode(a) || !passableNode(b)) continue;
+        const official = corridor(a, b), officialFord = official >= 0 && (fordWay || isFord(a.tags) || isFord(b.tags));
+        if (fordWay && !officialFord) continue;
+        if (!passableOnOfficialSegment(a, official, allowOfficialFords) || !passableOnOfficialSegment(b, official, allowOfficialFords)) {
+          if (!allowOfficialFords && officialFord) { if (isFord(a.tags)) excludedOfficialFords.add(a.id); if (isFord(b.tags)) excludedOfficialFords.add(b.id); }
+          continue;
+        }
         const metres = distance(a, b); if (metres <= 0) continue;
         const segment = `${way.id}/${i}`, forward = direction !== '-1', backward = !['yes', '1'].includes(direction);
-        const edge = { key: edgeKey(a.id, b.id), segment, way: way.id, metres, road: ROAD.has(tags.highway), steps: tags.highway === 'steps', hiking: hiking.get(way.id) || [], official: corridor(a, b), unknown: !ROAD.has(tags.highway) && !tags.sac_scale, clear: ['excellent', 'good'].includes(tags.trail_visibility), name: nameOf(way) };
+        const edge = { key: edgeKey(a.id, b.id), segment, way: way.id, metres, road: ROAD.has(tags.highway), steps: tags.highway === 'steps', ford: officialFord, hiking: hiking.get(way.id) || [], official, unknown: !ROAD.has(tags.highway) && !tags.sac_scale, clear: ['excellent', 'good'].includes(tags.trail_visibility), name: nameOf(way) };
         eligible.set(a.id, a); eligible.set(b.id, b);
         segments.push({ key: segment, a: a.id, b: b.id, edge, forward, backward });
         if (forward) addDirected(adj, reverse, a.id, b.id, edge);
@@ -366,7 +384,7 @@
     }
     if (missingNodes) throw new Error('Some walking-way geometry is missing. No incomplete graph will be routed. Please retry the map download.');
     if (!eligible.size) throw new Error('No eligible walking network was found. Roads without suitable access, restricted paths and demanding tagged terrain are excluded.');
-    return { nodes: eligible, allNodes: nodes, adj, reverse, segments, relations, features, excludedWays, timestamp: data.osm3s?.timestamp_osm_base || null };
+    return { nodes: eligible, allNodes: nodes, adj, reverse, segments, relations, features, excludedWays, excludedOfficialFords: [...excludedOfficialFords], timestamp: data.osm3s?.timestamp_osm_base || null };
   }
   function nearest(graph, point, maxMetres, candidates = graph.nodes.values()) {
     let match = null;
@@ -602,6 +620,7 @@
     const repeatedMetres = metres - [...unique.values()].reduce((s, d) => s + d, 0);
     const relations = [...new Map(chain.edges.flatMap(e => e.hiking).map(r => [r.id, r])).values()];
     const officialIds = [...new Set(chain.edges.filter(e => e.official >= 0).map(e => e.official))];
+    const fordCrossings = [...new Set(chain.ids.filter(id => isFord(graph.nodes.get(id)?.tags)))].map(id => { const node = graph.nodes.get(id); return { id, lat: node.lat, lon: node.lon }; });
     return {
       ids: chain.ids, coords: chain.ids.map(id => { const n = graph.nodes.get(id); return { lat: n.lat, lon: n.lon }; }),
       edges: chain.edges.map(e => ({ key: e.key, way: e.way, metres: e.metres })), metres, roadMetres, repeatedMetres,
@@ -609,7 +628,7 @@
       corridorMetres: chain.edges.filter(e => e.official >= 0).reduce((s, e) => s + e.metres, 0),
       unknownTerrainMetres: chain.edges.filter(e => e.unknown).reduce((s, e) => s + e.metres, 0),
       start: { ...start.stop, approach: start.path.metres, extendedApproach: start.extended }, end: { ...end.stop, approach: end.path.metres, extendedApproach: end.extended },
-      snaps, order, loop: settings.loop, relations, official: officialIds.map(i => graph.features[i].properties),
+      snaps, order, loop: settings.loop, relations, official: officialIds.map(i => graph.features[i].properties), fordCrossings,
       reversible: chain.ids.slice(1).every((id, i) => (graph.adj.get(id) || []).some(e => e.to === chain.ids[i])) && end.stop.services.some(s => s.alight) && start.stop.services.some(s => s.board),
       score: chain.edges.reduce((s, e) => s + e.metres * (e.official >= 0 ? 1 : e.hiking.length ? 1.1 : e.road ? 4 : e.clear ? 1.3 : 1.6), 0) + start.convenience + end.convenience + repeatedMetres * .45,
       osmTimestamp: graph.timestamp
@@ -644,12 +663,13 @@
     return choices.sort((a, b) => a.cost - b.cost)[0]?.order || null;
   }
   function plan(data, points, inputSettings = {}, features = [], progress = () => {}) {
-    const settings = { tolerance: 30, radius: 1000, maxApproach: 1000, maxDistance: 30000, maxRoad: 1500, optimize: true, loop: false, ...inputSettings };
+    const settings = { tolerance: 30, radius: 1000, maxApproach: 1000, maxDistance: 30000, maxRoad: 1500, optimize: true, loop: false, allowOfficialFords: false, ...inputSettings };
     if (typeof settings.loop !== 'boolean') throw new Error('Choose a valid Loop setting: on or off.');
+    if (typeof settings.allowOfficialFords !== 'boolean') throw new Error('Choose a valid official-trail stream-crossing setting: on or off.');
     settings.maxApproach = Math.min(MAX_APPROACH, settings.maxApproach);
     if (!Array.isArray(points) || !points.length || points.length > MAX_WAYPOINTS || points.some(p => !validPoint(p))) throw new Error(`Use 1–${MAX_WAYPOINTS} confirmed waypoints within one local walking area, between 75°S and 75°N. No waypoints are silently omitted.`);
     const canReorder = settings.optimize && points.length <= 8;
-    const graph = buildGraph(data, features);
+    const graph = buildGraph(data, features, settings);
     progress('Comparing nearby eligible path snaps and directed connections…');
     const snaps = snapWaypoints(graph, points, settings.tolerance), n = snaps.length;
     const transit = transportStops(graph, points, settings.radius), stopIds = transit.stops.map(s => s.node);
@@ -664,7 +684,8 @@
       if (canReorder || !i) starts[i] = endpoints(search(graph, snaps[i].id, 'distance', noPenalties, true, stopIds), transit.stops, 'alight', settings.maxApproach, settings.loop);
     }
     const missingLeg = ordered.slice(1).findIndex((to, i) => !pathFrom(shortest[i], snaps[to].id));
-    let orderedFailure = missingLeg >= 0 ? routeError('DISCONNECTED_WAYPOINTS', `Waypoint ${missingLeg + 1} → waypoint ${missingLeg + 2} cannot be connected in pin order in the downloaded walking network. Missing connections, foot one-way restrictions, access restrictions or excluded terrain may separate them. No gap was bridged.`) : null;
+    const fordHint = graph.excludedOfficialFords.length ? ' An AFCD-corridor ford is excluded by default; after checking current weather and crossing conditions, you may explicitly enable Official trail stream crossings in Requirements.' : '';
+    let orderedFailure = missingLeg >= 0 ? routeError('DISCONNECTED_WAYPOINTS', `Waypoint ${missingLeg + 1} → waypoint ${missingLeg + 2} cannot be connected in pin order in the downloaded walking network. Missing connections, foot one-way restrictions, access restrictions or excluded terrain may separate them. No gap was bridged.${fordHint}`) : null;
     const missingEnds = [!starts[0]?.length ? 0 : null, !ends[n - 1]?.length ? n - 1 : null].filter(i => i !== null);
     const missingLoop = settings.loop && !endpointPairs(starts[0], ends[n - 1], true).length;
     if (!orderedFailure && missingLoop) {
@@ -726,6 +747,7 @@
     const notices = [];
     if (!orderedFound) notices.push(`Pin order could not be kept. ${orderedFailure?.message || limitReasons.join('; ') || 'The ordered candidates failed the selected limits.'}`);
     if (settings.optimize && !canReorder) notices.push('For more than 8 waypoints, alternatives keep your pin order.');
+    if (selected.some(route => route.fordCrossings.length)) notices.push('This plan crosses a mapped ford on an AFCD trail corridor. Check rain, water level, official notices and conditions before going; the app cannot verify that the crossing is safe today.');
     selected.forEach((route, i) => {
       route.id = `route-${i + 1}`;
       if (settings.loop) { route.title += ' · loop'; route.reason += ' Returns to the same mapped start/finish near the same transport stop; some paths may be retraced.'; }
@@ -1067,7 +1089,7 @@
     let mapMarkersVisible = true;
     const ROUTE_BACKEND_URL = 'https://gpxdesign.vercel.app/api/plan-routes';
     const routing = { selected: null, result: null, visible: new Set(), fingerprint: '', serial: 0, controller: null, worker: null, cache: new Map(), busy: false, searched: false, evidence: '', blockedUntil: 0 };
-    const planFields = ['region', 'order', 'loop', 'date', 'distance', 'radius', 'tolerance', 'roads', 'provider'];
+    const planFields = ['region', 'order', 'loop', 'official-fords', 'date', 'distance', 'radius', 'tolerance', 'roads', 'provider'];
     const providers = {
       coffee: { name: 'Private.coffee', url: 'https://overpass.private.coffee/api/interpreter' },
       vk: { name: 'VK Maps', url: 'https://maps.mail.ru/osm/tools/overpass/api/interpreter' },
@@ -1082,8 +1104,10 @@
       world: ['Other regions', 'Local trail authority required', null]
     };
     const km = metres => `${(metres / 1000).toFixed(1)} km`;
-    const loopEnabled = () => $('plan-loop').getAttribute('aria-checked') === 'true';
-    const routingFingerprint = () => JSON.stringify([state.points, state.segments.length, state.source, ...planFields.map(id => id === 'loop' ? loopEnabled() : $('plan-' + id).value)]);
+    const switchEnabled = id => $('plan-' + id).getAttribute('aria-checked') === 'true';
+    const loopEnabled = () => switchEnabled('loop');
+    const officialFordsEnabled = () => switchEnabled('official-fords');
+    const routingFingerprint = () => JSON.stringify([state.points, state.segments.length, state.source, ...planFields.map(id => ['loop', 'official-fords'].includes(id) ? switchEnabled(id) : $('plan-' + id).value)]);
     function activeRegion() {
       const choice = $('plan-region').value; if (choice !== 'auto') return choice;
       const p = state.points[0]; if (!p) return 'world';
@@ -1150,6 +1174,7 @@
         const facts = element('ul', undefined, 'route-facts');
         if (route.reason) facts.append(element('li', route.reason));
         if (route.start.extendedApproach || route.end.extendedApproach) facts.append(element('li', `Extended transport walk: ${[route.start.extendedApproach ? 'start' : '', route.end.extendedApproach ? 'finish' : ''].filter(Boolean).join(' and ')}. ${route.loop ? 'No shared loop stop met the 1 km limit for both approaches' : 'No qualifying 1 km approach was found at that end'}; the 10 km limit applies.`));
+        if (route.fordCrossings?.length) facts.append(element('li', `${route.fordCrossings.length} mapped stream crossing${route.fordCrossings.length === 1 ? '' : 's'} · verify weather and water level.`));
         for (const text of [`All ${state.points.length} places · order ${route.order.map(i => i + 1).join(' → ')}`, `${km(route.start.approach)} approach / ${km(route.end.approach)} exit walk`, `${km(route.roadMetres)} road connectors · ${km(route.repeatedMetres)} retraced`, `Largest waypoint offset: ${Math.ceil(Math.max(...route.snaps.map(s => s.metres)))} m`]) facts.append(element('li', text));
         const select = element('button', routing.selected?.id === route.id ? 'Selected route ✓' : 'Select this route →', 'route-select primary'); select.addEventListener('click', () => selectRoute(route));
         const save = element('button', `Save Route ${i + 1} GPX ↓`, 'route-select'); save.addEventListener('click', () => { download(new Blob([plannedGPX(route)], { type: 'application/gpx+xml;charset=utf-8' }), `trailplanner-route-${i + 1}-PROVISIONAL.gpx`); track('gpx_exported'); });
@@ -1178,6 +1203,7 @@
         trails.append(element('p', `${km(r.corridorMetres)} lies near AFCD trail geometry (12 m matching tolerance). This approximate match is not proof of management, passability or safety.`));
         for (const f of r.official.slice(0, 8)) trails.append(element('p', `${f.TRAIL_NAME_EN || 'AFCD trail'} · ${f.DIFFICULTY_EN || 'difficulty unknown'}`));
       } else trails.append(element('p', 'Government-managed trail coverage is not established for this option. Government datasets are currently integrated only for Hong Kong; elsewhere, mapped hiking relations are a preference, not proof of official status.'));
+      if (r.fordCrossings?.length) trails.append(element('p', `Caution: this route uses ${r.fordCrossings.length} OSM-mapped ford crossing${r.fordCrossings.length === 1 ? '' : 's'} on an AFCD trail corridor. Check official notices, recent rain and the actual water level. Turn back if conditions are unsafe.`));
       for (const rel of r.relations.slice(0, 6)) { const p = element('p'); p.append(externalLink(rel.name, `https://www.openstreetmap.org/relation/${rel.id}`)); trails.append(p); }
       trails.append(element('p', `OSM snapshot: ${r.osmTimestamp || 'timestamp unavailable'}. Search is bounded to a local area; this is a ranked candidate, not a guaranteed globally optimal route.`));
       grid.append(transport, trails); detail.append(grid);
@@ -1299,7 +1325,7 @@
       const timeout = setTimeout(() => controller.abort(), 245000);
       try {
         const radius = +$('plan-radius').value, box = TrailRouter.boundingBox(state.points, radius);
-        const settings = { radius, maxApproach: 1000, maxDistance: +$('plan-distance').value, maxRoad: +$('plan-roads').value, tolerance: +$('plan-tolerance').value, optimize: $('plan-order').value === 'optimize', loop: loopEnabled() };
+        const settings = { radius, maxApproach: 1000, maxDistance: +$('plan-distance').value, maxRoad: +$('plan-roads').value, tolerance: +$('plan-tolerance').value, optimize: $('plan-order').value === 'optimize', loop: loopEnabled(), allowOfficialFords: officialFordsEnabled() };
         const points = state.points.map(p => ({ ...p }));
         try {
           $('routing-status').textContent = 'Checking mapped paths and transport: within 1 km first, then up to 20 km if needed…'; toast($('routing-status').textContent, false, 0);
@@ -1346,11 +1372,11 @@
     $('cancel-routing').addEventListener('click', () => { stopRouting(); $('routing-status').textContent = 'Search cancelled. Your waypoints are unchanged.'; $('route-options').replaceChildren(element('div', 'Search cancelled. Review your places and search again when ready.', 'routes-empty')); toast('Search cancelled. Your waypoints are unchanged.'); updateGuidance(); updateDockState(); });
     $('view-inputs').addEventListener('click', () => { routing.selected = null; $('selected-route-detail').hidden = true; $('route-export-review').hidden = true; if (routing.result) showRoutes(); render(); $('map-title').scrollIntoView({ behavior: 'smooth' }); });
     for (const id of planFields) $('plan-' + id).addEventListener('change', () => render(false));
-    $('plan-loop').addEventListener('click', () => {
-      const enabled = !loopEnabled();
-      $('plan-loop').setAttribute('aria-checked', String(enabled));
-      $('plan-loop').querySelector('.switch-state').textContent = enabled ? 'On' : 'Off';
-      $('plan-loop').dispatchEvent(new Event('change'));
+    for (const id of ['loop', 'official-fords']) $('plan-' + id).addEventListener('click', () => {
+      const control = $('plan-' + id), enabled = !switchEnabled(id);
+      control.setAttribute('aria-checked', String(enabled));
+      control.querySelector('.switch-state').textContent = enabled ? 'On' : 'Off';
+      control.dispatchEvent(new Event('change'));
     });
     const today = new Date(); $('plan-date').value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     function reversePlannedRoute() {
@@ -1364,14 +1390,15 @@
       showRoutes(); routeDetails(); render(); toast('Route reversed. Review arrival, departure and trail access again before saving.');
     }
     function plannedGPX(r) {
-      const warning = `PROVISIONAL ROUTE — independently check before navigation. Connected OSM walking ways only; no artificial connectors. Start near ${r.start.name} (${km(r.start.approach)} approach, ${Math.ceil(r.start.accessGap)} m unrouted stop gap); end near ${r.end.name} (${km(r.end.approach)} exit, ${Math.ceil(r.end.accessGap)} m gap). Transport approaches prefer 1 km, extending up to 20 km only when needed. Visit order: ${r.order.map(i => i + 1).join(" → ")}. All ${state.points.length} mandatory waypoints visited within the explicitly accepted ${$('plan-tolerance').value} m tolerance. OSM snapshot ${r.osmTimestamp || 'unknown'}. Hiking date ${$('plan-date').value}. Timetables, closures, permits, terrain and management are not automatically verified. OpenStreetMap contributors, ODbL: https://www.openstreetmap.org/copyright. AFCD corridor matches, where available, are approximate. No elevation invented.`;
+      const fordWarning = r.fordCrossings?.length ? ` CAUTION: ${r.fordCrossings.length} mapped ford crossing${r.fordCrossings.length === 1 ? '' : 's'} on an AFCD trail corridor; check official notices, recent rain and water level before going.` : '';
+      const warning = `PROVISIONAL ROUTE — independently check before navigation. Connected OSM walking ways only; no artificial connectors.${fordWarning} Start near ${r.start.name} (${km(r.start.approach)} approach, ${Math.ceil(r.start.accessGap)} m unrouted stop gap); end near ${r.end.name} (${km(r.end.approach)} exit, ${Math.ceil(r.end.accessGap)} m gap). Transport approaches prefer 1 km, extending up to 20 km only when needed. Visit order: ${r.order.map(i => i + 1).join(" → ")}. All ${state.points.length} mandatory waypoints visited within the explicitly accepted ${$('plan-tolerance').value} m tolerance. OSM snapshot ${r.osmTimestamp || 'unknown'}. Hiking date ${$('plan-date').value}. Timetables, closures, permits, terrain and management are not automatically verified. OpenStreetMap contributors, ODbL: https://www.openstreetmap.org/copyright. AFCD corridor matches, where available, are approximate. No elevation invented.`;
       const decimal = n => n.toFixed(8), wpts = [{ ...r.coords[0], name: 'Start near ' + r.start.name }, ...r.order.map(i => state.points[i]), { ...r.coords.at(-1), name: 'End near ' + r.end.name }];
       return `<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="TrailPlanner" xmlns="http://www.topografix.com/GPX/1/1"><metadata><name>${xmlText(r.title)}</name><desc>${xmlText(warning)}</desc><time>${new Date().toISOString()}</time></metadata>${wpts.map(p => `<wpt lat="${decimal(p.lat)}" lon="${decimal(p.lon)}"><name>${xmlText(p.name)}</name></wpt>`).join('')}<trk><name>${xmlText(r.title)} — provisional</name><desc>${xmlText(warning)}</desc><trkseg>${r.coords.map(p => `<trkpt lat="${decimal(p.lat)}" lon="${decimal(p.lon)}"></trkpt>`).join('')}</trkseg></trk></gpx>`;
     }
     function allRoutesGPX(routes) {
       const stamp = new Date().toISOString(), decimal = n => n.toFixed(8), warning = `PROVISIONAL ROUTE OPTIONS — independently check before navigation. Each track uses connected OpenStreetMap walking ways and visits every mandatory waypoint. Timetables, closures, permits, terrain, current access and government management are not automatically verified. OpenStreetMap contributors, ODbL: https://www.openstreetmap.org/copyright. No elevation invented.`;
       const waypoints = state.points.map((p, i) => `<wpt lat="${decimal(p.lat)}" lon="${decimal(p.lon)}"><name>${xmlText(`${i + 1}. ${p.name}`)}</name></wpt>`).join('');
-      const tracksXML = routes.map((r, i) => { const option = Number(String(r.id).split('-').at(-1)) || i + 1; return `<trk><name>${xmlText(`Route ${option} — ${r.title} — provisional`)}</name><desc>${xmlText(`${warning} Start near ${r.start.name} (${km(r.start.approach)} approach; ${Math.ceil(r.start.accessGap)} m unrouted stop gap); end near ${r.end.name} (${km(r.end.approach)} exit; ${Math.ceil(r.end.accessGap)} m unrouted stop gap). Visit order ${r.order.map(index => index + 1).join(" → ")}.`)}</desc><trkseg>${r.coords.map(p => `<trkpt lat="${decimal(p.lat)}" lon="${decimal(p.lon)}"></trkpt>`).join('')}</trkseg></trk>`; }).join('');
+      const tracksXML = routes.map((r, i) => { const option = Number(String(r.id).split('-').at(-1)) || i + 1, fordWarning = r.fordCrossings?.length ? ` CAUTION: ${r.fordCrossings.length} mapped ford crossing${r.fordCrossings.length === 1 ? '' : 's'} on an AFCD trail corridor; check official notices, recent rain and water level.` : ''; return `<trk><name>${xmlText(`Route ${option} — ${r.title} — provisional`)}</name><desc>${xmlText(`${warning}${fordWarning} Start near ${r.start.name} (${km(r.start.approach)} approach; ${Math.ceil(r.start.accessGap)} m unrouted stop gap); end near ${r.end.name} (${km(r.end.approach)} exit; ${Math.ceil(r.end.accessGap)} m unrouted stop gap). Visit order ${r.order.map(index => index + 1).join(" → ")}.`)}</desc><trkseg>${r.coords.map(p => `<trkpt lat="${decimal(p.lat)}" lon="${decimal(p.lon)}"></trkpt>`).join('')}</trkseg></trk>`; }).join('');
       return `<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="TrailPlanner" xmlns="http://www.topografix.com/GPX/1/1"><metadata><name>TrailPlanner route options</name><desc>${xmlText(warning)}</desc><time>${stamp}</time></metadata>${waypoints}${tracksXML}</gpx>`;
     }
     $('show-all-routes').addEventListener('click', () => { routing.result?.routes.forEach(route => routing.visible.add(route.id)); showRouteVisibility(); render(false); });

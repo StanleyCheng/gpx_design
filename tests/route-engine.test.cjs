@@ -152,6 +152,36 @@ test('private, conditional, demanding, ford and car-only paths are excluded', ()
   for (const tags of [{ highway: 'motorway', foot: 'yes' }, { highway: 'path', foot: 'no' }, { highway: 'path', access: 'private' }, { highway: 'path', sac_scale: 'mountain_hiking' }, { highway: 'path', ford: 'yes' }, { highway: 'path', 'foot:conditional': 'yes @ (Su)' }, { highway: 'cycleway' }]) assert.equal(R.walkable(tags), false);
   assert.equal(R.walkable({ highway: 'path', access: 'private', foot: 'yes' }), true);
 });
+test('a mapped ford is opt-in only and can connect an AFCD corridor without relaxing other restrictions', () => {
+  assert.equal(R.walkable({ highway: 'path', ford: 'yes' }, true), false, 'the public walkability check cannot bypass ford policy');
+  const nodes = [
+    { type: 'node', id: 1, lat: 22, lon: 114, tags: { highway: 'bus_stop', name: 'Start transit' } },
+    { type: 'node', id: 2, lat: 22, lon: 114.001, tags: { ford: 'yes' } },
+    { type: 'node', id: 3, lat: 22, lon: 114.003 },
+    { type: 'node', id: 4, lat: 22, lon: 114.004, tags: { railway: 'station', name: 'End transit' } },
+    { type: 'node', id: 5, lat: 22.0005, lon: 114 }
+  ];
+  const ways = [
+    { type: 'way', id: 10, nodes: [1, 2, 3, 4], tags: { highway: 'footway' } },
+    { type: 'way', id: 11, nodes: [1, 5], tags: { highway: 'path' } }
+  ];
+  const services = [
+    { type: 'relation', id: 101, tags: { route: 'bus' }, members: [{ type: 'node', ref: 1, role: 'platform' }] },
+    { type: 'relation', id: 102, tags: { route: 'train' }, members: [{ type: 'node', ref: 4, role: 'stop' }] }
+  ];
+  const data = { elements: [...nodes, ...ways, ...services] };
+  const required = [{ lat: 22, lon: 114 }, { lat: 22, lon: 114.003 }];
+  const official = [{ type: 'Feature', properties: { TRAIL_NAME_EN: 'Test country trail' }, geometry: { type: 'LineString', coordinates: [[114, 22], [114.004, 22]] } }];
+  assert.throws(() => R.plan(structuredClone(data), required, { optimize: false }, official), error => error.code === 'DISCONNECTED_WAYPOINTS' && /excluded by default/.test(error.message));
+  assert.throws(() => R.plan(structuredClone(data), required, { optimize: false, allowOfficialFords: true }), error => error.code === 'DISCONNECTED_WAYPOINTS', 'an OSM-only ford remains excluded');
+  const result = R.plan(structuredClone(data), required, { optimize: false, allowOfficialFords: true }, official);
+  assert.ok(result.routes.length);
+  assert.ok(result.routes.every(route => route.fordCrossings.some(crossing => crossing.id === 2)));
+  assert.ok(result.routes.every(route => route.snaps.every(snap => snap.metres <= 30)));
+  assert.match(result.notices.join(' '), /mapped ford on an AFCD trail corridor/);
+  const restricted = structuredClone(data); restricted.elements.find(element => element.id === 2).tags.foot = 'no';
+  assert.throws(() => R.plan(restricted, required, { optimize: false, allowOfficialFords: true }, official), error => error.code === 'DISCONNECTED_WAYPOINTS', 'explicit foot restrictions still win');
+});
 test('distance and road limits are not silently relaxed', () => {
   assert.throws(() => R.plan(fixture(), points, { maxDistance: 150 }), /none met/);
   const data = fixture(); data.elements.filter(e => e.type === 'way').forEach(e => { e.tags.highway = 'residential'; });

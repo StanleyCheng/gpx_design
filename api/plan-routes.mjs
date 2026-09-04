@@ -64,6 +64,7 @@ function validateInput(input) {
   const settings = input.settings || {};
   if (typeof settings.optimize !== 'boolean') throw new RequestError('Choose a valid waypoint order setting.');
   if (settings.loop !== undefined && typeof settings.loop !== 'boolean') throw new RequestError('Choose a valid Loop setting: on or off.');
+  if (settings.allowOfficialFords !== undefined && typeof settings.allowOfficialFords !== 'boolean') throw new RequestError('Choose a valid official-trail stream-crossing setting: on or off.');
   const radius = validateNumber(settings.radius, [1000, 2000, 4000, 6000], 'transport search distance');
   return {
     points,
@@ -76,7 +77,8 @@ function validateInput(input) {
       maxRoad: validateNumber(settings.maxRoad, [0, 500, 1500, 3000], 'road connector limit'),
       tolerance: validateNumber(settings.tolerance, [15, 30, 60], 'waypoint tolerance'),
       optimize: Boolean(settings.optimize),
-      loop: settings.loop === true
+      loop: settings.loop === true,
+      allowOfficialFords: settings.allowOfficialFords === true
     }
   };
 }
