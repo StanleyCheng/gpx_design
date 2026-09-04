@@ -103,10 +103,11 @@ test('route limits include the compact transport search and long-hike choices', 
 });
 
 test('compact map controls expose the requested motion and alignment safely', () => {
-  assert.match(html, /#map-route-action\{width:46px;height:46px[^}]*border:1px solid #1b211e[^}]*border-radius:50%/);
+  assert.match(html, /#map-route-action\{width:46px;height:46px[^}]*border:1px solid #1b211e[^}]*border-radius:50%[^}]*opacity:1!important/);
   assert.match(html, /id="map-route-action"[^>]*aria-busy="false"[^>]*><span class="find-label">Find<\/span><span class="finding-dots" aria-hidden="true"><span><\/span><span><\/span><span><\/span><\/span>/);
-  assert.match(html, /#map-route-action\[aria-busy=true\]\{animation:find-rgb-cycle 9s ease-in-out infinite\}/);
+  assert.match(html, /#map-route-action\[aria-busy=true\]\{animation:find-rgb-cycle 4\.5s ease-in-out infinite\}/);
   assert.match(html, /#map-route-action\[aria-busy=true\] \.finding-dots\{display:flex\}/);
+  assert.match(html, /#map-route-action\[aria-busy=true\] \.finding-dots span\{animation:find-dot \.575s ease-in-out infinite\}/);
   assert.match(html, /@keyframes find-dot\{0%,60%,100%\{transform:translateY\(1px\);opacity:\.35\}30%\{transform:translateY\(-2px\);opacity:1\}\}/);
   assert.match(html, /@keyframes find-rgb-cycle\{0%,100%\{background:#f1aaa2\}33\.333%\{background:#bfe3bd\}66\.666%\{background:#b9d8ef\}\}/);
   assert.match(html, /@media\(prefers-reduced-motion:reduce\)\{\.control-dock,\.dock-chevron\{transition:none\}#map-route-action\[aria-busy=true\]/);
