@@ -109,7 +109,7 @@ test('compact map controls expose the requested motion and alignment safely', ()
   assert.match(html, /#map-route-action\[aria-busy=true\] \.finding-dots\{display:flex\}/);
   assert.match(html, /#map-route-action\[aria-busy=true\] \.finding-dots span\{animation:find-dot \.575s ease-in-out infinite\}/);
   assert.match(html, /@keyframes find-dot\{0%,60%,100%\{transform:translateY\(1px\);opacity:\.35\}30%\{transform:translateY\(-2px\);opacity:1\}\}/);
-  assert.match(html, /@keyframes find-rgb-cycle\{0%,100%\{background:#8f1d1d\}33\.333%\{background:#145a32\}66\.666%\{background:#173f7a\}\}/);
+  assert.match(html, /@keyframes find-rgb-cycle\{0%,100%\{background:#ff1744\}33\.333%\{background:#00c853\}66\.666%\{background:#1677ff\}\}/);
   assert.match(html, /@media\(prefers-reduced-motion:reduce\)\{\.control-dock,\.dock-chevron\{transition:none\}#map-route-action\[aria-busy=true\]/);
   assert.match(html, /\.map-status-panel,\.map-quick-actions\{align-items:center\}/);
   assert.match(html, /\.dock-grip::before\{content:'↓'\}\.control-dock\.collapsed \.dock-grip::before\{content:'↑'\}/);

@@ -301,16 +301,18 @@ test('first route minimizes metres in pin order, without hidden road penalties',
   assert.ok(result.routes.some(r => r.roadMetres === 0), 'a trail option remains available');
   assert.ok(result.routes.every(r => r.metres >= result.routes[0].metres - .01));
 });
-test('a shorter reordered alternative follows, never replaces, the valid pin-order route', () => {
+test('the shortest qualifying candidate is Route 1 while pin order remains available', () => {
   const { data } = transportNetwork({ nearStart: true });
   const input = [{ lat: 22.05, lon: 114.006 }, { lat: 22.05, lon: 114.002 }, { lat: 22.05, lon: 114.01 }];
   const result = R.plan(data, input, { ...extended, optimize: true });
-  assert.deepEqual(result.routes[0].order, [0, 1, 2]);
-  const reordered = result.routes.find(r => !r.preservesOrder);
-  assert.ok(reordered, 'a different visit order is useful even if it shares path edges');
-  assert.ok(reordered.metres < result.routes[0].metres);
-  assert.deepEqual([...reordered.order].sort(), [0, 1, 2]);
-  assert.match(reordered.reason, /shorter/);
+  assert.equal(result.routes[0].metres, Math.min(...result.routes.map(route => route.metres)));
+  assert.equal(result.routes[0].preservesOrder, false);
+  assert.deepEqual([...result.routes[0].order].sort(), [0, 1, 2]);
+  assert.match(result.routes[0].title, /Shortest qualifying route/);
+  const ordered = result.routes.find(route => route.preservesOrder);
+  assert.ok(ordered, 'the valid entered-order route remains available');
+  assert.deepEqual(ordered.order, [0, 1, 2]);
+  assert.ok(result.routes[0].metres < ordered.metres);
   assert.ok(R.plan(data, input, extended).routes.every(r => r.preservesOrder));
 });
 test('one-way ordered failure is explained when reordering produces a qualifying route', () => {
@@ -418,8 +420,9 @@ test('reordered loop alternatives stay anchored at waypoint 1 and retain every m
   data.elements.filter(e => e.type === 'relation').forEach(e => { e.members[0].role = 'platform'; });
   const input = [.006, .002, .01, .004].map(lon => ({ lat: 22.05, lon: 114 + lon }));
   const result = R.plan(data, input, { ...extended, loop: true, optimize: true });
-  assert.deepEqual(result.routes[0].order, [0, 1, 2, 3]);
-  assert.ok(result.routes.some(r => !r.preservesOrder && r.metres < result.routes[0].metres));
+  assert.equal(result.routes[0].metres, Math.min(...result.routes.map(route => route.metres)));
+  assert.equal(result.routes[0].preservesOrder, false);
+  assert.deepEqual(result.routes.find(route => route.preservesOrder)?.order, [0, 1, 2, 3]);
   for (const route of result.routes) {
     assert.equal(route.start.id, route.end.id);
     assert.equal(route.order[0], 0);
