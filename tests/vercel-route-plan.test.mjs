@@ -158,9 +158,10 @@ test('backend retries only a missing transport end, with a separate expanded cac
   const body = await response.json();
   assert.equal(queries.length, 2);
   assert.doesNotMatch(queries[0], /around:/);
-  assert.match(queries[1], /around:20000,22.150000,114.000000/);
-  assert.doesNotMatch(queries[1], /around:20000,22.150000,114.010000/);
+  assert.match(queries[1], /around:4000,22.150000,114.000000/);
+  assert.doesNotMatch(queries[1], /around:4000,22.150000,114.010000/);
   assert.equal(body.result.transportExpanded, true);
+  assert.equal(body.result.transportExpansionMetres, 4000);
   assert.equal(body.result.routes[0].start.extendedApproach, true);
   assert.equal(body.result.routes[0].end.extendedApproach, false);
   assert.equal((await handler(routeRequest(points))).status, 200);
@@ -178,15 +179,22 @@ test('backend returns a specific off-path pin reason without a pointless transpo
 });
 test('backend stops at 20 km and reports the missing start, not a generic server error', async () => {
   const { data, points } = transportNetwork({ lat: 22.2, detour: true });
-  let calls = 0;
-  const handler = createRoutePlanHandler({ fetcher: async () => { calls++; return Response.json(data); } });
+  const queries = [];
+  const handler = createRoutePlanHandler({ fetcher: async (url, options) => {
+    queries.push(options.body.get('data'));
+    return Response.json(data);
+  } });
   const response = await handler(routeRequest(points));
   assert.equal(response.status, 422);
   const body = await response.json();
   assert.equal(body.code, 'NO_TRANSPORT');
   assert.match(body.error, /start before waypoint 1/);
   assert.match(body.error, /20 km maximum was reached/);
-  assert.equal(calls, 2);
+  assert.equal(queries.length, 4);
+  assert.doesNotMatch(queries[0], /around:/);
+  assert.match(queries[1], /around:4000,22.200000,114.000000/);
+  assert.match(queries[2], /around:10000,22.200000,114.000000/);
+  assert.match(queries[3], /around:20000,22.200000,114.000000/);
 });
 
 test('backend carries Loop through transport expansion and returns only closed tracks', async () => {
@@ -202,9 +210,10 @@ test('backend carries Loop through transport expansion and returns only closed t
   const { result } = await response.json();
   assert.equal(result.settings.loop, true);
   assert.equal(result.transportExpanded, true);
+  assert.equal(result.transportExpansionMetres, 4000);
   assert.equal(queries.length, 2);
-  assert.match(queries[1], /around:20000,22.250000,114.000000/);
-  assert.match(queries[1], /around:20000,22.250000,114.010000/);
+  assert.match(queries[1], /around:4000,22.250000,114.000000/);
+  assert.match(queries[1], /around:4000,22.250000,114.010000/);
   for (const route of result.routes) {
     assert.equal(route.start.id, 1); assert.equal(route.end.id, 1);
     assert.deepEqual(route.coords[0], route.coords.at(-1));

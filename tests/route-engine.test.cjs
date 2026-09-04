@@ -321,10 +321,13 @@ test('unclear or impassable tagged paths never enter any variant', () => {
 test('transport query expands only missing ends and rejects unbounded areas', () => {
   const box = R.boundingBox(points, 1000);
   const query = R.queryFor(box, [{ ...points[0], radius: 20000 }]);
+  assert.deepEqual(R.TRANSPORT_EXPANSION_STEPS, [4000, 10000, 20000]);
   assert.match(query, /around:20000,22.000000,114.001000/);
   assert.doesNotMatch(query, /around:20000,22.000000,114.004000/);
   assert.ok(query.includes(box.join(',')), 'the complete core waypoint area is retained');
+  assert.deepEqual(R.transportExpansion(points, { code: 'NO_TRANSPORT', endpointIndices: [0] }, 4000), [{ ...points[0], radius: 4000 }]);
   assert.deepEqual(R.transportExpansion(points, { code: 'WAYPOINT_OFF_PATH' }), []);
+  assert.throws(() => R.transportExpansion(points, { code: 'NO_TRANSPORT' }, 6000), /bounded 4 km, 10 km or 20 km step/);
   assert.throws(() => R.queryFor(box, [{ ...points[0], radius: 50000 }]), /at most two/);
 });
 test('arrival and departure checks are independent when only the finish needs extension', () => {

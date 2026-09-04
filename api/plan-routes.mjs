@@ -150,7 +150,10 @@ async function fetchMapData(box, selected, fetcher, signal, now, areas = []) {
       return { data, provider, cached: false };
     } catch (error) {
       if (signal.aborted) throw error;
-      if (error?.status === 413) throw new UpstreamError(areas.length ? 'The 20 km transport extension exceeded the map download size limit. Try a waypoint closer to a serviced trailhead; no partial route was used.' : 'The requested map area is too large. Use closer waypoints or a smaller transport search distance.', 413);
+      if (error?.status === 413) {
+        const kilometres = areas.length ? Math.max(...areas.map(area => area.radius)) / 1000 : 0;
+        throw new UpstreamError(areas.length ? `The ${kilometres} km transport expansion exceeded the map download size limit. Try a waypoint closer to a serviced trailhead; no partial route was used.` : 'The requested map area is too large. Use closer waypoints or a smaller transport search distance.', 413);
+      }
       const reason = ['TimeoutError', 'AbortError'].includes(error?.name) ? 'timeout' : error instanceof UpstreamError ? error.message : 'network unavailable';
       failures.push(`${provider.name}: ${String(reason).slice(0, 80)}`);
     }
@@ -213,19 +216,25 @@ export function createRoutePlanHandler(options = {}) {
           fetchOfficialTrails(box, input.region, fetcher, controller.signal, now)
         ]);
         controller.signal.throwIfAborted();
-        let result;
+        let result, failure;
         try { result = TrailRouter.plan(map.data, input.points, input.settings, official.features); }
-        catch (error) {
-          const areas = TrailRouter.transportExpansion(input.points, error);
-          if (!areas.length) throw error;
+        catch (error) { failure = error; }
+        for (const radius of TrailRouter.TRANSPORT_EXPANSION_STEPS) {
+          if (result) break;
+          const areas = TrailRouter.transportExpansion(input.points, failure, radius);
+          if (!areas.length) throw failure;
           [map, official] = await Promise.all([
             fetchMapData(box, input.provider, fetcher, controller.signal, now, areas),
             fetchOfficialTrails(TrailRouter.coverageBox(box, areas), input.region, fetcher, controller.signal, now)
           ]);
           controller.signal.throwIfAborted();
-          result = TrailRouter.plan(map.data, input.points, { ...input.settings, radius: TrailRouter.MAX_APPROACH, maxApproach: TrailRouter.MAX_APPROACH }, official.features);
-          result.transportExpanded = true;
+          try {
+            result = TrailRouter.plan(map.data, input.points, { ...input.settings, radius, maxApproach: radius }, official.features);
+            result.transportExpanded = true;
+            result.transportExpansionMetres = radius;
+          } catch (error) { failure = error; }
         }
+        if (!result) throw failure;
         return json(200, { result, source: `${map.provider.name} / OpenStreetMap${map.cached ? ' · server cache' : ''}`, officialNote: official.note }, origin);
       } finally {
         clearTimeout(timeout);
