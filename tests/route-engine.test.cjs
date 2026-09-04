@@ -16,6 +16,27 @@ function fixture() {
   ];
   return { elements: [...nodes, ...ways, ...relations], osm3s: { timestamp_osm_base: '2026-08-31T00:00:00Z' } };
 }
+function nearbyBranchFixture(kind = 'isolated') {
+  const node = (id, lat, lon, tags) => ({ type: 'node', id, lat, lon, ...(tags ? { tags } : {}) });
+  const nodes = [
+    node(1, 22, 114, { highway: 'bus_stop', name: 'Start transit' }),
+    node(2, 22, 114.001), node(3, 22, 114.003),
+    node(4, 22, 114.004, { railway: 'station', name: 'End transit' })
+  ];
+  const ways = [{ type: 'way', id: 10, nodes: [1, 2, 3, 4], tags: { highway: 'footway', foot: 'designated' } }];
+  if (kind === 'isolated') {
+    nodes.push(node(20, 22.00005, 114.0008), node(21, 22.00005, 114.0012));
+    ways.push({ type: 'way', id: 20, nodes: [20, 21], tags: { highway: 'path' } });
+  } else {
+    nodes.push(node(21, 22.00025, 114.001));
+    ways.push({ type: 'way', id: 20, nodes: [2, 21], tags: { highway: 'path', 'oneway:foot': 'yes' } });
+  }
+  const relations = [
+    { type: 'relation', id: 101, tags: { route: 'bus' }, members: [{ type: 'node', ref: 1, role: 'platform' }] },
+    { type: 'relation', id: 102, tags: { route: 'train' }, members: [{ type: 'node', ref: 4, role: 'stop' }] }
+  ];
+  return { data: { elements: [...nodes, ...ways, ...relations] }, points: [{ lat: 22.00005, lon: 114.001 }, { lat: 22, lon: 114.003 }] };
+}
 const points = [{ lat: 22, lon: 114.001 }, { lat: 22, lon: 114.004 }];
 test('three distinct source-geometry routes visit every waypoint and reach serviced passenger stops', () => {
   const data = fixture(), result = R.plan(data, points);
@@ -53,6 +74,69 @@ test('splitting a path for an interior waypoint preserves its foot direction', (
   assert.ok(R.pathFrom(R.search(graph, 1, 'distance', new Map()), snap.id));
   assert.equal(R.pathFrom(R.search(graph, snap.id, 'distance', new Map()), 1), null);
 });
+test('a slightly farther connected segment is selected over the closest isolated branch', () => {
+  const { data, points } = nearbyBranchFixture('isolated');
+  const closest = R.snapWaypoints(R.buildGraph(data), [points[0]], 30)[0];
+  assert.ok(Math.abs(closest.point.lat - 22.00005) < 1e-9, 'the isolated branch is locally closest');
+  const first = R.plan(data, points, { optimize: false, tolerance: 30 }).routes[0];
+  assert.equal(first.snaps.length, 2);
+  assert.equal(first.snaps[0].id, 2, 'the collective choice uses the connected main path');
+  assert.ok(first.snaps.every(snap => snap.metres <= 30));
+  const ways = new Map(data.elements.filter(e => e.type === 'way').map(way => [way.id, way]));
+  assert.ok(first.edges.every(edge => ways.has(edge.way) && R.walkable(ways.get(edge.way).tags)), 'every output edge retains eligible downloaded OSM provenance');
+  assert.deepEqual(R.plan(data, points, { optimize: false, tolerance: 30 }).routes[0].snaps.map(s => s.id), first.snaps.map(s => s.id), 'candidate selection is deterministic');
+});
+test('a valid directed candidate replaces the closest wrong-way dead-end snap', () => {
+  const { data, points } = nearbyBranchFixture('oneway');
+  const graph = R.buildGraph(data), closest = R.snapWaypoints(graph, [points[0]], 30)[0];
+  assert.ok(Math.abs(closest.point.lat - points[0].lat) < 1e-9, 'the one-way branch is locally closest');
+  assert.equal(R.pathFrom(R.search(graph, closest.id, 'distance', new Map()), 3), null, 'the closest branch cannot be exited in the requested direction');
+  const route = R.plan(data, points, { optimize: false, tolerance: 30 }).routes[0];
+  assert.equal(route.snaps[0].id, 2);
+  assert.deepEqual(route.ids, [1, 2, 3, 4]);
+  assert.ok(route.snaps.every(snap => snap.metres <= 30));
+});
+test('equal-offset connected combinations use mapped route distance as the deterministic tie-breaker', () => {
+  const nodes = [
+    [1, 22, 114], [2, 22, 114.001], [3, 22, 114.003], [4, 22, 114.004],
+    [5, 22.0002, 114], [6, 22.0002, 114.001], [7, 22.002, 114.002], [8, 22.0002, 114.003], [9, 22.0002, 114.004]
+  ].map(([id, lat, lon]) => ({ type: 'node', id, lat, lon }));
+  const data = { elements: [...nodes,
+    { type: 'way', id: 10, nodes: [1, 2, 3, 4], tags: { highway: 'path' } },
+    { type: 'way', id: 20, nodes: [5, 6, 7, 8, 9], tags: { highway: 'path' } }
+  ] };
+  const snaps = R.snapWaypoints(R.buildGraph(data), [{ lat: 22.0001, lon: 114.001 }, { lat: 22.0001, lon: 114.003 }], 30);
+  assert.deepEqual(snaps.map(snap => snap.id), [2, 3]);
+});
+test('visually crossing ways without a shared OSM node remain disconnected', () => {
+  const nodes = [
+    [1, 22, 114, { highway: 'bus_stop' }], [2, 22, 114.002],
+    [3, 21.999, 114.001], [4, 22.001, 114.001, { railway: 'station' }]
+  ].map(([id, lat, lon, tags]) => ({ type: 'node', id, lat, lon, ...(tags ? { tags } : {}) }));
+  const data = { elements: [...nodes,
+    { type: 'way', id: 10, nodes: [1, 2], tags: { highway: 'path' } },
+    { type: 'way', id: 20, nodes: [3, 4], tags: { highway: 'path' } },
+    { type: 'relation', id: 101, tags: { route: 'bus' }, members: [{ type: 'node', ref: 1, role: 'platform' }] },
+    { type: 'relation', id: 102, tags: { route: 'train' }, members: [{ type: 'node', ref: 4, role: 'stop' }] }
+  ] };
+  const crossingPoints = [{ lat: 22, lon: 114.0005 }, { lat: 22.0005, lon: 114.001 }];
+  assert.throws(() => R.plan(data, crossingPoints, { optimize: false, tolerance: 30 }), error => error.code === 'DISCONNECTED_WAYPOINTS' && /No gap was bridged/.test(error.message));
+});
+test('all nearby candidates disconnected still fail without a fabricated link', () => {
+  const nodes = [
+    [1, 22, 114, { highway: 'bus_stop' }], [2, 22, 114.001], [3, 22.0001, 114], [4, 22.0001, 114.001],
+    [5, 22, 114.003], [6, 22, 114.004, { railway: 'station' }], [7, 22.0001, 114.003], [8, 22.0001, 114.004]
+  ].map(([id, lat, lon, tags]) => ({ type: 'node', id, lat, lon, ...(tags ? { tags } : {}) }));
+  const ways = [[10, [1, 2]], [11, [3, 4]], [20, [5, 6]], [21, [7, 8]]].map(([id, ids]) => ({ type: 'way', id, nodes: ids, tags: { highway: 'path' } }));
+  const data = { elements: [...nodes, ...ways,
+    { type: 'relation', id: 101, tags: { route: 'bus' }, members: [{ type: 'node', ref: 1, role: 'platform' }] },
+    { type: 'relation', id: 102, tags: { route: 'train' }, members: [{ type: 'node', ref: 6, role: 'stop' }] }
+  ] };
+  const disconnected = [{ lat: 22.00005, lon: 114.0005 }, { lat: 22.00005, lon: 114.0035 }];
+  const graph = R.buildGraph(data); R.snapWaypoints(graph, disconnected, 30);
+  assert.ok([...graph.nodes.keys()].filter(id => String(id).startsWith('waypoint:')).length >= 4, 'multiple in-tolerance candidates were materialized');
+  assert.throws(() => R.plan(data, disconnected, { optimize: false, tolerance: 30 }), error => error.code === 'DISCONNECTED_WAYPOINTS' && /Waypoint 1 → waypoint 2/.test(error.message));
+});
 test('a stop without a transport service never qualifies', () => {
   const data = fixture(); data.elements = data.elements.filter(e => e.type !== 'relation' || e.tags.route === 'hiking');
   assert.throws(() => R.plan(data, points), /No passenger stops linked/);
@@ -86,6 +170,14 @@ test('optimised order retains all mandatory waypoints', () => {
 test('query size and large waypoint counts are bounded', () => {
   assert.throws(() => R.boundingBox([{ lat: 22, lon: 114 }, { lat: 35, lon: 139 }], 4000), /250/);
   assert.throws(() => R.plan(fixture(), Array(51).fill(points[0])), /1–50/);
+  const denseElements = [];
+  for (let i = 0; i < 40; i++) {
+    const lat = 22 + (i - 20) * .00001, a = 1000 + i * 2, b = a + 1;
+    denseElements.push({ type: 'node', id: a, lat, lon: 114 }, { type: 'node', id: b, lat, lon: 114.002 }, { type: 'way', id: 2000 + i, nodes: [a, b], tags: { highway: 'path' } });
+  }
+  const denseGraph = R.buildGraph({ elements: denseElements });
+  R.snapWaypoints(denseGraph, [{ lat: 22, lon: 114.001 }], 30);
+  assert.equal([...denseGraph.nodes.keys()].filter(id => String(id).startsWith('waypoint:')).length, R.MAX_SNAP_CANDIDATES, 'dense candidate materialization stays capped');
   const query = R.queryFor(R.boundingBox(points, 2000));
   assert.ok(query.includes('out body qt'));
   assert.ok(query.includes('relation(bw.paths)'));
@@ -93,6 +185,7 @@ test('query size and large waypoint counts are bounded', () => {
   assert.doesNotMatch(query, /relation\["route"[^\n]+\]\(/, 'never download every route relation intersecting the whole bounding box');
 });
 test('50 required waypoints stay on mapped geometry and in order, including loops', () => {
+  assert.equal(R.MAX_SNAP_CANDIDATES, 24);
   const { data, points } = require('./fixtures/fifty-waypoints.cjs')();
   for (const loop of [false, true]) {
     const result = R.plan(data, points, { optimize: true, loop });
