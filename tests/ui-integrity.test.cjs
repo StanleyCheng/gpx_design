@@ -85,7 +85,7 @@ test('map-first route controls support colored combinations and individual or co
   assert.match(planner, /ROUTE_COLORS/);
   assert.match(planner, /routing\.visible/);
   assert.match(planner, /function allRoutesGPX/);
-  assert.match(planner, /Route \$\{i \+ 1\} · \$\{km\(route\.metres\)\}/);
+  assert.match(planner, /<strong>Route \$\{i \+ 1\}<\/strong><small>\$\{km\(route\.metres\)\}<\/small>/);
   assert.match(planner, /className: 'route-endpoint-pin'/);
   assert.match(planner, /const letter = endpoint \? 'F' : 'S'/);
   assert.match(planner, /'map-route-dot'/);
@@ -98,8 +98,16 @@ test('map-first route controls support colored combinations and individual or co
 });
 
 test('route limits include the compact transport search and long-hike choices', () => {
-  assert.match(html, /<option value="1000" selected>1 km first · up to 10 km if needed<\/option>/);
+  assert.match(html, /<option value="1000" selected>1 km first · up to 20 km if needed<\/option>/);
   assert.match(html, /<option value="80000">80 km<\/option>/);
+});
+
+test('compact map controls expose the requested motion and alignment safely', () => {
+  assert.match(html, /#map-route-action\{width:46px;height:46px[^}]*border:1px solid #1b211e[^}]*border-radius:50%/);
+  assert.match(html, /@keyframes find-rgb-cycle\{0%,100%\{background:#f1aaa2\}33\.333%\{background:#bfe3bd\}66\.666%\{background:#b9d8ef\}\}/);
+  assert.match(html, /@media\(prefers-reduced-motion:reduce\)\{\.control-dock,\.dock-chevron\{transition:none\}#map-route-action\{animation:none/);
+  assert.match(html, /\.map-status-panel,\.map-quick-actions\{align-items:center\}/);
+  assert.match(html, /\.dock-grip::before\{content:'↓'\}\.control-dock\.collapsed \.dock-grip::before\{content:'↑'\}/);
 });
 
 test('map data providers offer automatic transient-error fallback', () => {

@@ -148,7 +148,7 @@ async function fetchMapData(box, selected, fetcher, signal, now, areas = []) {
       return { data, provider, cached: false };
     } catch (error) {
       if (signal.aborted) throw error;
-      if (error?.status === 413) throw new UpstreamError(areas.length ? 'The 10 km transport extension exceeded the map download size limit. Try a waypoint closer to a serviced trailhead; no partial route was used.' : 'The requested map area is too large. Use closer waypoints or a smaller transport search distance.', 413);
+      if (error?.status === 413) throw new UpstreamError(areas.length ? 'The 20 km transport extension exceeded the map download size limit. Try a waypoint closer to a serviced trailhead; no partial route was used.' : 'The requested map area is too large. Use closer waypoints or a smaller transport search distance.', 413);
       const reason = ['TimeoutError', 'AbortError'].includes(error?.name) ? 'timeout' : error instanceof UpstreamError ? error.message : 'network unavailable';
       failures.push(`${provider.name}: ${String(reason).slice(0, 80)}`);
     }
@@ -221,7 +221,7 @@ export function createRoutePlanHandler(options = {}) {
             fetchOfficialTrails(TrailRouter.coverageBox(box, areas), input.region, fetcher, controller.signal, now)
           ]);
           controller.signal.throwIfAborted();
-          result = TrailRouter.plan(map.data, input.points, { ...input.settings, radius: 10000, maxApproach: 10000 }, official.features);
+          result = TrailRouter.plan(map.data, input.points, { ...input.settings, radius: TrailRouter.MAX_APPROACH, maxApproach: TrailRouter.MAX_APPROACH }, official.features);
           result.transportExpanded = true;
         }
         return json(200, { result, source: `${map.provider.name} / OpenStreetMap${map.cached ? ' · server cache' : ''}`, officialNote: official.note }, origin);

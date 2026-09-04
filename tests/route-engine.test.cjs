@@ -126,14 +126,14 @@ test('passenger entrance names inherit their station and restricted services are
 });
 
 const transportNetwork = require('./fixtures/transport-network.cjs');
-const extended = { radius: 10000, maxApproach: 10000, optimize: false };
+const extended = { radius: 20000, maxApproach: 20000, optimize: false };
 test('missing arrival transport widens only the start and preserves a nearby finish', () => {
   const { data, points } = transportNetwork();
   let failure;
   assert.throws(() => R.plan(data, points, { optimize: false }), error => { failure = error; return error.code === 'NO_TRANSPORT' && /start before waypoint 1/.test(error.message) && !/finish after/.test(error.message); });
   assert.deepEqual(failure.endpointIndices, [0]);
   const areas = R.transportExpansion(points, failure);
-  assert.deepEqual(areas, [{ ...points[0], radius: 10000 }]);
+  assert.deepEqual(areas, [{ ...points[0], radius: 20000 }]);
   const result = R.plan(data, points, extended), route = result.routes[0];
   assert.equal(route.start.id, 1); assert.equal(route.end.id, 4);
   assert.equal(route.start.extendedApproach, true); assert.equal(route.end.extendedApproach, false);
@@ -148,10 +148,17 @@ test('reachable transport within 1 km takes priority over farther services after
   const result = R.plan(data, points, extended);
   assert.ok(result.routes.every(r => r.start.id === 5 && !r.start.extendedApproach));
 });
-test('10 km is walking distance, not a straight-line circle; no detour is bridged', () => {
+test('a mapped walking approach between 10 km and 20 km can reach transport', () => {
+  const { data, points } = transportNetwork({ detour: .06 });
+  const route = R.plan(data, points, extended).routes[0];
+  assert.ok(route.start.approach > 10000 && route.start.approach < 20000);
+  assert.equal(route.start.extendedApproach, true);
+  assert.ok(route.ids.every(id => data.elements.some(e => e.type === 'node' && e.id === id)));
+});
+test('20 km is walking distance, not a straight-line circle; no detour is bridged', () => {
   const { data, points } = transportNetwork({ detour: true });
   assert.ok(R.distance(points[0], data.elements[0]) < 1000);
-  assert.throws(() => R.plan(data, points, extended), error => error.code === 'NO_TRANSPORT' && /10 km maximum was reached/.test(error.message));
+  assert.throws(() => R.plan(data, points, extended), error => error.code === 'NO_TRANSPORT' && /20 km maximum was reached/.test(error.message));
 });
 test('first route minimizes metres in pin order, without hidden road penalties', () => {
   const data = fixture();
@@ -190,9 +197,9 @@ test('unclear or impassable tagged paths never enter any variant', () => {
 });
 test('transport query expands only missing ends and rejects unbounded areas', () => {
   const box = R.boundingBox(points, 1000);
-  const query = R.queryFor(box, [{ ...points[0], radius: 10000 }]);
-  assert.match(query, /around:10000,22.000000,114.001000/);
-  assert.doesNotMatch(query, /around:10000,22.000000,114.004000/);
+  const query = R.queryFor(box, [{ ...points[0], radius: 20000 }]);
+  assert.match(query, /around:20000,22.000000,114.001000/);
+  assert.doesNotMatch(query, /around:20000,22.000000,114.004000/);
   assert.ok(query.includes(box.join(',')), 'the complete core waypoint area is retained');
   assert.deepEqual(R.transportExpansion(points, { code: 'WAYPOINT_OFF_PATH' }), []);
   assert.throws(() => R.queryFor(box, [{ ...points[0], radius: 50000 }]), /at most two/);

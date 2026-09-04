@@ -153,8 +153,8 @@ test('backend retries only a missing transport end, with a separate expanded cac
   const body = await response.json();
   assert.equal(queries.length, 2);
   assert.doesNotMatch(queries[0], /around:/);
-  assert.match(queries[1], /around:10000,22.150000,114.000000/);
-  assert.doesNotMatch(queries[1], /around:10000,22.150000,114.010000/);
+  assert.match(queries[1], /around:20000,22.150000,114.000000/);
+  assert.doesNotMatch(queries[1], /around:20000,22.150000,114.010000/);
   assert.equal(body.result.transportExpanded, true);
   assert.equal(body.result.routes[0].start.extendedApproach, true);
   assert.equal(body.result.routes[0].end.extendedApproach, false);
@@ -171,7 +171,7 @@ test('backend returns a specific off-path pin reason without a pointless transpo
   assert.match(body.error, /Waypoint 1 has no eligible path within 30 m/);
   assert.equal(calls, 1);
 });
-test('backend stops at 10 km and reports the missing start, not a generic server error', async () => {
+test('backend stops at 20 km and reports the missing start, not a generic server error', async () => {
   const { data, points } = transportNetwork({ lat: 22.2, detour: true });
   let calls = 0;
   const handler = createRoutePlanHandler({ fetcher: async () => { calls++; return Response.json(data); } });
@@ -180,7 +180,7 @@ test('backend stops at 10 km and reports the missing start, not a generic server
   const body = await response.json();
   assert.equal(body.code, 'NO_TRANSPORT');
   assert.match(body.error, /start before waypoint 1/);
-  assert.match(body.error, /10 km maximum was reached/);
+  assert.match(body.error, /20 km maximum was reached/);
   assert.equal(calls, 2);
 });
 
@@ -198,8 +198,8 @@ test('backend carries Loop through transport expansion and returns only closed t
   assert.equal(result.settings.loop, true);
   assert.equal(result.transportExpanded, true);
   assert.equal(queries.length, 2);
-  assert.match(queries[1], /around:10000,22.250000,114.000000/);
-  assert.match(queries[1], /around:10000,22.250000,114.010000/);
+  assert.match(queries[1], /around:20000,22.250000,114.000000/);
+  assert.match(queries[1], /around:20000,22.250000,114.010000/);
   for (const route of result.routes) {
     assert.equal(route.start.id, 1); assert.equal(route.end.id, 1);
     assert.deepEqual(route.coords[0], route.coords.at(-1));

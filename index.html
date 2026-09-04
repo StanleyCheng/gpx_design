@@ -78,16 +78,19 @@
     @media(max-width:720px){.control-dock{width:100%}.header-map-status{max-width:48%;font-size:10px;padding:5px 7px}.topbar-inner{gap:8px}.map-status-panel{top:10px}.dock-body{padding-inline:14px}.stage-footer{padding-inline:14px}.stage-tabs{padding-inline:10px;gap:2px}.stage-tabs button{font-size:10px}.control-dock input,.control-dock select,.control-dock textarea{font-size:16px}.control-dock input[type=date]{min-width:0}.control-dock .map-tools{margin-top:0}.control-dock .map-bottom{padding:0}}
     @media(max-width:380px){.brand-name{font-size:23px}.brand-mark{width:29px;height:29px}.brand{gap:6px}.header-map-status{font-size:9px}.stage-tabs{padding-inline:5px}.stage-tabs button{font-size:9px}.dock-body{padding-inline:12px}}
     @media(max-width:720px),(pointer:coarse) and (max-height:500px){
-      .control-dock.collapsed{bottom:env(safe-area-inset-bottom,0px);height:22px;max-height:22px;padding-bottom:0;border-radius:10px 10px 0 0}
+      .control-dock.collapsed{bottom:0;height:22px;max-height:22px;padding-bottom:0;border-radius:10px 10px 0 0}
       .control-dock.collapsed .dock-toggle{height:100%;min-height:0;padding:0 12px;border-radius:10px 10px 0 0}
       .control-dock.collapsed .dock-toggle::before{content:'';position:absolute;left:0;right:0;bottom:0;height:44px}
     }
     #map-markers-action[aria-pressed=true]{background:color-mix(in srgb,#dcefdc 80%,transparent);color:var(--ink)}#map-markers-action[aria-pressed=false]{background:var(--soft);color:var(--muted);border-style:dashed}
-    #map-route-action{min-width:44px}#map-route-action[aria-busy=true]{animation:route-search-pulse 2.4s ease-in-out infinite}
-    @keyframes route-search-pulse{0%,100%{opacity:1}50%{opacity:.55}}
+    .map-status-panel,.map-quick-actions{align-items:center}
+    #map-route-action{width:46px;height:46px;min-width:46px;min-height:46px;padding:0;border:1px solid #1b211e;border-radius:50%;background:#bfe3bd;color:#17231e;animation:find-rgb-cycle 9s ease-in-out infinite}
+    @keyframes find-rgb-cycle{0%,100%{background:#f1aaa2}33.333%{background:#bfe3bd}66.666%{background:#b9d8ef}}
+    .route-line-label span{min-width:70px;min-height:38px;flex-direction:column;gap:2px;padding:4px 7px;line-height:1.05;text-align:center;white-space:normal}.route-line-label strong,.route-line-label small{display:block;font:inherit}.route-line-label small{font-size:10px}
+    .dock-grip{display:grid;place-items:center;width:20px;height:20px;background:none!important;opacity:1!important;color:var(--ink);font:700 13px/1 var(--font)}.dock-grip::before{content:'↓'}.control-dock.collapsed .dock-grip::before{content:'↑'}.dock-chevron{display:none!important}
     .plan-loop-field{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:47px;padding:0 10px;border:1px solid var(--line);border-radius:7px;background:var(--soft);font-size:12px;font-weight:600;align-self:end}
     .plan-switch{display:flex;align-items:center;gap:8px;min-height:44px;padding:4px 0;border:0;background:transparent;font-size:12px;box-shadow:none}.switch-track{position:relative;width:36px;height:22px;border-radius:12px;background:var(--muted)}.switch-track::after{content:'';position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:var(--white)}.plan-switch[aria-checked=true] .switch-track{background:var(--ink)}.plan-switch[aria-checked=true] .switch-track::after{transform:translateX(14px)}.switch-state{min-width:22px}
-    @media(prefers-reduced-motion:reduce){.control-dock,.dock-chevron{transition:none}#map-route-action[aria-busy=true]{animation:none;opacity:1;outline:2px solid var(--ink);outline-offset:2px}}
+    @media(prefers-reduced-motion:reduce){.control-dock,.dock-chevron{transition:none}#map-route-action{animation:none;background:#bfe3bd}}
   </style>
 </head>
 <body class="map-first">
@@ -199,7 +202,7 @@
           <div class="plan-loop-field"><span id="plan-loop-label">Loop</span><button id="plan-loop" class="plan-switch" type="button" role="switch" aria-checked="false" aria-labelledby="plan-loop-label" title="Return to the same start and finish"><span class="switch-track" aria-hidden="true"></span><span class="switch-state" aria-hidden="true">Off</span></button></div>
           <label>Hike date<input id="plan-date" type="date"></label>
           <label>Maximum hike distance<select id="plan-distance"><option value="10000">10 km</option><option value="20000">20 km</option><option value="30000" selected>30 km</option><option value="50000">50 km</option><option value="80000">80 km</option></select></label>
-          <label>Transport at each end<select id="plan-radius"><option value="1000" selected>1 km first · up to 10 km if needed</option></select></label>
+          <label>Transport at each end<select id="plan-radius"><option value="1000" selected>1 km first · up to 20 km if needed</option></select></label>
           <label>Waypoint-to-path tolerance<select id="plan-tolerance"><option value="15">15 m · strict</option><option value="30" selected>30 m</option><option value="60">60 m · review offsets carefully</option></select></label>
           <label>Maximum mapped road connectors<select id="plan-roads"><option value="0">None · paths only</option><option value="500">500 m total</option><option value="1500" selected>1.5 km total</option><option value="3000">3 km total</option></select></label>
           <label>OpenStreetMap data provider<select id="plan-provider"><option value="auto" selected>Automatic fallback · recommended</option><option value="coffee">Private.coffee Overpass</option><option value="vk">VK Maps Overpass</option><option value="fossgis">FOSSGIS Overpass</option></select></label>
@@ -266,7 +269,7 @@
   const NO = new Set(['no', 'private', 'customers', 'permit', 'agricultural', 'forestry', 'delivery', 'students', 'staff', 'residents']);
   const YES = new Set(['yes', 'designated', 'permissive']);
   const MAX_WAYPOINTS = 50;
-  const PREFERRED_APPROACH = 1000, MAX_APPROACH = 10000;
+  const PREFERRED_APPROACH = 1000, MAX_APPROACH = 20000;
   function routeError(code, message, details = {}) { return Object.assign(new Error(message), { code, ...details }); }
   const distance = (a, b) => {
     const rad = Math.PI / 180, dlat = (b.lat - a.lat) * rad, dlon = (b.lon - a.lon) * rad;
@@ -588,12 +591,12 @@
     const missingEnds = [!starts[0]?.length ? 0 : null, !ends[n - 1]?.length ? n - 1 : null].filter(i => i !== null);
     const missingLoop = settings.loop && !endpointPairs(starts[0], ends[n - 1], true).length;
     if (!orderedFailure && missingLoop) {
-      orderedFailure = routeError('NO_TRANSPORT', `No shared start/finish was found for a loop in pin order within ${settings.maxApproach / 1000} km of walking from both end pins. The same transport stop must allow arrival and departure, with eligible mapped paths to waypoint 1 and back from waypoint ${n}. Separate stops or a one-way path without a mapped return cannot close the loop.${settings.maxApproach >= MAX_APPROACH ? ' The 10 km maximum was reached; no off-path closing line was added.' : ''}`, { endpointIndices: [...new Set([0, n - 1])] });
+      orderedFailure = routeError('NO_TRANSPORT', `No shared start/finish was found for a loop in pin order within ${settings.maxApproach / 1000} km of walking from both end pins. The same transport stop must allow arrival and departure, with eligible mapped paths to waypoint 1 and back from waypoint ${n}. Separate stops or a one-way path without a mapped return cannot close the loop.${settings.maxApproach >= MAX_APPROACH ? ' The 20 km maximum was reached; no off-path closing line was added.' : ''}`, { endpointIndices: [...new Set([0, n - 1])] });
       if (settings.maxApproach < MAX_APPROACH) throw orderedFailure;
     } else if (!orderedFailure && missingEnds.length) {
       const roles = [!starts[0]?.length ? `start before waypoint 1 (a service allowing arrival)` : '', !ends[n - 1]?.length ? `finish after waypoint ${n} (a service allowing departure)` : ''].filter(Boolean);
       const unlinked = transit.unlinked ? ` ${transit.unlinked} nearby stop(s) had no mapped service link.` : '';
-      orderedFailure = routeError('NO_TRANSPORT', `${!transit.stops.length ? 'No passenger stops linked to usable mapped services were found. ' : ''}No reachable transport for the ${roles.join(' and ')} within ${settings.maxApproach / 1000} km of walking. Stops must connect to the eligible walking network within 80 m; that final stop gap remains unverified.${unlinked}${settings.maxApproach >= MAX_APPROACH ? ' The 10 km maximum was reached; no longer approach or off-path shortcut was used.' : ''}`, { endpointIndices: [...new Set(missingEnds)] });
+      orderedFailure = routeError('NO_TRANSPORT', `${!transit.stops.length ? 'No passenger stops linked to usable mapped services were found. ' : ''}No reachable transport for the ${roles.join(' and ')} within ${settings.maxApproach / 1000} km of walking. Stops must connect to the eligible walking network within 80 m; that final stop gap remains unverified.${unlinked}${settings.maxApproach >= MAX_APPROACH ? ' The 20 km maximum was reached; no longer approach or off-path shortcut was used.' : ''}`, { endpointIndices: [...new Set(missingEnds)] });
       // Give the entered order its transport extension before considering reorderings.
       if (settings.maxApproach < MAX_APPROACH) throw orderedFailure;
     }
@@ -670,17 +673,17 @@
     const lat = points.reduce((s, p) => s + p.lat, 0) / points.length, padLat = radius / 111195, padLon = padLat / Math.cos(lat * Math.PI / 180);
     const box = [Math.min(...points.map(p => p.lat)) - padLat, Math.min(...points.map(p => p.lon)) - padLon, Math.max(...points.map(p => p.lat)) + padLat, Math.max(...points.map(p => p.lon)) + padLon];
     const area = distance({ lat: box[0], lon: box[1] }, { lat: box[2], lon: box[1] }) * distance({ lat: box[0], lon: box[1] }, { lat: box[0], lon: box[3] });
-    if (box[1] < -180 || box[3] > 180 || box[3] - box[1] > 180 || area > 250e6) throw routeError('AREA_TOO_LARGE', 'The core waypoint area exceeds 250 km² or crosses the date line. Use closer waypoints or split this into separate hikes. The 10 km transport extension does not remove this core-area limit.');
+    if (box[1] < -180 || box[3] > 180 || box[3] - box[1] > 180 || area > 250e6) throw routeError('AREA_TOO_LARGE', 'The core waypoint area exceeds 250 km² or crosses the date line. Use closer waypoints or split this into separate hikes. The 20 km transport extension does not remove this core-area limit.');
     return box.map(n => Number(n.toFixed(6)));
   }
   function queryFor(box, areas = []) {
-    if (areas.length > 2 || areas.some(p => !validPoint(p) || p.radius !== MAX_APPROACH)) throw new Error('Transport expansion must use at most two valid 10 km endpoint areas.');
+    if (areas.length > 2 || areas.some(p => !validPoint(p) || p.radius !== MAX_APPROACH)) throw new Error('Transport expansion must use at most two valid 20 km endpoint areas.');
     const scopes = [box.join(','), ...areas.map(p => `around:${p.radius},${p.lat.toFixed(6)},${p.lon.toFixed(6)}`)];
     const paths = scopes.map(scope => `way["highway"~"^(path|footway|pedestrian|steps|living_street|track|residential|service|unclassified|tertiary|cycleway)$"](${scope});`).join('\n');
     const stops = scopes.map(scope => `node["highway"="bus_stop"](${scope});node["public_transport"="platform"](${scope});node["railway"~"^(station|halt|tram_stop|subway_entrance)$"](${scope});node["amenity"="ferry_terminal"](${scope});`).join('\n');
     return `[out:json][timeout:40][maxsize:67108864];\n(${paths})->.paths;\n(.paths;node(w.paths););out body qt;\nrelation(bw.paths)["route"~"^(hiking|foot)$"];out body qt;\n(${stops})->.stops;\n.stops out body qt;\nrelation(bn.stops)["public_transport"="stop_area"]->.stopareas;\n.stopareas out body qt;\nnode(r.stopareas)->.stopmembers;\n(relation(bn.stops)["route"~"^(bus|trolleybus|train|subway|light_rail|tram|ferry|share_taxi)$"];relation(bn.stopmembers)["route"~"^(bus|trolleybus|train|subway|light_rail|tram|ferry|share_taxi)$"];relation(br.stopareas)["route"~"^(bus|trolleybus|train|subway|light_rail|tram|ferry|share_taxi)$"];);out body qt;`;
   }
-  return { MAX_WAYPOINTS, distance, walkable, passableNode, buildGraph, nearest, snapWaypoints, transportStops, search, pathFrom, distinct, optimizeOrder, plan, boundingBox, queryFor, transportExpansion, coverageBox };
+  return { MAX_WAYPOINTS, MAX_APPROACH, distance, walkable, passableNode, buildGraph, nearest, snapWaypoints, transportStops, search, pathFrom, distinct, optimizeOrder, plan, boundingBox, queryFor, transportExpansion, coverageBox };
 });
 
   </script>
@@ -1114,7 +1117,7 @@
           const selected = routing.selected?.id === route.id, color = ROUTE_COLORS[i];
           L.polyline(route.coords.map(p => [p.lat, p.lon]), { color, weight: selected ? 7 : 5, opacity: selected ? 1 : .78 }).bindPopup(`Route ${i + 1} · ${route.title} · ${km(route.metres)}`).addTo(tracks);
           const midpoint = route.coords[Math.floor(route.coords.length / 2)];
-          if (midpoint) L.marker([midpoint.lat, midpoint.lon], { interactive: false, icon: L.divIcon({ className: 'route-line-label', html: `<span style="background:${color}">Route ${i + 1} · ${km(route.metres)}</span>`, iconSize: [122, 26], iconAnchor: [61, -10] }) }).addTo(markers);
+          if (midpoint) L.marker([midpoint.lat, midpoint.lon], { interactive: false, icon: L.divIcon({ className: 'route-line-label', html: `<span style="background:${color}"><strong>Route ${i + 1}</strong><small>${km(route.metres)}</small></span>`, iconSize: [78, 42], iconAnchor: [39, -10] }) }).addTo(markers);
           if (mapMarkersVisible) [route.coords[0], route.coords.at(-1)].forEach((point, endpoint) => { if (!point) return; const letter = endpoint ? 'F' : 'S', offset = (i - 1) * 26, loopEnd = endpoint && TrailRouter.distance(route.coords[0], route.coords.at(-1)) < 1; L.marker([point.lat, point.lon], { interactive: false, icon: L.divIcon({ className: 'route-endpoint-pin', html: `<span style="background:${color}">${letter}</span>`, iconSize: [24, 24], iconAnchor: [12 - offset, loopEnd ? -16 : 12] }), title: `Route ${i + 1} ${endpoint ? 'finish' : 'start'}` }).addTo(markers); });
         });
       }
@@ -1215,7 +1218,7 @@
       stopRouting(); const serial = routing.serial, controller = new AbortController(); routing.controller = controller; routing.busy = true; routing.searched = true; routing.selected = null; routing.result = null; routing.visible.clear(); $('selected-route-detail').hidden = true; $('route-export-review').hidden = true; $('route-visibility-controls').hidden = true; clearExport();
       $('cancel-routing').hidden = false; $('routing-status').hidden = false; $('routing-status').textContent = 'Downloading walking paths and mapped passenger services…';
       $('map-route-toolbar').hidden = true; $('map-route-dots').replaceChildren(); $('map-export-action').disabled = true;
-      toast('Finding routes in pin order first. Transport: 1 km first, extending up to 10 km if needed…', false, 0);
+      toast('Finding routes in pin order first. Transport: 1 km first, extending up to 20 km if needed…', false, 0);
       $('route-options').replaceChildren(element('div', 'Checking real paths and transport connections. The search may take up to four minutes if a transport extension is needed; you can cancel.', 'routes-empty')); render(false); setStage('routes', { expand: false });
       const timeout = setTimeout(() => controller.abort(), 245000);
       try {
@@ -1223,7 +1226,7 @@
         const settings = { radius, maxApproach: 1000, maxDistance: +$('plan-distance').value, maxRoad: +$('plan-roads').value, tolerance: +$('plan-tolerance').value, optimize: $('plan-order').value === 'optimize', loop: loopEnabled() };
         const points = state.points.map(p => ({ ...p }));
         try {
-          $('routing-status').textContent = 'Checking mapped paths and transport: within 1 km first, then up to 10 km if needed…'; toast($('routing-status').textContent, false, 0);
+          $('routing-status').textContent = 'Checking mapped paths and transport: within 1 km first, then up to 20 km if needed…'; toast($('routing-status').textContent, false, 0);
           const planned = await getBackendPlan(points, settings, $('plan-provider').value, activeRegion(), controller.signal);
           if (serial !== routing.serial) return;
           controller.signal.throwIfAborted();
@@ -1239,14 +1242,14 @@
           catch (error) {
             const areas = TrailRouter.transportExpansion(points, error);
             if (!areas.length) throw error;
-            toast(settings.loop ? 'No shared loop stop within a 1 km walk of both end pins. Checking mapped approaches up to 10 km…' : 'No transport within a 1 km walk at an end. Checking connected approaches up to 10 km…', false, 0);
+            toast(settings.loop ? 'No shared loop stop within a 1 km walk of both end pins. Checking mapped approaches up to 20 km…' : 'No transport within a 1 km walk at an end. Checking connected approaches up to 20 km…', false, 0);
             [mapData, official] = await Promise.all([
               getMapData(box, $('plan-provider').value, controller.signal, areas),
               getOfficialTrails(TrailRouter.coverageBox(box, areas), controller.signal)
             ]);
             if (serial !== routing.serial) return;
             controller.signal.throwIfAborted();
-            result = await workerPlan(mapData.data, points, { ...settings, radius: 10000, maxApproach: 10000 }, official.features, serial);
+            result = await workerPlan(mapData.data, points, { ...settings, radius: TrailRouter.MAX_APPROACH, maxApproach: TrailRouter.MAX_APPROACH }, official.features, serial);
             result.transportExpanded = true;
           }
           if (serial !== routing.serial) return;
@@ -1285,7 +1288,7 @@
       showRoutes(); routeDetails(); render(); toast('Route reversed. Review arrival, departure and trail access again before saving.');
     }
     function plannedGPX(r) {
-      const warning = `PROVISIONAL ROUTE — independently check before navigation. Connected OSM walking ways only; no artificial connectors. Start near ${r.start.name} (${km(r.start.approach)} approach, ${Math.ceil(r.start.accessGap)} m unrouted stop gap); end near ${r.end.name} (${km(r.end.approach)} exit, ${Math.ceil(r.end.accessGap)} m gap). Transport approaches prefer 1 km, extending up to 10 km only when needed. Visit order: ${r.order.map(i => i + 1).join(" → ")}. All ${state.points.length} mandatory waypoints visited within the explicitly accepted ${$('plan-tolerance').value} m tolerance. OSM snapshot ${r.osmTimestamp || 'unknown'}. Hiking date ${$('plan-date').value}. Timetables, closures, permits, terrain and management are not automatically verified. OpenStreetMap contributors, ODbL: https://www.openstreetmap.org/copyright. AFCD corridor matches, where available, are approximate. No elevation invented.`;
+      const warning = `PROVISIONAL ROUTE — independently check before navigation. Connected OSM walking ways only; no artificial connectors. Start near ${r.start.name} (${km(r.start.approach)} approach, ${Math.ceil(r.start.accessGap)} m unrouted stop gap); end near ${r.end.name} (${km(r.end.approach)} exit, ${Math.ceil(r.end.accessGap)} m gap). Transport approaches prefer 1 km, extending up to 20 km only when needed. Visit order: ${r.order.map(i => i + 1).join(" → ")}. All ${state.points.length} mandatory waypoints visited within the explicitly accepted ${$('plan-tolerance').value} m tolerance. OSM snapshot ${r.osmTimestamp || 'unknown'}. Hiking date ${$('plan-date').value}. Timetables, closures, permits, terrain and management are not automatically verified. OpenStreetMap contributors, ODbL: https://www.openstreetmap.org/copyright. AFCD corridor matches, where available, are approximate. No elevation invented.`;
       const decimal = n => n.toFixed(8), wpts = [{ ...r.coords[0], name: 'Start near ' + r.start.name }, ...r.order.map(i => state.points[i]), { ...r.coords.at(-1), name: 'End near ' + r.end.name }];
       return `<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="TrailPlanner" xmlns="http://www.topografix.com/GPX/1/1"><metadata><name>${xmlText(r.title)}</name><desc>${xmlText(warning)}</desc><time>${new Date().toISOString()}</time></metadata>${wpts.map(p => `<wpt lat="${decimal(p.lat)}" lon="${decimal(p.lon)}"><name>${xmlText(p.name)}</name></wpt>`).join('')}<trk><name>${xmlText(r.title)} — provisional</name><desc>${xmlText(warning)}</desc><trkseg>${r.coords.map(p => `<trkpt lat="${decimal(p.lat)}" lon="${decimal(p.lon)}"></trkpt>`).join('')}</trkseg></trk></gpx>`;
     }
