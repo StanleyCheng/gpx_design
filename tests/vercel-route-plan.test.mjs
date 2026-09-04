@@ -197,25 +197,25 @@ test('backend stops at 20 km and reports the missing start, not a generic server
   assert.match(queries[3], /around:20000,22.200000,114.000000/);
 });
 
-test('backend carries Loop through transport expansion and returns only closed tracks', async () => {
+test('backend loops omit transport data and return only closed tracks without expansion', async () => {
   const { data, points } = transportNetwork({ lat: 22.25, nearStart: true });
-  data.elements.find(e => e.id === 501).members[0].role = 'platform';
   const queries = [];
   const handler = createRoutePlanHandler({ fetcher: async (url, options) => {
     queries.push(options.body.get('data'));
     return Response.json(data);
   } });
-  const response = await handler(routeRequest(points, undefined, { loop: true }));
+  const response = await handler(routeRequest(points, undefined, { loop: true, maxRoad: 80000 }));
   assert.equal(response.status, 200);
   const { result } = await response.json();
   assert.equal(result.settings.loop, true);
-  assert.equal(result.transportExpanded, true);
-  assert.equal(result.transportExpansionMetres, 4000);
-  assert.equal(queries.length, 2);
-  assert.match(queries[1], /around:4000,22.250000,114.000000/);
-  assert.match(queries[1], /around:4000,22.250000,114.010000/);
+  assert.equal(result.settings.maxRoad, 80000);
+  assert.equal(result.transportExpanded, undefined);
+  assert.equal(result.stopCount, 0);
+  assert.equal(queries.length, 1);
+  assert.doesNotMatch(queries[0], /bus_stop|public_transport|ferry_terminal|around:/);
   for (const route of result.routes) {
-    assert.equal(route.start.id, 1); assert.equal(route.end.id, 1);
+    assert.equal(route.start.id, route.end.id);
+    assert.match(route.start.id, /^loop\//);
     assert.deepEqual(route.coords[0], route.coords.at(-1));
   }
 });

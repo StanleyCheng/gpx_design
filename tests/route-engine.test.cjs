@@ -85,6 +85,9 @@ test('a slightly farther connected segment is selected over the closest isolated
   const ways = new Map(data.elements.filter(e => e.type === 'way').map(way => [way.id, way]));
   assert.ok(first.edges.every(edge => ways.has(edge.way) && R.walkable(ways.get(edge.way).tags)), 'every output edge retains eligible downloaded OSM provenance');
   assert.deepEqual(R.plan(data, points, { optimize: false, tolerance: 30 }).routes[0].snaps.map(s => s.id), first.snaps.map(s => s.id), 'candidate selection is deterministic');
+  const loop = R.plan(data, points, { optimize: false, tolerance: 30, loop: true }).routes[0];
+  assert.equal(loop.snaps[0].id, 2, 'loop snapping also rejects the closest isolated branch');
+  assert.deepEqual(loop.coords[0], loop.coords.at(-1));
 });
 test('a valid directed candidate replaces the closest wrong-way dead-end snap', () => {
   const { data, points } = nearbyBranchFixture('oneway');
@@ -95,6 +98,9 @@ test('a valid directed candidate replaces the closest wrong-way dead-end snap', 
   assert.equal(route.snaps[0].id, 2);
   assert.deepEqual(route.ids, [1, 2, 3, 4]);
   assert.ok(route.snaps.every(snap => snap.metres <= 30));
+  const loop = R.plan(data, points, { optimize: false, tolerance: 30, loop: true }).routes[0];
+  assert.equal(loop.snaps[0].id, 2, 'the loop uses a candidate that permits both outbound and return travel');
+  assert.deepEqual(loop.coords[0], loop.coords.at(-1));
 });
 test('equal-offset connected combinations use mapped route distance as the deterministic tie-breaker', () => {
   const nodes = [
@@ -151,6 +157,8 @@ test('disconnected paths and missing source geometry fail closed', () => {
 test('private, conditional, demanding, ford and car-only paths are excluded', () => {
   for (const tags of [{ highway: 'motorway', foot: 'yes' }, { highway: 'path', foot: 'no' }, { highway: 'path', access: 'private' }, { highway: 'path', sac_scale: 'mountain_hiking' }, { highway: 'path', ford: 'yes' }, { highway: 'path', 'foot:conditional': 'yes @ (Su)' }, { highway: 'cycleway' }]) assert.equal(R.walkable(tags), false);
   assert.equal(R.walkable({ highway: 'path', access: 'private', foot: 'yes' }), true);
+  assert.equal(R.walkable({ highway: 'corridor', indoor: 'yes' }), true, 'a public mapped pedestrian corridor can connect station waypoints');
+  assert.equal(R.walkable({ highway: 'corridor', indoor: 'yes', access: 'private' }), false);
 });
 test('a mapped ford is opt-in only and can connect an AFCD corridor without relaxing other restrictions', () => {
   assert.equal(R.walkable({ highway: 'path', ford: 'yes' }, true), false, 'the public walkability check cannot bypass ford policy');
@@ -329,6 +337,10 @@ test('transport query expands only missing ends and rejects unbounded areas', ()
   assert.deepEqual(R.transportExpansion(points, { code: 'WAYPOINT_OFF_PATH' }), []);
   assert.throws(() => R.transportExpansion(points, { code: 'NO_TRANSPORT' }, 6000), /bounded 4 km, 10 km or 20 km step/);
   assert.throws(() => R.queryFor(box, [{ ...points[0], radius: 50000 }]), /at most two/);
+  const loopQuery = R.queryFor(box, [], { includeTransport: false });
+  assert.match(loopQuery, /way\["highway"/);
+  assert.doesNotMatch(loopQuery, /bus_stop|public_transport|ferry_terminal/);
+  assert.throws(() => R.queryFor(box, [{ ...points[0], radius: 4000 }], { includeTransport: false }), /loop without transport/);
 });
 test('arrival and departure checks are independent when only the finish needs extension', () => {
   const { data, points } = transportNetwork();
@@ -351,6 +363,8 @@ test('Loop defaults off; enabling it closes every route using real directed grap
   for (const route of result.routes) {
     assert.equal(route.loop, true);
     assert.equal(route.start.id, route.end.id);
+    assert.equal(route.start.id, 'loop/2');
+    assert.equal(route.start.approach, 0);
     assert.deepEqual(route.coords[0], route.coords.at(-1));
     assert.deepEqual(route.order, [0, 1]);
     assert.ok(route.ids.indexOf(3, route.ids.indexOf(2)) > route.ids.indexOf(2));
@@ -358,47 +372,48 @@ test('Loop defaults off; enabling it closes every route using real directed grap
     assert.ok(route.metres >= result.routes[0].metres - .01);
   }
   const tree = R.search(graph, 2, 'distance', new Map());
-  const expected = 2 * (tree.length.get(1) + tree.length.get(3));
+  const expected = 2 * tree.length.get(3);
   assert.ok(Math.abs(result.routes[0].metres - expected) < .01, 'the first loop uses the shortest in-order walk, including return');
+  assert.equal(result.stopCount, 0);
 });
 
-test('loops require a shared stop with both passenger roles and a mapped return', () => {
+test('loops ignore public transport but still require a real directed mapped return', () => {
   const data = fixture();
-  data.elements.find(e => e.id === 501).members[0].role = 'platform_exit_only';
-  data.elements.find(e => e.id === 502).members[0].role = 'platform_entry_only';
-  assert.ok(R.plan(data, points).routes.length);
-  assert.throws(() => R.plan(data, points, { ...extended, loop: true }), error => error.code === 'NO_TRANSPORT' && /shared start\/finish/.test(error.message));
+  data.elements = data.elements.filter(element => element.type !== 'relation' || element.tags.route === 'hiking');
+  data.elements.filter(element => element.type === 'node').forEach(node => { delete node.tags; });
+  const loop = R.plan(data, points, { loop: true, optimize: false });
+  assert.ok(loop.routes.length);
+  assert.equal(loop.stopCount, 0);
+  assert.equal(loop.routes[0].start.id, 'loop/2');
+  assert.deepEqual(loop.routes[0].coords[0], loop.routes[0].coords.at(-1));
   const directed = fixture();
   directed.elements.filter(e => e.type === 'way').forEach(e => { e.tags['oneway:foot'] = 'yes'; });
   assert.ok(R.plan(directed, points).routes.length);
-  assert.throws(() => R.plan(directed, points, { ...extended, loop: true }), /one-way path without a mapped return/);
+  assert.throws(() => R.plan(directed, points, { loop: true, optimize: false }), error => error.code === 'DISCONNECTED_WAYPOINTS' && /cannot return to waypoint 1|loop cannot close/.test(error.message));
 });
 
-test('a shared loop stop is matched before nearby-stop pruning and the 12-stop shortlist', () => {
+test('dense or invalid passenger service data is not processed for a loop', () => {
   const { data, points } = transportNetwork({ nearStart: true });
-  // Nearby arrival-only / departure-only stops cannot form a loop. Only the
-  // farther stop at node 1 has both roles, so it needs the existing expansion.
-  data.elements.find(e => e.id === 501).members[0].role = 'platform';
   for (let i = 0; i < 15; i++) {
     data.elements.push({ type: 'node', id: 1000 + i, ...points[0], tags: { highway: 'bus_stop' } });
     data.elements.push({ type: 'relation', id: 2000 + i, tags: { route: 'bus' }, members: [{ type: 'node', ref: 1000 + i, role: 'platform_exit_only' }] });
   }
-  assert.throws(() => R.plan(data, points, { loop: true }), error => error.code === 'NO_TRANSPORT' && error.endpointIndices.join(',') === '0,1');
-  const route = R.plan(data, points, { ...extended, loop: true }).routes[0];
-  assert.equal(route.start.id, 1); assert.equal(route.end.id, 1);
-  assert.ok(route.start.extendedApproach && route.end.extendedApproach);
-  assert.deepEqual(route.ids, [1, 5, 2, 3, 2, 5, 1]);
+  const result = R.plan(data, points, { loop: true, optimize: false });
+  assert.equal(result.stopCount, 0);
+  assert.equal(result.unlinkedStops, 0);
+  assert.ok(result.routes.every(route => route.start.id === route.end.id && route.start.id.startsWith('loop/')));
 });
 
 test('loop returns count toward distance and road limits; no partial open route is substituted', () => {
-  const normal = R.plan(fixture(), points, { optimize: false }).routes[0];
-  assert.throws(() => R.plan(fixture(), points, { loop: true, maxDistance: normal.metres + 10 }), error => error.code === 'ROUTE_LIMITS' && /loop returning/.test(error.message));
+  const loop = R.plan(fixture(), points, { loop: true, optimize: false }).routes[0];
+  assert.throws(() => R.plan(fixture(), points, { loop: true, optimize: false, maxDistance: loop.metres - 1 }), error => error.code === 'ROUTE_LIMITS' && /loop returning/.test(error.message));
   const data = fixture();
   data.elements.filter(e => e.type === 'way').forEach(e => { e.tags.highway = 'residential'; });
-  assert.throws(() => R.plan(data, points, { loop: true, maxRoad: normal.metres + 10 }), /road limit/);
+  const roadLoop = R.plan(data, points, { loop: true, optimize: false, maxRoad: 30000 }).routes[0];
+  assert.throws(() => R.plan(data, points, { loop: true, optimize: false, maxRoad: roadLoop.roadMetres - 1 }), /road limit/);
 });
 
-test('reordered loop alternatives retain the common stop and every mandatory pin', () => {
+test('reordered loop alternatives stay anchored at waypoint 1 and retain every mandatory pin', () => {
   const { data } = transportNetwork({ nearStart: true });
   data.elements.filter(e => e.type === 'relation').forEach(e => { e.members[0].role = 'platform'; });
   const input = [.006, .002, .01, .004].map(lon => ({ lat: 22.05, lon: 114 + lon }));
@@ -407,13 +422,25 @@ test('reordered loop alternatives retain the common stop and every mandatory pin
   assert.ok(result.routes.some(r => !r.preservesOrder && r.metres < result.routes[0].metres));
   for (const route of result.routes) {
     assert.equal(route.start.id, route.end.id);
+    assert.equal(route.order[0], 0);
+    assert.equal(route.start.node, route.snaps[0].id);
     assert.deepEqual(route.coords[0], route.coords.at(-1));
     assert.deepEqual([...route.order].sort(), [0, 1, 2, 3]);
   }
 });
 
-test('a single mandatory pin can make an out-and-back loop without dropping that pin', () => {
-  const route = R.plan(fixture(), [points[0]], { loop: true }).routes[0];
-  assert.deepEqual(route.ids, [1, 2, 1]);
-  assert.deepEqual(route.order, [0]);
+test('a loop needs at least two mandatory pins instead of inventing a circuit', () => {
+  assert.throws(() => R.plan(fixture(), [points[0]], { loop: true }), error => error.code === 'INVALID_LOOP' && /at least two waypoints/.test(error.message));
+});
+
+test('the walking graph accepts the documented dense-city bound and rejects larger payloads', () => {
+  assert.equal(R.MAX_MAP_ELEMENTS, 500000);
+  const aboveOldLimit = { elements: [
+    { type: 'node', id: 1, lat: 22, lon: 114 },
+    { type: 'node', id: 2, lat: 22, lon: 114.001 },
+    { type: 'way', id: 1, nodes: [1, 2], tags: { highway: 'path' } },
+    ...Array.from({ length: 199998 }, (_, index) => ({ type: 'ignored', id: index + 1 }))
+  ] };
+  assert.doesNotThrow(() => R.buildGraph(aboveOldLimit));
+  assert.throws(() => R.buildGraph({ elements: new Array(R.MAX_MAP_ELEMENTS + 1) }), error => error.code === 'MAP_TOO_LARGE' && /500,000-element/.test(error.message));
 });

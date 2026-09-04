@@ -74,7 +74,7 @@ function validateInput(input) {
       radius,
       maxApproach: 1000,
       maxDistance: validateNumber(settings.maxDistance, [10000, 20000, 30000, 50000, 80000], 'maximum hike distance'),
-      maxRoad: validateNumber(settings.maxRoad, [0, 500, 1500, 3000], 'road connector limit'),
+      maxRoad: validateNumber(settings.maxRoad, [0, 500, 1500, 3000, 80000], 'road connector limit'),
       tolerance: validateNumber(settings.tolerance, [15, 30, 60], 'waypoint tolerance'),
       optimize: Boolean(settings.optimize),
       loop: settings.loop === true,
@@ -125,9 +125,9 @@ function cachePut(cache, key, value, now) {
   while (cache.size > 8) cache.delete(cache.keys().next().value);
 }
 
-async function fetchMapData(box, selected, fetcher, signal, now, areas = []) {
+async function fetchMapData(box, selected, fetcher, signal, now, areas = [], queryOptions = {}) {
   const choices = selected === 'auto' ? PROVIDER_ORDER : [selected];
-  const query = TrailRouter.queryFor(box, areas);
+  const query = TrailRouter.queryFor(box, areas, queryOptions);
   signal.throwIfAborted();
   // A cached backup is immediately usable; do not wait for earlier providers again.
   for (const choice of choices) {
@@ -212,7 +212,7 @@ export function createRoutePlanHandler(options = {}) {
       if (request.signal.aborted) clientAbort();
       try {
         let [map, official] = await Promise.all([
-          fetchMapData(box, input.provider, fetcher, controller.signal, now),
+          fetchMapData(box, input.provider, fetcher, controller.signal, now, [], { includeTransport: !input.settings.loop }),
           fetchOfficialTrails(box, input.region, fetcher, controller.signal, now)
         ]);
         controller.signal.throwIfAborted();
