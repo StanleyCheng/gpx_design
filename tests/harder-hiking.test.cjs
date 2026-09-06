@@ -10,9 +10,9 @@ const makeHelpers = routing => new Function('TrailRouter', 'routing', `${helpers
 const { routeDifficultySections, harderTerrainWarning, roughSurfaceWarning, sacScaleLabel } = makeHelpers();
 const harderRouteSections = route => routeDifficultySections(route).filter(section => R.harderThanHiking(section.sacScale));
 
-test('the harder hiking switch is off initially and changing it changes the route fingerprint', () => {
+test('the harder hiking switch is on initially and changing it changes the route fingerprint', () => {
   const html = readFileSync(join(__dirname, '../index.html'), 'utf8');
-  assert.match(html, /id="plan-harder-hiking"[^>]*role="switch"[^>]*aria-checked="false"/);
+  assert.match(html, /id="plan-harder-hiking"[^>]*role="switch"[^>]*aria-checked="true"[^>]*>[\s\S]*?<span class="switch-state"[^>]*>On<\/span>/);
   const controls = new Map();
   const $ = id => {
     if (!controls.has(id)) controls.set(id, { value: '', checked: 'false', state: { textContent: 'Off' }, getAttribute() { return this.checked; }, setAttribute(k, v) { this.checked = v; }, querySelector() { return this.state; }, addEventListener(k, fn) { this[k] = fn; }, dispatchEvent() { this.changed = true; } });
@@ -21,10 +21,11 @@ test('the harder hiking switch is off initially and changing it changes the rout
   const declarations = source.slice(source.indexOf('    const planSwitches'), source.indexOf('    const providers')) + source.slice(source.indexOf('    const switchEnabled'), source.indexOf('    const sacScaleLabel'));
   const handler = source.slice(source.indexOf('    for (const id of planSwitches)'), source.indexOf('    const today'));
   const fingerprint = new Function('$', 'state', `${declarations}\n${handler}\nreturn routingFingerprint;`)($, { points: [], segments: [], source: '' });
-  const before = fingerprint(), control = $('plan-harder-hiking');
+  const control = $('plan-harder-hiking'); control.checked = 'true'; control.state.textContent = 'On';
+  const before = fingerprint();
   control.click();
-  assert.equal(control.checked, 'true');
-  assert.equal(control.state.textContent, 'On');
+  assert.equal(control.checked, 'false');
+  assert.equal(control.state.textContent, 'Off');
   assert.equal(control.changed, true);
   assert.notEqual(fingerprint(), before);
   control.click(); assert.equal(fingerprint(), before);

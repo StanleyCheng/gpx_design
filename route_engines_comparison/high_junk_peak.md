@@ -17,7 +17,7 @@ The basemap independently renders paths that are excluded from the routing graph
 
 ## Implemented control
 
-**Allow harder hiking paths** is off by default. On admits the five recognized SAC grades above `hiking`: T2 mountain hiking, T3 demanding mountain hiking, T4 alpine hiking, T5 demanding alpine hiking and T6 difficult alpine hiking. Easier `strolling` and `hiking` remain eligible. Unknown tag values remain excluded; absent tags remain unknown. See [OSM's SAC scale definitions](https://wiki.openstreetmap.org/wiki/Key:sac_scale).
+**Allow harder hiking paths** is on by default and admits the five recognized SAC grades above `hiking`: T2 mountain hiking, T3 demanding mountain hiking, T4 alpine hiking, T5 demanding alpine hiking and T6 difficult alpine hiking. Turn it off to exclude those known harder grades. Easier `strolling` and `hiking` remain eligible. Unknown tag values remain excluded; absent tags remain unknown. See [OSM's SAC scale definitions](https://wiki.openstreetmap.org/wiki/Key:sac_scale).
 
 Every selected route edge carries its SAC grade. Difficulty coloring is **off by default**. The **Difficulty** switch is directly below the route-number toggles in the right-hand map toolbar and recolors the visible routes immediately. It does not recompute routes, change their visibility or alter the selected option.
 
