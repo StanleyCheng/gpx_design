@@ -17,8 +17,8 @@ function animationHarness(overrides = {}) {
   const markers = { removeLayer(dot) { removed.push(dot); } };
   const L = { circleMarker(latlng, options) { const dot = { latlng, options, positions: [], addTo() { return this; }, setLatLng(next) { this.latlng = next; this.positions.push(next); } }; dots.push(dot); return dot; } };
   const TrailRouter = { distance(a, b) { return Math.hypot(b.lat - a.lat, b.lon - a.lon) * 100; } };
-  const factory = new Function('TrailRouter', 'routing', 'map', 'L', 'markers', 'requestAnimationFrame', 'cancelAnimationFrame', 'routeRunAnimation', 'ROUTE_RUNNER_COLOR', 'routeRunEnabled', `${animationSource}; return { routeAnimationGeometry, pointOnRoute, startRouteRun, stopRouteRun };`);
-  const api = factory(TrailRouter, routing, {}, L, markers, requestAnimationFrame, cancelAnimationFrame, routeRunAnimation, '#ff6f7d', () => true);
+  const factory = new Function('TrailRouter', 'routing', 'map', 'L', 'markers', 'requestAnimationFrame', 'cancelAnimationFrame', 'routeRunAnimation', 'ROUTE_RUNNER_COLOR', 'ROUTE_RUNNER_EDGE', 'routeRunEnabled', `${animationSource}; return { routeAnimationGeometry, pointOnRoute, startRouteRun, stopRouteRun };`);
+  const api = factory(TrailRouter, routing, {}, L, markers, requestAnimationFrame, cancelAnimationFrame, routeRunAnimation, '#ff6f7d', .75, () => true);
   const runFrame = now => { const entry = frameQueue.entries().next().value; assert.ok(entry, 'an animation frame is queued'); frameQueue.delete(entry[0]); entry[1](now); };
   return { ...api, routing, routeRunAnimation, frameQueue, cancelled, removed, dots, runFrame };
 }
@@ -46,7 +46,7 @@ test('route animation interpolates by route distance and follows reversed geomet
   assert.equal(routeAnimationGeometry({ coords: [{ lat: 0, lon: 0 }] }), null);
 });
 
-test('one light red dot runs on each visible route with the exact route width', () => {
+test('one outlined light red dot runs on each visible route with the exact route width', () => {
   const routes = [
     { id: 'route-1', coords: [{ lat: 0, lon: 0 }, { lat: 0, lon: 1 }, { lat: 0, lon: 3 }] },
     { id: 'route-2', coords: [{ lat: 1, lon: 0 }, { lat: 1, lon: 3 }] },
@@ -55,8 +55,8 @@ test('one light red dot runs on each visible route with the exact route width', 
   const harness = animationHarness({ routing: { visible: new Set(['route-1', 'route-2']), selected: routes[1] } });
   harness.startRouteRun(routes);
   assert.equal(harness.dots.length, 2);
-  assert.deepEqual(harness.dots.map(dot => dot.options.radius), [2.5, 3.5]);
-  assert.ok(harness.dots.every(dot => dot.options.fillColor === '#ff6f7d' && dot.options.stroke === false));
+  assert.deepEqual(harness.dots.map(dot => dot.options.radius * 2 + dot.options.weight), [5, 7]);
+  assert.ok(harness.dots.every(dot => dot.options.fillColor === '#ff6f7d' && dot.options.stroke === true && dot.options.color === '#fff' && dot.options.weight === .75));
   harness.runFrame(0);
   harness.runFrame(4000);
   assert.deepEqual(harness.dots[0].positions.at(-1), [0, 1.5]);
@@ -64,6 +64,12 @@ test('one light red dot runs on each visible route with the exact route width', 
   assert.equal(harness.routeRunAnimation.frame, 0);
   assert.equal(harness.removed.length, 2);
   assert.equal(harness.cancelled.length, 1);
+});
+
+test('route number and length live in the toolbar instead of covering map geometry', () => {
+  assert.match(source, /dot\.append\(element\('span', String\(i \+ 1\), 'map-route-number'\), element\('small', km\(route\.metres\), 'map-route-length'\)\)/);
+  assert.doesNotMatch(source, /route-line-label/);
+  assert.doesNotMatch(html, /route-line-label/);
 });
 
 test('Run toggles rendering immediately and resets for a new route search', () => {

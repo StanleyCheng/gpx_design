@@ -95,7 +95,9 @@ test('map-first route controls support colored combinations and individual or co
   assert.match(planner, /ROUTE_COLORS/);
   assert.match(planner, /routing\.visible/);
   assert.match(planner, /function allRoutesGPX/);
-  assert.match(planner, /<strong>Route \$\{i \+ 1\}<\/strong><small>\$\{km\(route\.metres\)\}<\/small>/);
+  assert.match(planner, /'map-route-number'/);
+  assert.match(planner, /'map-route-length'/);
+  assert.doesNotMatch(planner, /route-line-label/);
   assert.match(planner, /className: 'route-endpoint-pin'/);
   assert.match(planner, /const letter = endpoint \? 'F' : 'S'/);
   assert.match(planner, /'map-route-dot'/);
