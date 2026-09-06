@@ -106,7 +106,7 @@
   <noscript><p class="noscript">JavaScript is required to import files and use the map. Route planning requires JavaScript. No route is certified safe.</p></noscript>
   <main class="shell">
     <section class="map-section" aria-labelledby="map-title"><h1 id="map-title" class="skip">Planning map</h1>
-      <div id="map-capture" class="map-container"><div id="map" aria-label="Interactive map for reviewing and editing waypoint locations" aria-describedby="map-gesture-note"></div><div id="route-difficulty-legend" class="route-difficulty-legend" role="status" hidden><span class="difficulty-key" style="--difficulty-color:#13834b">Easy</span><span class="difficulty-key" style="--difficulty-color:#e34e9b">Demanding</span><span class="difficulty-key" style="--difficulty-color:#d00000">Difficult</span><span class="difficulty-key" style="--difficulty-color:#777777">Unknown</span></div><div class="map-status-panel"><div class="map-quick-actions" aria-label="Map planning shortcuts"><button id="map-route-action" type="button" aria-label="Find routes" aria-busy="false" disabled><span class="find-label">Find</span><span class="finding-dots" aria-hidden="true"><span></span><span></span><span></span></span></button></div><aside id="map-route-toolbar" class="map-route-toolbar" aria-label="Routes shown on map" hidden><strong>Routes</strong><div id="map-route-dots" class="map-route-dots"></div><div id="route-difficulty-control" class="map-difficulty-control" hidden><span id="route-difficulty-label">Difficulty</span><button id="route-difficulty-colors" class="plan-switch" type="button" role="switch" aria-checked="false" aria-label="Color by difficulty" aria-describedby="route-difficulty-note" title="Green: easy; pink: demanding; red: difficult/alpine; gray: unknown"><span class="switch-track" aria-hidden="true"></span><span class="switch-state" aria-hidden="true">Off</span></button><span id="route-difficulty-note" hidden>Green: strolling / easy hiking (T1). Pink: more demanding hiking (T2–T3). Red: difficult / alpine (T4–T6). Gray: unknown. Changes colors immediately without recalculating routes.</span></div><button id="map-markers-action" class="map-export-action" type="button" aria-pressed="true" aria-label="Hide waypoint pins and start/finish markers" title="Hide pins and start/finish points">Pins</button><button id="map-export-action" class="map-export-action" type="button" aria-label="Export shown routes as GPX" disabled>Export</button></aside></div></div>
+      <div id="map-capture" class="map-container"><div id="map" aria-label="Interactive map for reviewing and editing waypoint locations" aria-describedby="map-gesture-note"></div><div id="route-difficulty-legend" class="route-difficulty-legend" role="status" hidden><span class="difficulty-key" style="--difficulty-color:#13834b">Easy</span><span class="difficulty-key" style="--difficulty-color:#e34e9b">Demanding</span><span class="difficulty-key" style="--difficulty-color:#d00000">Difficult</span><span class="difficulty-key" style="--difficulty-color:#777777">Unknown</span></div><div class="map-status-panel"><div class="map-quick-actions" aria-label="Map planning shortcuts"><button id="map-route-action" type="button" aria-label="Find routes" aria-busy="false" disabled><span class="find-label">Find</span><span class="finding-dots" aria-hidden="true"><span></span><span></span><span></span></span></button></div><aside id="map-route-toolbar" class="map-route-toolbar" aria-label="Routes shown on map" hidden><strong>Routes</strong><div id="map-route-dots" class="map-route-dots"></div><div id="route-difficulty-control" class="map-difficulty-control" hidden><span id="route-difficulty-label">Difficulty</span><button id="route-difficulty-colors" class="plan-switch" type="button" role="switch" aria-checked="false" aria-label="Color by difficulty" aria-describedby="route-difficulty-note" title="Green: easy; pink: demanding; red: difficult/alpine; gray: unknown"><span class="switch-track" aria-hidden="true"></span><span class="switch-state" aria-hidden="true">Off</span></button><span id="route-difficulty-note" hidden>Green: strolling / easy hiking (T1). Pink: more demanding hiking (T2–T3). Red: difficult / alpine (T4–T6). Gray: unknown. Changes colors immediately without recalculating routes.</span></div><div id="route-run-control" class="map-difficulty-control" hidden><span id="route-run-label">Run</span><button id="route-run" class="plan-switch" type="button" role="switch" aria-checked="false" aria-labelledby="route-run-label" aria-describedby="route-run-note" title="Animate the direction of every visible route"><span class="switch-track" aria-hidden="true"></span><span class="switch-state" aria-hidden="true">Off</span></button><span id="route-run-note" hidden>A small light red dot follows each visible route from start to finish. This changes only the map display.</span></div><button id="map-markers-action" class="map-export-action" type="button" aria-pressed="true" aria-label="Hide waypoint pins and start/finish markers" title="Hide pins and start/finish points">Pins</button><button id="map-export-action" class="map-export-action" type="button" aria-label="Export shown routes as GPX" disabled>Export</button></aside></div></div>
     </section>
     <section id="control-dock" class="control-dock collapsed" aria-label="Route planning controls">
       <button id="control-dock-toggle" class="dock-toggle" type="button" aria-expanded="false" aria-controls="control-dock-content" aria-label="Open planning controls"><span class="dock-grip" aria-hidden="true"></span><span class="dock-heading"><strong id="dock-title">Add your waypoints</strong><span id="dock-summary">Choose how you want to add places</span></span><span class="dock-chevron" aria-hidden="true">⌄</span></button>
@@ -1256,6 +1256,7 @@
 
     // BEGIN PLANNER UI
     const ROUTE_COLORS = ['#087f68', '#d4572f', '#6555a5'];
+    const ROUTE_RUNNER_COLOR = '#ff6f7d';
     const DIFFICULTY_STYLES = [
       { color: '#777777', label: 'Unknown difficulty', rank: 0 },
       { color: '#13834b', label: 'Easy hiking', rank: 1 },
@@ -1264,6 +1265,7 @@
     ];
     const WAYPOINT_PIN_PATH = 'M12 1C5.9 1 1 5.8 1 11.7C1 19.5 12 29 12 29S23 19.5 23 11.7C23 5.8 18.1 1 12 1Z';
     let mapMarkersVisible = true;
+    const routeRunAnimation = { frame: 0, dots: [] };
     const ROUTE_BACKEND_URL = 'https://gpxdesign.vercel.app/api/plan-routes';
     const routing = { selected: null, result: null, visible: new Set(), fingerprint: '', serial: 0, controller: null, worker: null, cache: new Map(), busy: false, searched: false, evidence: '', blockedUntil: 0 };
     const planSwitches = ['loop', 'official-fords', 'harder-hiking'];
@@ -1288,6 +1290,7 @@
     const harderHikingEnabled = () => switchEnabled('harder-hiking');
     const routingFingerprint = () => JSON.stringify([state.points, state.segments.length, state.source, ...planFields.map(id => planSwitches.includes(id) ? switchEnabled(id) : $('plan-' + id).value)]);
     const difficultyColorsEnabled = () => $('route-difficulty-colors').getAttribute('aria-checked') === 'true';
+    const routeRunEnabled = () => $('route-run').getAttribute('aria-checked') === 'true';
     const sacScaleLabel = scale => scale === 'strolling' ? 'Strolling' : TrailRouter.SAC_SCALES.indexOf(scale) >= 1 ? `T${TrailRouter.SAC_SCALES.indexOf(scale)} · ${scale.replaceAll('_', ' ')}` : 'Difficulty not tagged';
     function routeDifficultySections(route) {
       const sections = [];
@@ -1304,6 +1307,46 @@
     }
     function visibleDifficultySections(routes) {
       return routes.flatMap((route, index) => routing.visible.has(route.id) ? routeDifficultySections(route).map(section => ({ ...section, routeId: route.id, routeNumber: index + 1 })) : []).sort((a, b) => a.rank - b.rank);
+    }
+    function routeAnimationGeometry(route) {
+      if (!Array.isArray(route.coords) || route.coords.length < 2) return null;
+      const cumulative = [0];
+      for (let i = 1; i < route.coords.length; i++) cumulative.push(cumulative.at(-1) + TrailRouter.distance(route.coords[i - 1], route.coords[i]));
+      return cumulative.at(-1) > 0 ? { coords: route.coords, cumulative, total: cumulative.at(-1) } : null;
+    }
+    function pointOnRoute(geometry, progress) {
+      const target = (((progress % 1) + 1) % 1) * geometry.total;
+      let low = 1, high = geometry.cumulative.length - 1;
+      while (low < high) { const middle = (low + high) >> 1; geometry.cumulative[middle] < target ? low = middle + 1 : high = middle; }
+      const start = geometry.coords[low - 1], end = geometry.coords[low], segmentStart = geometry.cumulative[low - 1], segmentLength = geometry.cumulative[low] - segmentStart;
+      const ratio = segmentLength ? (target - segmentStart) / segmentLength : 0;
+      return { lat: start.lat + (end.lat - start.lat) * ratio, lon: start.lon + (end.lon - start.lon) * ratio };
+    }
+    function stopRouteRun() {
+      if (routeRunAnimation.frame) cancelAnimationFrame(routeRunAnimation.frame);
+      routeRunAnimation.frame = 0;
+      routeRunAnimation.dots.forEach(dot => markers.removeLayer?.(dot));
+      routeRunAnimation.dots = [];
+    }
+    function startRouteRun(routes) {
+      if (!map || !routeRunEnabled()) return;
+      const runners = routes.flatMap(route => {
+        if (!routing.visible.has(route.id)) return [];
+        const geometry = routeAnimationGeometry(route);
+        if (!geometry) return [];
+        const width = routing.selected?.id === route.id ? 7 : 5;
+        const dot = L.circleMarker([geometry.coords[0].lat, geometry.coords[0].lon], { radius: width / 2, stroke: false, fillColor: ROUTE_RUNNER_COLOR, fillOpacity: 1, interactive: false }).addTo(markers);
+        routeRunAnimation.dots.push(dot);
+        return [{ dot, geometry, duration: Math.max(8000, Math.min(24000, geometry.total * 9)) }];
+      });
+      if (!runners.length) return;
+      let started;
+      const animate = now => {
+        started ??= now;
+        runners.forEach(runner => { const point = pointOnRoute(runner.geometry, (now - started) / runner.duration); runner.dot.setLatLng([point.lat, point.lon]); });
+        routeRunAnimation.frame = requestAnimationFrame(animate);
+      };
+      routeRunAnimation.frame = requestAnimationFrame(animate);
     }
     function harderTerrainWarning(route) {
       const sections = routeDifficultySections(route).filter(section => TrailRouter.harderThanHiking(section.sacScale));
@@ -1327,6 +1370,7 @@
     function stopRouting() { routing.serial++; routing.controller?.abort(); routing.worker?.terminate(); routing.controller = null; routing.worker = null; routing.busy = false; $('cancel-routing').hidden = true; }
     function invalidateRoutes() {
       stopRouting(); routing.selected = null; routing.result = null; routing.visible.clear(); routing.searched = false;
+      setRouteRun(false); stopRouteRun();
       setMapMarkersVisible(true);
       $('route-options').replaceChildren(element('div', 'Review your places, then search for up to three distinct walking connections. Every option must include all your waypoints and mapped transport services at both ends.', 'routes-empty'));
       $('route-result-count').textContent = 'No routes searched yet'; $('selected-route-detail').hidden = true; $('route-export-review').hidden = true; $('route-visibility-controls').hidden = true; $('save-all-gpx').disabled = true; $('routing-status').hidden = true;
@@ -1428,9 +1472,11 @@
       $('route-export-review').hidden = false;
     }
     function paintPlannedRoute() {
+      stopRouteRun();
       const routes = routing.result?.routes || [];
       const byDifficulty = difficultyColorsEnabled();
       $('route-difficulty-control').hidden = !routes.length;
+      $('route-run-control').hidden = !routes.length;
       $('route-difficulty-legend').hidden = !byDifficulty || !routes.some(route => routing.visible.has(route.id));
       if (!routes.length) return;
       if (map) {
@@ -1447,6 +1493,7 @@
           L.polyline(section.coords.map(p => [p.lat, p.lon]), { color: section.color, weight: routing.selected?.id === section.routeId ? 7 : 5, opacity: 1 })
             .bindPopup(`Route ${section.routeNumber} · ${section.label} · ${sacScaleLabel(section.sacScale)} · ${Math.ceil(section.metres)} m`).addTo(tracks);
         }
+        startRouteRun(routes);
       }
       const r = routing.selected; if (!r) { $('map-caption').textContent = `${routes.length} proposed route${routes.length === 1 ? '' : 's'}`; $('map-count').textContent = 'Choose any combination below'; return; }
       $('map-caption').textContent = `${r.title} · provisional`; $('map-count').textContent = `${km(r.metres)} · all ${state.points.length} mandatory places`;
@@ -1593,7 +1640,7 @@
     $('find-routes').addEventListener('click', async () => {
       if ($('find-routes').disabled) return;
       if (Date.now() < routing.blockedUntil) { toast('The map provider asked us to pause. Wait 30 seconds before retrying.'); return; }
-      stopRouting(); const serial = routing.serial, controller = new AbortController(); routing.controller = controller; routing.busy = true; routing.searched = true; routing.selected = null; routing.result = null; routing.visible.clear(); $('selected-route-detail').hidden = true; $('route-export-review').hidden = true; $('route-visibility-controls').hidden = true; clearExport();
+      stopRouting(); setRouteRun(false); stopRouteRun(); const serial = routing.serial, controller = new AbortController(); routing.controller = controller; routing.busy = true; routing.searched = true; routing.selected = null; routing.result = null; routing.visible.clear(); $('selected-route-detail').hidden = true; $('route-export-review').hidden = true; $('route-visibility-controls').hidden = true; clearExport();
       $('cancel-routing').hidden = false; $('routing-status').hidden = false; $('routing-status').textContent = loopEnabled() ? 'Downloading walking paths for the loop…' : 'Downloading walking paths and mapped passenger services…';
       $('map-route-toolbar').hidden = true; $('map-route-dots').replaceChildren(); $('map-export-action').disabled = true;
       toast(loopEnabled() ? 'Finding a mapped loop in pin order first. Transport is not required.' : 'Finding routes in pin order first. Transport: 1 km first, extending up to 20 km if needed…', false, 0);
@@ -1667,6 +1714,13 @@
       render(false);
     }
     $('route-difficulty-colors').addEventListener('click', toggleDifficultyColors);
+    function setRouteRun(enabled) {
+      const control = $('route-run');
+      control.setAttribute('aria-checked', String(enabled));
+      control.querySelector('.switch-state').textContent = enabled ? 'On' : 'Off';
+    }
+    function toggleRouteRun() { setRouteRun(!routeRunEnabled()); render(false); }
+    $('route-run').addEventListener('click', toggleRouteRun);
     const today = new Date(); $('plan-date').value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     function reversePlannedRoute() {
       const r = routing.selected; if (!r || !r.reversible) return;

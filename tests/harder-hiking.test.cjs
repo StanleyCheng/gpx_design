@@ -100,7 +100,7 @@ test('difficulty colors are optional and immediately replace normal colors for v
   const layer = { bindPopup(text) { this.popup = text; return this; }, addTo() { return this; } };
   const L = { polyline(coords, options) { const line = { ...layer, coords, ...options }; lines.push(line); return line; }, marker: () => layer, divIcon: () => ({}) };
   const paintSource = source.slice(source.indexOf('    function paintPlannedRoute'), source.indexOf('    async function boundedJSON'));
-  const paint = new Function('routing', '$', 'map', 'L', 'tracks', 'markers', 'ROUTE_COLORS', 'difficultyColorsEnabled', 'visibleDifficultySections', 'sacScaleLabel', 'mapMarkersVisible', 'km', `${paintSource};return paintPlannedRoute;`)(routing, $, {}, L, {}, {}, ['green', 'purple'], enabled, makeHelpers(routing).visibleDifficultySections, sacScaleLabel, false, n => String(n));
+  const paint = new Function('routing', '$', 'map', 'L', 'tracks', 'markers', 'ROUTE_COLORS', 'difficultyColorsEnabled', 'visibleDifficultySections', 'sacScaleLabel', 'mapMarkersVisible', 'km', 'stopRouteRun', 'startRouteRun', `${paintSource};return paintPlannedRoute;`)(routing, $, {}, L, {}, {}, ['green', 'purple'], enabled, makeHelpers(routing).visibleDifficultySections, sacScaleLabel, false, n => String(n), () => {}, () => {});
   paint();
   assert.deepEqual(lines.map(l => l.color), ['green', 'purple']);
   assert.equal($('route-difficulty-legend').hidden, true);
