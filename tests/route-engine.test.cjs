@@ -322,8 +322,8 @@ test('one-way ordered failure is explained when reordering produces a qualifying
   assert.match(result.notices[0], /Waypoint 1 → waypoint 2 cannot be connected/);
   assert.equal(result.routes[0].reversible, false);
 });
-test('unclear or impassable tagged paths never enter any variant', () => {
-  for (const tags of [{ trail_visibility: 'intermediate' }, { smoothness: 'impassable' }, { via_ferrata_scale: '2' }]) {
+test('unclear paths and via ferrata never enter any variant', () => {
+  for (const tags of [{ trail_visibility: 'intermediate' }, { via_ferrata_scale: '2' }]) {
     const data = fixture(); data.elements.filter(e => e.type === 'way').forEach(e => Object.assign(e.tags, tags));
     assert.throws(() => R.plan(data, points), /No eligible walking network/);
   }

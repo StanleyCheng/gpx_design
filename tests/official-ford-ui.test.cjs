@@ -11,7 +11,7 @@ test('official-trail stream crossings are explicit, off by default, and sent to 
   assert.match(html, /id="plan-official-fords"[^>]*role="switch"[^>]*aria-checked="false"/);
   assert.match(html, /id="plan-official-fords-label">Official trail stream crossings</);
   assert.match(planner, /allowOfficialFords: officialFordsEnabled\(\)/);
-  assert.match(planner, /\['loop', 'official-fords'\]/);
+  assert.match(planner, /\['loop', 'official-fords', 'harder-hiking'\]/);
 });
 
 test('route review and GPX output disclose every enabled ford crossing', () => {

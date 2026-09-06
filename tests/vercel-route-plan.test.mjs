@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRoutePlanHandler } from '../api/plan-routes.mjs';
 import fiftyWaypoints from './fixtures/fifty-waypoints.cjs';
+import harderHiking from './fixtures/harder-hiking.cjs';
+import TrailRouter from '../lib/route-engine.js';
 
 function fixture() {
   const nodes = [
@@ -32,6 +34,58 @@ function routeRequest(points = [{ lat: 22, lon: 114.001 }, { lat: 22, lon: 114.0
     })
   });
 }
+
+test('backend validates harder hiking opt-in and returns per-edge grades from the cached map', async () => {
+  const { data, points } = harderHiking();
+  let fetches = 0;
+  const handler = createRoutePlanHandler({ fetcher: async () => { fetches++; return Response.json(data); } });
+  const invalid = await handler(routeRequest(points, undefined, { loop: true, allowHarderHiking: 'yes' }));
+  assert.equal(invalid.status, 400);
+  assert.match((await invalid.json()).error, /harder hiking paths setting/);
+  assert.equal(fetches, 0);
+  const normal = await (await handler(routeRequest(points, undefined, { loop: true }))).json();
+  const allowed = await (await handler(routeRequest(points, undefined, { loop: true, allowHarderHiking: true }))).json();
+  assert.equal(normal.result.settings.allowHarderHiking, false);
+  assert.equal(allowed.result.settings.allowHarderHiking, true);
+  assert.ok(allowed.result.routes[0].metres < normal.result.routes[0].metres);
+  assert.ok(allowed.result.routes[0].edges.some(e => e.sacScale === 'mountain_hiking'));
+  assert.ok(allowed.result.routes[0].harderTerrainMetres > 0);
+  assert.equal(fetches, 1, 'eligibility is recomputed for each setting on the same cached map');
+});
+
+test('backend returns the current pedestrian policy and preserves rough-surface evidence', async () => {
+  const { data, points } = harderHiking('hiking', { smoothness: 'impassable' });
+  for (const node of data.elements.filter(e => e.type === 'node')) node.lat += 0.03;
+  for (const point of points) point.lat += 0.03;
+  const handler = createRoutePlanHandler({ fetcher: async () => Response.json(data) });
+  const response = await handler(routeRequest(points, undefined, { loop: true }));
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('x-trailplanner-route-policy'), String(TrailRouter.ROUTING_POLICY_VERSION));
+  assert.match(response.headers.get('access-control-expose-headers'), /X-TrailPlanner-Route-Policy/);
+  const { result } = await response.json();
+  assert.equal(result.policyVersion, TrailRouter.ROUTING_POLICY_VERSION);
+  assert.ok(result.routes[0].roughSurfaceMetres > 0);
+  assert.ok(result.routes[0].edges.some(e => e.smoothness === 'impassable'));
+  assert.equal(result.routes[0].harderTerrainMetres, 0);
+});
+
+test('an oversized streaming request is cancelled before its full body is buffered', async () => {
+  let pulls = 0, cancelled = false;
+  const body = new ReadableStream({
+    pull(controller) { pulls++; controller.enqueue(new Uint8Array(20000)); },
+    cancel() { cancelled = true; }
+  });
+  const handler = createRoutePlanHandler({ fetcher: async () => { throw new Error('must not fetch'); } });
+  const request = new Request('https://gpxdesign.vercel.app/api/plan-routes', {
+    method: 'POST', duplex: 'half', body,
+    headers: { Origin: 'https://gpxdesign.vercel.app', 'Content-Type': 'application/json' }
+  });
+  const response = await handler(request);
+  assert.equal(response.status, 400);
+  assert.match((await response.json()).error, /request is too large/);
+  assert.equal(cancelled, true);
+  assert.ok(pulls <= 5);
+});
 
 test('route backend rejects foreign origins and supports local-file preflight', async () => {
   const handler = createRoutePlanHandler({ fetcher: async () => { throw new Error('must not fetch'); } });
@@ -172,6 +226,7 @@ test('backend returns a specific off-path pin reason without a pointless transpo
   const handler = createRoutePlanHandler({ fetcher: async () => { calls++; return Response.json(fixture()); } });
   const response = await handler(routeRequest([{ lat: 22.001, lon: 114.007 }]));
   assert.equal(response.status, 422);
+  assert.equal(response.headers.get('x-trailplanner-route-policy'), String(TrailRouter.ROUTING_POLICY_VERSION));
   const body = await response.json();
   assert.equal(body.code, 'WAYPOINT_OFF_PATH');
   assert.match(body.error, /Waypoint 1 has no eligible path within 30 m/);

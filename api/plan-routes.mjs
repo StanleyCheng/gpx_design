@@ -34,7 +34,9 @@ function responseHeaders(origin = '') {
     'Referrer-Policy': 'no-referrer',
     'Vary': 'Origin',
     'X-Content-Type-Options': 'nosniff',
-    'X-TrailPlanner-Route-Backend': '1'
+    'X-TrailPlanner-Route-Backend': '1',
+    'X-TrailPlanner-Route-Policy': String(TrailRouter.ROUTING_POLICY_VERSION),
+    'Access-Control-Expose-Headers': 'X-TrailPlanner-Route-Policy'
   };
   if (origin) headers['Access-Control-Allow-Origin'] = origin;
   return headers;
@@ -49,11 +51,6 @@ function validateChoice(value, allowed, label) {
   return value;
 }
 
-function validateNumber(value, allowed, label) {
-  if (typeof value !== 'number' || !allowed.includes(value)) throw new RequestError(`Choose a valid ${label}.`);
-  return value;
-}
-
 function validateInput(input) {
   if (!input || !Array.isArray(input.points) || !input.points.length || input.points.length > TrailRouter.MAX_WAYPOINTS) throw new RequestError(`Use 1–${TrailRouter.MAX_WAYPOINTS} valid waypoints.`);
   const points = input.points.map((point, index) => {
@@ -65,7 +62,8 @@ function validateInput(input) {
   if (typeof settings.optimize !== 'boolean') throw new RequestError('Choose a valid waypoint order setting.');
   if (settings.loop !== undefined && typeof settings.loop !== 'boolean') throw new RequestError('Choose a valid Loop setting: on or off.');
   if (settings.allowOfficialFords !== undefined && typeof settings.allowOfficialFords !== 'boolean') throw new RequestError('Choose a valid official-trail stream-crossing setting: on or off.');
-  const radius = validateNumber(settings.radius, [1000, 2000, 4000, 6000], 'transport search distance');
+  if (settings.allowHarderHiking !== undefined && typeof settings.allowHarderHiking !== 'boolean') throw new RequestError('Choose a valid harder hiking paths setting: on or off.');
+  const radius = validateChoice(settings.radius, [1000, 2000, 4000, 6000], 'transport search distance');
   return {
     points,
     provider: validateChoice(input.provider || 'auto', ['auto', ...PROVIDER_ORDER], 'map data provider'),
@@ -73,17 +71,42 @@ function validateInput(input) {
     settings: {
       radius,
       maxApproach: 1000,
-      maxDistance: validateNumber(settings.maxDistance, [10000, 20000, 30000, 50000, 80000], 'maximum hike distance'),
-      maxRoad: validateNumber(settings.maxRoad, [0, 500, 1500, 3000, 80000], 'road connector limit'),
-      tolerance: validateNumber(settings.tolerance, [15, 30, 60], 'waypoint tolerance'),
-      optimize: Boolean(settings.optimize),
+      maxDistance: validateChoice(settings.maxDistance, [10000, 20000, 30000, 50000, 80000], 'maximum hike distance'),
+      maxRoad: validateChoice(settings.maxRoad, [0, 500, 1500, 3000, 80000], 'road connector limit'),
+      tolerance: validateChoice(settings.tolerance, [15, 30, 60], 'waypoint tolerance'),
+      optimize: settings.optimize,
       loop: settings.loop === true,
-      allowOfficialFords: settings.allowOfficialFords === true
+      allowOfficialFords: settings.allowOfficialFords === true,
+      allowHarderHiking: settings.allowHarderHiking === true
     }
   };
 }
 
-async function readJSON(response, maxBytes = MAX_MAP_BYTES) {
+async function readRequest(request) {
+  const tooLarge = () => new RequestError('Route request is too large.');
+  if (Number(request.headers.get('content-length') || 0) > MAX_REQUEST_BYTES) {
+    await request.body?.cancel().catch(() => {});
+    throw tooLarge();
+  }
+  const reader = request.body?.getReader();
+  if (!reader) throw new RequestError('A JSON route request is required.');
+  const chunks = []; let size = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > MAX_REQUEST_BYTES) throw tooLarge();
+      chunks.push(value);
+    }
+  } catch (error) {
+    await reader.cancel().catch(() => {});
+    throw error;
+  } finally { reader.releaseLock(); }
+  return JSON.parse(Buffer.concat(chunks, size).toString('utf8'));
+}
+
+async function readJSON(response, maxBytes = MAX_MAP_BYTES, metrics = {}) {
   if (!response.ok) {
     const status = response.status;
     throw new UpstreamError(`HTTP ${status}`, [429, 502, 503, 504].includes(status) ? status : 503);
@@ -94,7 +117,7 @@ async function readJSON(response, maxBytes = MAX_MAP_BYTES) {
     throw new UpstreamError('response too large', 413);
   }
   const reader = response.body?.getReader();
-  if (!reader) return response.json();
+  if (!reader) { metrics.bytes = Infinity; return response.json(); }
   const chunks = []; let size = 0;
   try {
     while (true) {
@@ -110,6 +133,7 @@ async function readJSON(response, maxBytes = MAX_MAP_BYTES) {
   } finally { reader.releaseLock(); }
   const buffer = new Uint8Array(size); let offset = 0;
   for (const chunk of chunks) { buffer.set(chunk, offset); offset += chunk.length; }
+  metrics.bytes = size;
   try { return JSON.parse(new TextDecoder().decode(buffer)); }
   catch { throw new UpstreamError('invalid JSON', 503); }
 }
@@ -120,9 +144,16 @@ function cacheGet(cache, key, now) {
   return entry.value;
 }
 
-function cachePut(cache, key, value, now) {
-  cache.set(key, { value, at: now });
-  while (cache.size > 8) cache.delete(cache.keys().next().value);
+function cachePut(cache, key, value, now, bytes, budget = MAX_MAP_BYTES) {
+  for (const [entryKey, entry] of cache) if (now - entry.at > CACHE_TTL_MS) cache.delete(entryKey);
+  if (!Number.isFinite(bytes) || bytes > budget) return;
+  cache.delete(key);
+  cache.set(key, { value, at: now, bytes });
+  let total = [...cache.values()].reduce((sum, entry) => sum + entry.bytes, 0);
+  while (cache.size > 8 || total > budget) {
+    const oldest = cache.keys().next().value;
+    total -= cache.get(oldest).bytes; cache.delete(oldest);
+  }
 }
 
 async function fetchMapData(box, selected, fetcher, signal, now, areas = [], queryOptions = {}) {
@@ -144,9 +175,9 @@ async function fetchMapData(box, selected, fetcher, signal, now, areas = [], que
         headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', 'User-Agent': 'TrailPlanner/1.0 (+https://gpxdesign.vercel.app/)', Referer: 'https://gpxdesign.vercel.app/' },
         signal: AbortSignal.any([signal, AbortSignal.timeout(PROVIDER_TIMEOUT_MS)])
       });
-      const data = await readJSON(response);
+      const metrics = {}, data = await readJSON(response, MAX_MAP_BYTES, metrics);
       if (data?.remark || !Array.isArray(data?.elements)) throw new UpstreamError('incomplete map data', 503);
-      cachePut(mapCache, key, data, now());
+      cachePut(mapCache, key, data, now(), metrics.bytes);
       return { data, provider, cached: false };
     } catch (error) {
       if (signal.aborted) throw error;
@@ -168,10 +199,10 @@ async function fetchOfficialTrails(box, region, fetcher, signal, now) {
   const params = new URLSearchParams({ where: '1=1', geometry: `${box[1]},${box[0]},${box[3]},${box[2]}`, geometryType: 'esriGeometryEnvelope', inSR: '4326', spatialRel: 'esriSpatialRelIntersects', outFields: 'TRAIL_NAME_EN,DIFFICULTY_EN,WEBSITE', outSR: '4326', returnGeometry: 'true', f: 'geojson' });
   try {
     const response = await fetcher(`https://portal.csdi.gov.hk/server/rest/services/common/afcd_rcd_1665568199103_4360/MapServer/0/query?${params}`, { signal: AbortSignal.any([signal, AbortSignal.timeout(35_000)]) });
-    const data = await readJSON(response, 12 * 1024 * 1024);
+    const metrics = {}, data = await readJSON(response, 12 * 1024 * 1024, metrics);
     if (!Array.isArray(data.features) || data.exceededTransferLimit) throw new Error('incomplete data');
     const value = { features: data.features, note: 'AFCD corridor data checked; nearby geometry is not proof of current access.' };
-    cachePut(officialCache, key, value, now()); return value;
+    cachePut(officialCache, key, value, now(), metrics.bytes, 12 * 1024 * 1024); return value;
   } catch (error) {
     if (signal.aborted) throw error;
     return { features: [], note: 'AFCD trail data was unavailable. Government-managed coverage cannot be established.' };
@@ -199,13 +230,11 @@ export function createRoutePlanHandler(options = {}) {
     if (!request.headers.get('content-type')?.startsWith('application/json')) return json(415, { error: 'Use application/json.' }, origin);
 
     try {
-      const declared = Number(request.headers.get('content-length') || 0);
-      if (declared > MAX_REQUEST_BYTES) throw new RequestError('Route request is too large.');
-      const raw = await request.text();
-      if (Buffer.byteLength(raw) > MAX_REQUEST_BYTES) throw new RequestError('Route request is too large.');
-      const input = validateInput(JSON.parse(raw));
+      const input = validateInput(await readRequest(request));
       const box = TrailRouter.boundingBox(input.points, input.settings.radius);
       const controller = new AbortController();
+      // A timer alone cannot interrupt synchronous graph work on the event loop.
+      const control = { signal: controller.signal, deadline: Date.now() + ROUTE_TIMEOUT_MS };
       const timeout = setTimeout(() => controller.abort(new DOMException('Route backend timed out', 'TimeoutError')), ROUTE_TIMEOUT_MS);
       const clientAbort = () => controller.abort(request.signal.reason);
       request.signal.addEventListener('abort', clientAbort, { once: true });
@@ -217,7 +246,7 @@ export function createRoutePlanHandler(options = {}) {
         ]);
         controller.signal.throwIfAborted();
         let result, failure;
-        try { result = TrailRouter.plan(map.data, input.points, input.settings, official.features); }
+        try { result = TrailRouter.plan(map.data, input.points, input.settings, official.features, undefined, control); }
         catch (error) { failure = error; }
         for (const radius of TrailRouter.TRANSPORT_EXPANSION_STEPS) {
           if (result) break;
@@ -229,7 +258,7 @@ export function createRoutePlanHandler(options = {}) {
           ]);
           controller.signal.throwIfAborted();
           try {
-            result = TrailRouter.plan(map.data, input.points, { ...input.settings, radius, maxApproach: radius }, official.features);
+            result = TrailRouter.plan(map.data, input.points, { ...input.settings, radius, maxApproach: radius }, official.features, undefined, control);
             result.transportExpanded = true;
             result.transportExpansionMetres = radius;
           } catch (error) { failure = error; }
@@ -246,7 +275,7 @@ export function createRoutePlanHandler(options = {}) {
       if (error instanceof UpstreamError || error?.name === 'TimeoutError' || error?.name === 'AbortError') {
         const timedOut = error?.name === 'TimeoutError' || /timed out/i.test(error?.message || '');
         const status = error?.status === 413 ? 413 : timedOut ? 504 : 503;
-        const message = status === 413 ? `${error.message} Your waypoints are unchanged.` : timedOut ? 'The route backend timed out while waiting for map data. Please retry; your waypoints are unchanged.' : `${error.message} Please retry; your waypoints are unchanged.`;
+        const message = status === 413 ? `${error.message} Your waypoints are unchanged.` : timedOut ? 'The route backend timed out while downloading or computing the route. Please retry; your waypoints are unchanged.' : `${error.message} Please retry; your waypoints are unchanged.`;
         return json(status, { error: message }, origin);
       }
       const message = String(error?.message || 'No connected route met the selected limits.').slice(0, 1200);

@@ -1,0 +1,33 @@
+{
+  "node": "v24.15.0",
+  "platform": "darwin/x64",
+  "fixture": "100 × 100 mapped footway grid; synthetic, no network latency",
+  "nodes": 10000,
+  "directedEdges": 39600,
+  "singleLeg": {
+    "dijkstra": {
+      "medianMs": 7.357,
+      "visitedNodes": 5050,
+      "metres": 5504.148868905664
+    },
+    "astar": {
+      "medianMs": 0.205,
+      "visitedNodes": 100,
+      "metres": 5504.148868905664
+    }
+  },
+  "fiftyPinLoop": {
+    "current": {
+      "medianMs": 145.651,
+      "metres": 5448.5514055833855,
+      "returnedRoutes": 2,
+      "mandatoryPins": 50
+    },
+    "baseline": {
+      "medianMs": 527.86,
+      "metres": 5448.5514055833855,
+      "returnedRoutes": 2,
+      "mandatoryPins": 50
+    }
+  }
+}

@@ -80,6 +80,16 @@ test('method guidance and map gestures use the existing planning controls', () =
   assert.match(html, /touchZoom/);
 });
 
+test('requirements waypoint coordinates copy to the system clipboard', () => {
+  assert.match(html, /element\('button', coordinates, 'pin-coordinate mono'\)/);
+  assert.match(html, /navigator\.clipboard\?\.writeText/);
+  assert.match(html, /navigator\.clipboard\.writeText\(text\)/);
+  assert.match(html, /copyText\(coordinates\)/);
+  assert.match(html, /document\.execCommand\('copy'\)/);
+  assert.match(html, /Copy coordinates for waypoint/);
+  assert.match(html, /coordinates copied/);
+});
+
 test('map-first route controls support colored combinations and individual or combined GPX', () => {
   for (const id of ['control-dock', 'map-pins-panel', 'map-route-action', 'map-route-toolbar', 'map-route-dots', 'map-export-action', 'route-visibility', 'show-all-routes', 'hide-all-routes', 'save-all-gpx']) assert.match(html, new RegExp(`id=["']${id}["']`));
   assert.match(planner, /ROUTE_COLORS/);
@@ -124,7 +134,7 @@ test('map data providers offer automatic transient-error fallback', () => {
   assert.match(planner, /async function getMapData\(/);
   assert.match(planner, /https:\/\/gpxdesign\.vercel\.app\/api\/plan-routes/);
   assert.match(planner, /async function getBackendPlan\(/);
-  assert.match(planner, /Route backend could not be reached\. Trying direct map providers/);
+  assert.match(planner, /Using the local route engine\. Downloading paths from map providers/);
   assert.match(planner, /if \(!canTryAnotherProvider\(error\)/);
 });
 
