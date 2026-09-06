@@ -68,6 +68,7 @@ test('one outlined light red dot runs on each visible route with the exact route
 
 test('route number and length live in the toolbar instead of covering map geometry', () => {
   assert.match(source, /dot\.append\(element\('span', String\(i \+ 1\), 'map-route-number'\), element\('small', km\(route\.metres\), 'map-route-length'\)\)/);
+  assert.match(source, /\$\('map-caption'\)\.textContent = `Route \$\{routeNumber\} · \$\{km\(r\.metres\)\}`/);
   assert.doesNotMatch(source, /route-line-label/);
   assert.doesNotMatch(html, /route-line-label/);
 });
