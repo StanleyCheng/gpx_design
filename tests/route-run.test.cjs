@@ -18,7 +18,7 @@ function animationHarness(overrides = {}) {
   const L = { circleMarker(latlng, options) { const dot = { latlng, options, positions: [], addTo() { return this; }, setLatLng(next) { this.latlng = next; this.positions.push(next); } }; dots.push(dot); return dot; } };
   const TrailRouter = { distance(a, b) { return Math.hypot(b.lat - a.lat, b.lon - a.lon) * 100; } };
   const factory = new Function('TrailRouter', 'routing', 'map', 'L', 'markers', 'requestAnimationFrame', 'cancelAnimationFrame', 'routeRunAnimation', 'ROUTE_RUNNER_COLOR', 'ROUTE_RUNNER_EDGE', 'routeRunEnabled', `${animationSource}; return { routeAnimationGeometry, pointOnRoute, startRouteRun, stopRouteRun };`);
-  const api = factory(TrailRouter, routing, {}, L, markers, requestAnimationFrame, cancelAnimationFrame, routeRunAnimation, '#ff6f7d', .75, () => true);
+  const api = factory(TrailRouter, routing, {}, L, markers, requestAnimationFrame, cancelAnimationFrame, routeRunAnimation, '#ffe066', .75, () => true);
   const runFrame = now => { const entry = frameQueue.entries().next().value; assert.ok(entry, 'an animation frame is queued'); frameQueue.delete(entry[0]); entry[1](now); };
   return { ...api, routing, routeRunAnimation, frameQueue, cancelled, removed, dots, runFrame };
 }
@@ -30,7 +30,7 @@ test('Run switch is directly below Difficulty and starts off', () => {
   const pins = html.indexOf('id="map-markers-action"');
   assert.ok(dots < difficulty && difficulty < run && run < pins);
   assert.match(html, /id="route-run"[^>]*role="switch"[^>]*aria-checked="false"/);
-  assert.match(html, /small light red dot follows each visible route from start to finish/);
+  assert.match(html, /small light yellow dot follows each visible route from start to finish/);
 });
 
 test('route animation interpolates by route distance and follows reversed geometry', () => {
@@ -46,7 +46,7 @@ test('route animation interpolates by route distance and follows reversed geomet
   assert.equal(routeAnimationGeometry({ coords: [{ lat: 0, lon: 0 }] }), null);
 });
 
-test('one outlined light red dot runs on each visible route with the exact route width', () => {
+test('one outlined light yellow dot runs on each visible route with the exact route width', () => {
   const routes = [
     { id: 'route-1', coords: [{ lat: 0, lon: 0 }, { lat: 0, lon: 1 }, { lat: 0, lon: 3 }] },
     { id: 'route-2', coords: [{ lat: 1, lon: 0 }, { lat: 1, lon: 3 }] },
@@ -56,10 +56,10 @@ test('one outlined light red dot runs on each visible route with the exact route
   harness.startRouteRun(routes);
   assert.equal(harness.dots.length, 2);
   assert.deepEqual(harness.dots.map(dot => dot.options.radius * 2 + dot.options.weight), [5, 7]);
-  assert.ok(harness.dots.every(dot => dot.options.fillColor === '#ff6f7d' && dot.options.stroke === true && dot.options.color === '#fff' && dot.options.weight === .75));
+  assert.ok(harness.dots.every(dot => dot.options.fillColor === '#ffe066' && dot.options.stroke === true && dot.options.color === '#fff' && dot.options.weight === .75));
   harness.runFrame(0);
   harness.runFrame(4000);
-  assert.deepEqual(harness.dots[0].positions.at(-1), [0, 1.5]);
+  assert.deepEqual(harness.dots[0].positions.at(-1), [0, 2.25]);
   harness.stopRouteRun();
   assert.equal(harness.routeRunAnimation.frame, 0);
   assert.equal(harness.removed.length, 2);

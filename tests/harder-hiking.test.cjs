@@ -118,12 +118,12 @@ test('difficulty colors are optional and immediately replace normal colors for v
   assert.equal($('route-difficulty-legend').hidden, true);
 });
 
-test('easy grades are green, T2–T3 pink, alpine grades red, and unknown remains gray', () => {
+test('easy and untagged grades are green, T2–T3 pink, and alpine grades red', () => {
   const scales = [...R.SAC_SCALES, null, 'unrecognized'];
   const route = { coords: Array.from({ length: scales.length + 1 }, (_, i) => ({ lat: 22, lon: 114 + i / 1000 })), edges: scales.map(sacScale => ({ sacScale, metres: 10 })) };
   const sections = routeDifficultySections(route);
-  assert.deepEqual(sections.map(s => s.color), ['#13834b', '#13834b', '#e34e9b', '#e34e9b', '#d00000', '#d00000', '#d00000', '#777777']);
-  assert.equal(sections.at(-1).coords.length, 3, 'adjacent unknown values form one gray section');
+  assert.deepEqual(sections.map(s => s.color), ['#13834b', '#13834b', '#e34e9b', '#e34e9b', '#d00000', '#d00000', '#d00000', '#13834b']);
+  assert.equal(sections.at(-1).coords.length, 3, 'adjacent untagged values form one green section');
   assert.equal(sections.reduce((sum, s) => sum + s.metres, 0), 90);
 });
 
