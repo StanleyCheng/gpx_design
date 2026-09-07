@@ -64,6 +64,8 @@ The layered search minimizes this distance over **at most 24 retained segment pr
 
 **A hard road allowance is a separate resource constraint.** The shortest distance candidate is checked against distance and road limits; trail and diversity candidates may provide feasible alternatives. This is still a bounded heuristic for finding a route under a binding road cap, not an exact constrained solver. Endpoint choice caps, stop gaps, the 100 m minimum and later feasibility checks also mean “no qualifying candidate found” is not proof that no feasible route exists. No limit is silently relaxed.
 
+Policy 2 handles the exact **zero-road** case before snapping: all mapped road-connector edges are removed from the eligible graph. This prevents a shorter road component from displacing an in-tolerance footpath, without adding another search or relaxing a rule. Nonzero road budgets retain the bounded candidate search described above. Near-endpoint projections now keep their actual source position instead of moving to a nearby vertex using a ratio epsilon; actual chosen-coordinate distance is checked against tolerance. Trail-preferred transport approaches respect the smaller of the selected approach cap and the 1 km nearby-stop preference.
+
 Reordering, when requested, uses matrices for the snaps chosen in the entered order. It does not jointly optimize all orders, snaps, stops and constraints. “Route 1” remains the shortest qualifying candidate found, with these limits disclosed.
 
 ## Reproducible measurement

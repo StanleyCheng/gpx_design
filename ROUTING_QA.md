@@ -1,4 +1,12 @@
-# Routing and interface validation — 2026-09-06
+# Routing and interface validation — 2026-09-07
+
+The waypoint/geometry contract review passes **138 tests**. Four reproduced defects were corrected: near-endpoint snap rounding could exceed a strict tolerance; trail-preferred approaches could exceed an approach limit below 1 km; zero-road planning could choose a disconnected road component instead of a nearby usable footway; reversing one browser-worker option could change another option's declared waypoint order. Routing policy is now **2**, so a mismatched backend cannot silently supply an older plan. See [the review](route_engines_comparison/review.md) for changes, scope and bounds.
+
+The corrected engine was rerun against the saved Tokyo OSM snapshot `2026-09-06T15:18:21Z`, using the supplied 30 Yamanote pins, strict order, Loop on, 30 m tolerance, 50 km maximum distance and the explicitly selected 80 km urban-road allowance. It reproduced **40.625 km** and **47.007 km** loops in 8.84 seconds locally. All 30 chosen snap vertices were visited in order, with a maximum actual gap of **29.665 m**. All **5,232 edges** across both options were independently checked against eligible directed source segments; changes between segments used shared original OSM node IDs, not visual crossings. The first option uses 17.152 km of mapped roads, while the second uses 2.894 km. These are dated software/data checks, not a fresh field-condition or transport verification. Private inputs and source downloads remain in ignored `exports/` and are not published.
+
+The new deterministic network tests check 45 returned options from 256 planning attempts, including actual waypoint gaps, pin order, directed source geometry, shared-node junctions, distances, road budgets and endpoint limits. They complement the existing disconnected-branch, wrong-foot-direction, visual-crossing and 50-waypoint regressions. No new visual layout or physical-device testing is claimed in this routing-only change.
+
+## Historical validation — 2026-09-06
 
 The routing review now passes **106 tests**, plus `npm run build`. The current engine uses distance-first layered snapping, includes complete loop-return or transit-approach costs, and uses A* for single-target legs. Strict pin order is the default. See [the engine comparison](route_engines_comparison/comparison.md) for algorithm scope, reproducible measurements and limitations, and [the code review](route_engines_comparison/review.md) for robustness fixes. A local browser smoke test confirmed coordinate import and the strict-order default. No new live-map or physical-device validation is claimed.
 

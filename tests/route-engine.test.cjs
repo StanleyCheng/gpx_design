@@ -193,7 +193,7 @@ test('a mapped ford is opt-in only and can connect an AFCD corridor without rela
 test('distance and road limits are not silently relaxed', () => {
   assert.throws(() => R.plan(fixture(), points, { maxDistance: 150 }), /none met/);
   const data = fixture(); data.elements.filter(e => e.type === 'way').forEach(e => { e.tags.highway = 'residential'; });
-  assert.throws(() => R.plan(data, points, { maxRoad: 0 }), /none met/);
+  assert.throws(() => R.plan(data, points, { maxRoad: 0 }), error => error.code === 'NO_ELIGIBLE_NETWORK' && /0 km road limit/.test(error.message));
 });
 test('foot one-way affects connectivity and reversal', () => {
   const data = fixture(); data.elements.filter(e => e.type === 'way').forEach(e => { e.tags['oneway:foot'] = 'yes'; });
