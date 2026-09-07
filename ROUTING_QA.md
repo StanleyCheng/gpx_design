@@ -1,4 +1,10 @@
-# Routing and interface validation — 2026-09-07
+# Routing and interface validation — 2026-09-08
+
+Waypoint snap selection now prefers passing close to each entered pin: inside the hard tolerance, every metre of snap offset costs as much as 10 m of extra walking (`SNAP_OFFSET_WEIGHT`), so a closer path wins unless it demands a substantially longer or directed-detour route. Walking distance, remaining offset and stable source identity break the remaining ties. `npm test`: **139 passing tests**, including a new regression proving closer in-tolerance snaps beat a marginally shorter route past farther snaps, while the existing long-detour and directed-return protections still choose the slightly farther snap.
+
+Rerunning the saved 30-pin Yamanote request against the same OSM snapshot `2026-09-06T15:18:21Z`: Route 1 measures **41.705 km** (was 40.625 km, +2.7%) with the mean pin offset reduced from **16.9 m to 2.6 m**. Pins offset more than 15 m dropped from **18 of 30 to 1 of 30** (pin 5 at 27.3 m; no eligible mapped way runs closer, and no connector is invented). Pin order is preserved and both returned loops still close at waypoint 1. Route cards now flag any pin offset above 15 m in warning styling, name the worst pin and suggest raising the tolerance or moving the pin onto a mapped path; the tolerance help text documents the closest-path preference.
+
+## Historical validation — 2026-09-07
 
 The waypoint/geometry contract review passes **138 tests**. Four reproduced defects were corrected: near-endpoint snap rounding could exceed a strict tolerance; trail-preferred approaches could exceed an approach limit below 1 km; zero-road planning could choose a disconnected road component instead of a nearby usable footway; reversing one browser-worker option could change another option's declared waypoint order. Routing policy is now **2**, so a mismatched backend cannot silently supply an older plan. See [the review](route_engines_comparison/review.md) for changes, scope and bounds.
 

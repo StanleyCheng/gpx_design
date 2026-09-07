@@ -212,7 +212,7 @@
           <label>Walkable road allowance<select id="plan-roads"><option value="0">None · paths only</option><option value="500">500 m total</option><option value="1500">1.5 km total</option><option value="3000">3 km total · trail focused</option><option value="80000" selected>Urban runner / hiker · eligible ways</option></select></label>
           <label>OpenStreetMap data provider<select id="plan-provider"><option value="auto" selected>Automatic fallback · recommended</option><option value="coffee">Private.coffee Overpass</option><option value="vk">VK Maps Overpass</option><option value="fossgis">FOSSGIS Overpass</option></select></label>
         </div>
-        <p class="help">Check the suggested region, especially near borders or islands. Searches favour mapped hiking trails and, where available, government trail data. Restricted access and unsuitable roads are excluded. Allow harder hiking paths starts on and includes recognized T2–T6 terrain; turn it off to restrict known grades to strolling and hiking (T1). Color by difficulty below the route toggles shows the mapped grades. The Official trail stream crossings setting also starts on, but admits a ford only where it matches Hong Kong AFCD trail geometry; current water conditions still require your review. Missing terrain tags are unknown. Every waypoint must match a real path within your chosen tolerance; there are no invented links.</p>
+        <p class="help">Check the suggested region, especially near borders or islands. Searches favour mapped hiking trails and, where available, government trail data. Restricted access and unsuitable roads are excluded. Allow harder hiking paths starts on and includes recognized T2–T6 terrain; turn it off to restrict known grades to strolling and hiking (T1). Color by difficulty below the route toggles shows the mapped grades. The Official trail stream crossings setting also starts on, but admits a ford only where it matches Hong Kong AFCD trail geometry; current water conditions still require your review. Missing terrain tags are unknown. Every waypoint must match a real path within your chosen tolerance; there are no invented links. Within that tolerance, routes prefer the path closest to each pin, and any large remaining offset is flagged on the route option.</p>
         <div class="build-actions"><button id="find-routes" class="primary" disabled>Find up to 3 routes ↗</button><button id="view-inputs" class="text-button" disabled>Review input pins on map ↓</button></div>
         <p class="help">Route search sends only your waypoint coordinates and selected limits to TrailPlanner’s Vercel backend. The backend tries another public Overpass provider when one times out or has a temporary server error, then returns only the planned route options. It does not retry oversized or invalid searches. Hong Kong searches also check AFCD’s public trail dataset. Your uploaded file and image are not sent. Successful graph routing does not verify timetables, closures or safe access.</p>
 
@@ -477,9 +477,15 @@
       }
     }
   }
-  // Tolerance is a hard eligibility limit. Once inside it, minimize walking
-  // distance first; proximity and stable source identity only break ties.
-  const compareSnapScore = (a, b) => a.routeMetres - b.routeMetres || a.snapMetres - b.snapMetres || compareText(a.tie, b.tie);
+  // Tolerance is a hard eligibility limit. Inside it, the route should pass
+  // as close to each entered pin as the mapped network allows: every metre of
+  // snap offset costs as much as 10 m of extra walking, so a closer path wins
+  // unless it demands a substantially longer route (e.g. a connected detour or
+  // a directed return). Walking distance, remaining offset and stable source
+  // identity then break the remaining ties, in that order.
+  const SNAP_OFFSET_WEIGHT = 10;
+  const snapScore = state => state.routeMetres + SNAP_OFFSET_WEIGHT * state.snapMetres;
+  const compareSnapScore = (a, b) => snapScore(a) - snapScore(b) || a.routeMetres - b.routeMetres || a.snapMetres - b.snapMetres || compareText(a.tie, b.tie);
   function connectedSnapCombination(graph, candidateSets, initialCosts = null, finalCosts = null) {
     const layers = Array(candidateSets.length);
     layers[candidateSets.length - 1] = candidateSets.at(-1).map(candidate => {
@@ -1435,7 +1441,11 @@
         if (route.fordCrossings?.length) facts.append(element('li', `${route.fordCrossings.length} mapped stream crossing${route.fordCrossings.length === 1 ? '' : 's'} · verify weather and water level.`));
         if (route.harderTerrainMetres > 0) facts.append(element('li', harderTerrainWarning(route), 'terrain-warning'));
         if (route.roughSurfaceMetres > 0) facts.append(element('li', roughSurfaceWarning(route)));
-        for (const text of [`All ${state.points.length} places · order ${route.order.map(i => i + 1).join(' → ')}`, route.loop ? `${km(route.end.approach)} final mapped leg back to waypoint 1` : `${km(route.start.approach)} approach / ${km(route.end.approach)} exit walk`, `${km(route.roadMetres)} mapped roads · ${km(route.repeatedMetres)} retraced`, `Largest waypoint offset: ${Math.ceil(Math.max(...route.snaps.map(s => s.metres)))} m`]) facts.append(element('li', text));
+        for (const text of [`All ${state.points.length} places · order ${route.order.map(i => i + 1).join(' → ')}`, route.loop ? `${km(route.end.approach)} final mapped leg back to waypoint 1` : `${km(route.start.approach)} approach / ${km(route.end.approach)} exit walk`, `${km(route.roadMetres)} mapped roads · ${km(route.repeatedMetres)} retraced`]) facts.append(element('li', text));
+        const worstSnap = route.snaps.reduce((worst, snap) => snap.metres > worst.metres ? snap : worst);
+        facts.append(worstSnap.metres > 15
+          ? element('li', `Largest waypoint offset: pin ${worstSnap.index + 1} “${worstSnap.original.name}” is ${Math.ceil(worstSnap.metres)} m from the routed path. The route follows the nearest eligible mapped way; raise the waypoint tolerance or move that pin onto a mapped path to pass closer.`, 'terrain-warning')
+          : element('li', `Largest waypoint offset: ${Math.ceil(worstSnap.metres)} m`));
         const select = element('button', routing.selected?.id === route.id ? 'Selected route ✓' : 'Select this route →', 'route-select primary'); select.addEventListener('click', () => selectRoute(route));
         const save = element('button', `Save Route ${i + 1} GPX ↓`, 'route-select'); save.addEventListener('click', () => { download(new Blob([plannedGPX(route)], { type: 'application/gpx+xml;charset=utf-8' }), `trailplanner-route-${i + 1}-PROVISIONAL.gpx`); track('gpx_exported'); });
         card.append(facts, select, save); cards.append(card);

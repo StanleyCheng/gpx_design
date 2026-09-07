@@ -61,6 +61,20 @@ test('shortest route uses a slightly farther snap instead of a connected long de
   assert.ok(route.edges.every(edge => edge.way === 20));
 });
 
+test('closer in-tolerance snaps win over a slightly shorter route past farther snaps', () => {
+  // Way 10 passes exactly through both pins but is ~18 m longer per leg than
+  // the parallel way 20, which runs ~11 m from each pin. Passing through the
+  // pins is worth that small detour: offset metres cost 10× walking metres.
+  const data = { elements: [node(1, 22.0001, 114.001), node(2, 22.0001, 114.003), node(5, 22.0005, 114.002),
+    node(3, 22, 114.001), node(4, 22, 114.003),
+    way(10, [1, 5, 2]), way(20, [3, 4])
+  ] };
+  const points = [data.elements[0], data.elements[1]];
+  const snaps = R.snapWaypoints(R.buildGraph(data), points, 15, true);
+  assert.deepEqual(snaps.map(snap => snap.id), [1, 2], 'the route passes through both pins despite the marginally longer path');
+  assert.ok(snaps.every(snap => snap.metres < 0.1));
+});
+
 test('loop snap selection includes directed return cost before choosing the final snap', () => {
   const data = { elements: [node(1, 22, 114), node(2, 22, 114.002), node(3, 22.0001, 114.002), node(4, 22.01, 114.002), node(5, 22.001, 114.001),
     way(10, [1, 2, 4, 1], { 'oneway:foot': 'yes' }), way(20, [1, 5, 3])
